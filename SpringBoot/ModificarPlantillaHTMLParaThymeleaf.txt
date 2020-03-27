@@ -1,0 +1,1 @@
+window->preferences->web->editor->templates->name new html file (5) edit ahi hat que agregar el namespace y listo, va a estar disponible en futuras plantillas de html

@@ -1,0 +1,26 @@
+El DispatcherServlet es un Servlet (extends HttpServlet). Es un minicontrolador.
+Al iniciar la app springMVC, buscará el archivo web.xml en el directorio WEB-INF. Este archivo contiene todas las configuraciones para la web, por lo que debemos
+referir en él el DispatcherServlet (cuyo nombre es springmvc) , agregando:
+
+<servlet>
+<servlet-name>springmvc</servlet-name>
+<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+<load-on-startup>1</load-on-startup>
+</servlet>
+<servlet-mapping>
+<servlet-name>springmvc</servlet-name>
+<url-pattern>*.html</url-pattern>
+</servlet-mapping>
+
+De esta forma la app es dirigida hacia el DispatcherServlet.
+
+Un context se define como el entorno de ejecución compuesto por varios componentes (variables de entorno, variables de
+instancia, estado de las clases, alcance de objetos, sesiones) para una aplicación en particular.
+Ejemplos:
+• En una aplicación Java Web EE existe el ServletContext que representa en entorno de ejecución para una
+aplicación web dentro del contenedor (Apache Tomcat).
+• En una aplicación desarrollada con Spring existe el AppcationContext que representa el nucleo de una
+aplicación (Beans) dentro del contenedor de Spring.
+
+Recordar que la linea <servlet-name>springmvc</servlet-name> en el archivo web.xml es un tipo de context para la web (en este caso el context es llamado WebAplicationContext).
+

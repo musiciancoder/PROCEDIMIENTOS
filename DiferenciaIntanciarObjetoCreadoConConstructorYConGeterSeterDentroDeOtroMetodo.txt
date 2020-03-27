@@ -1,0 +1,31 @@
+1. /*CON CONSTRUCTOR*/
+
+
+	}
+ public String metodo(Model model);{
+Vacante vacante = new Vacante (1,"Ingeniero de sistemas", "Ingeniero junior", null,9700.0) ; 
+model.addAttribute("vacante", vacante);
+}
+
+2./*CON SETTER Y GETTER A */
+ public String metodo (Model model){
+		
+		Vacante vacante = new Vacante () ;
+		vacante.setId(1);
+		vacante.setNombre("Ingeniero de sistemas");
+		vacante.setDescripcion("Ingeniero junior");
+		vacante.setFecha(null);
+		vacante.setSalario(9700.0);
+		model.addAttribute("vacante", vacante);
+}
+
+3./*CON SETTER Y GETTER B */
+     public String metodo (Model model, Vacante vacante){
+		vacante.setId(1);
+		vacante.setNombre("Ingeniero de sistemas");
+		vacante.setDescripcion("Ingeniero junior");
+		vacante.setFecha(null);
+		vacante.setSalario(9700.0);
+		model.addAttribute("vacante", vacante);
+}
+

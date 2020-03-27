@@ -1,0 +1,18 @@
+//HOISTING
+
+var es hoisted al comienzo del codigo solo para la declaracion, pero no para la inicializacion;
+let no es hoisted nunca para la declaracion;
+
+//FUNCIONES
+
+const se declara e inicializa en la misma linea (fuera de la funcion o dentro de ella), sino marca error. No se puede modificar su valor nunca.
+al declarar una variable dentro de una funcion, ya sea con const, let o var, esta variable solo tiene valor local, y no puede ser accedida desde fuera de la funcion.
+si inicializo una variable dentro de una funcion (esto es, sin usar const var o let), esta variable será global y podrá ser accedida fuera de la funcion
+si defino un var o un let fuera de una funcion, yo puedo inicializarlas dentro de la funcion, o bien modificar su valor en la funcion sin problemas.
+
+//LLaves if, for, etc.
+si defino dentro de las llaves una variable con const o let, fuera de las llaves no tengo acceso a ellas desde fuera; si defino dentro de las llaves una variable con var, entonces SÍ tendré acceso a ellas desde fuera.
+si inicializo una variable dentro de unas llaves (esto es, sin usar const var o let), esta variable será global y podrá ser accedida fuera de las llaves.
+si defino un var o un let fuera de unas llaves, yo puedo inicializarlas dentro de las llaves, o bien modificar su valor en la funcion sin problemas.
+si dentro de las llaves intento inicializar o modificar una variable usando dentro de las llaves let, esta variable tomara un comportamiento de variable local, no modificará el valor de afuera de las llaves
+si dentro de las llaves intento inicializar o modificar una variable usando dentro de las llaves var, esta variable tomara un comportamiento de variable global, y sí modificará el valor de afuera de las llaves

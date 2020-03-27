@@ -1,0 +1,12 @@
+Dos casos de errores:
+1. Error en tiempo de compilacion (normalmente errores de sintaxis)
+2.Error en tiempo de ejecución 
+2.1. Error controlado: de tipo IOException, por ejemplo para subir un archivo. No dependen del programador. Cuando se ejecuta un método tipo throws IOException, siempre debe
+ obligatoriamente estar bajo un try catch.
+ 2.2. Error no controlado. de tipo RuntimeException u otra clase de error que hereda de RuntimeException(como NullPointerException, por ejemplo). Corresponde al programador mejorar el código.
+ Acá no estamos obligados a un try catch, si bien igual se puede crear un try catch para que el programa no se caiga si da este tipo de error al crear un médodo que tiene problemas.
+ Para esto al declarar el método, escribimos: public nombreMetodo throws NullPointerException , y al ejecutar el método lo rodeamos por un try {nombreMetodo} catch (NullPointerException e){system.out...}
+ Con throws, el programa podria generar un error, pero con throw nosotros le pedimos al programa intencionalmente que genere si o si un error. 
+ Ejemplo: if (algoPasa){ throw new EOFException. (EOFException hereda de IOException, mas con un hijo de RuntimeException tambien se puede.
+ Si por ejemplo EOFException o ninguna otra clase de error de java grafica el tipo de error que queremos capturar, tambien es posible crear nuestros propias clases de errores con class nombreError extends Exception (puede extender RuuntimeException tb, y entonces no necesitariamos del try catch al ejecutar el metodo)
+ con los constructores public nombreError(){} y public nombreError(String mensaje){ system.out.print ("el error es :" + mensaje); e.printStackTrace;} capturamos el error. 

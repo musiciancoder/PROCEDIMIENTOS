@@ -1,0 +1,7 @@
+1.Abrir wamp
+2.click izquierdo sobre icono->mysql->mysqlconsole
+3.user:root; password(no tiene)
+
+para mariaDB:
+2.click izquierdo sobre icono->mariaDB->mariaDBconsole
+3.user:root; password(no tiene)

@@ -1,0 +1,6 @@
+1. Ir a la url https://start.spring.io/  y seleccionar las dependencias (Ivan solo selecciono SpringWeb). Al seleccionar la version, al dia 23/03/2020 la version 2.1.13 
+era la que funcionaba, porque con versiones mas nuevas da un error tipo "no se puede encontrar la clase principal". Presionar generate para crear archivo zip
+2.Descomprimir el archivo zip en el workspace e importarlo con import->mavenProyect->Existing MavenProject->Seleccionar carpeta q hemos descomprimido->finish. Esperar unos cinco minutos para q se genere el proyecto.
+3.Probar el proyecto en el IDE con SpringDashBoard (hexagono verde)->start
+
+ESTO NOS PERMITE AHORRARNOS LA CONFIGURACION DE LOS XML DE OTROS FRAMEWORKS (SPRING MVC, JAVA EE, ETC)

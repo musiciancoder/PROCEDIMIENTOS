@@ -1,0 +1,161 @@
+
+Andres@LAPTOP-0JOL34HF ~
+$ git --version
+git version 2.21.0
+
+
+---crear usuario---
+Andres@LAPTOP-0JOL34HF ~
+$ git config --global user.name "Andres"
+
+Andres@LAPTOP-0JOL34HF ~
+$ git config --global user.email "andresguitarra1980@gmail.com"
+
+
+
+
+
+Andres@LAPTOP-0JOL34HF ~
+$ git config --list
+user.name=Andres
+user.email=<andresguitarra1980@gmail.com>
+
+
+-------------------------------
+
+
+--------crear repositorios-----------------
+Andres@LAPTOP-0JOL34HF ~
+$ git --help init: ve lo que hace init en el manual de ayuda
+
+
+
+ llegar a directorio en linux: cd C:/Users/Andres/Documents/miproyectoweb  RAYAS ADELANTE!!! EN WINDOWS RAYAS HACIA ATRAS!!!
+
+inicializar repositorio (se debe estar ubicado en la carpeta de interes): git init
+
+ls -la : ver archivos y archivos ocultos (ya que .git es un directorio oculto)
+
+--clonar proyecto-----
+
+git  clone ./miproyectoweb/ proyectoclonado (en mi computador; debemos ponernos en la carpeta anterior para hacer esto (la carpeta que contiene a miproyectoweb)
+
+git  clone urlEnGithub proyectoclonado     (clonar un proyecto desde github a mi computador)
+
+
+
+------------------------------------agregar archivos a un commit---------
+
+git status (para ver cuales archivos estan o no agregados a un commit)
+git add nombrearchivo  para agregar archivos a un commit
+Si modificamos un archivo y escribimos git status, va a aparecer con rojo los cambios no agregados al commit de git (aunque si guardados con el editor de texto)
+con git diff nombredearchivo muestra los cambios en el archivo (esto debe hacerce antes de agregar los cambios al commit con git add nombrearchivo)
+
+--------------------------------para guardar un commit en la rama master-------
+1. agregar los archivos a un commit
+2.escribir git commit -m "Comentarios del commit"
+Una vez hecho esto si escribimos git status va a salir "On branch Manager", nothing to commit working directory clean
+
+git log   (para ver el commit en la rama master)
+git log --oneline para ver el código del commit
+
+$ git commit -am "Algun comentario de la modificacion" (esto es para guardar directamente algun cambio en el archivo en la rama principal sin tener que hacer git add.
+
+luego se puede ver las diferencias en lo que se ha guardado en la rama con $ git diff codigocambio1 codigocambio2  (con git log --oneline se averiguan los cambios).
+
+Volver atras en archivo agregado (con add) pero no comiteado (con commit) : git reset nombredearchivo (lo saca de add, pero no lo modifica en editor de texto); git checkout nombredearchivo (lo saca de add, y ademas lo modifica en editor de texto;
+
+
+-----------------------------eliminar y deshacer un commit------------------
+ git log --oneline para saber las claves de los commit
+git reset --hard claveDeCommitAEliminar elimina ese commit (no se vuelve al estado anterior a add, sino que lo elimina)
+
+
+---------------------------abrir un commit anterior--------------------------
+cerrar el archivo, escribir git checkout codigoCommit (en este caso fb0a834), entonce se cambiará el HEAD al que nos interesa y al abrir el archivo en la ventana de windows aparecera con los cambios.
+
+Luego de lo anterior, 
+Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
+$ git branch rama20 fb0a834
+
+Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
+$ git status
+HEAD desacoplada en fb0a834
+nada para hacer commit, el árbol de trabajo está limpio
+
+Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
+$ git checkout rama20
+Cambiado a rama 'rama20'
+
+Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
+$ git status
+En la rama rama20
+nada para hacer commit, el árbol de trabajo está limpio
+
+Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
+$ git log --oneline
+fb0a834 (HEAD -> rama20) video 79 bueno, con plantilla arreglada por mi
+32cfe65 (rama15) video 79
+3086b04 video 78
+0f90ed1 video 77
+d0d2935 video 76
+
+PARA SUBIR LA RAMA Q HEMOS CREADO EN LOCAL A REMOTO: git push -u origin rama20
+
+
+ 
+git reset HEAD~1 vuelve atras el ultimo commit, git reset HEAD~2 vuelve atras el penultimo commit, etc. Al darle git status aparecera en rojo, es decir en el estado anterior a add. Los archivos se podrán volver atras en el editor (pregunta si o no en el mismo editor)
+
+---------------------Buscar commit-------------
+$ git log --grep=palabraencomentario : busca segun el titulo/comentario
+$ git log -S 'textoaBuscar' : busca un texto al interior de los archivos
+
+ver un commit git show codigoCommit
+
+
+
+---------------------------ramas---------------------
+Una vez que se hace add a un archivo (pero no commit) no se ve nada en ninguna rama.m Si hacemos git stash guarda en estado add (pero no commit) en la rama que nos encontramos
+crear nueva rama a partir de un comit ya existente en rama master: git branch nombreRama codigoDeAlgunCommitDeRamaMaster 
+ver ramas: git branch (en blanco saldra la rama en la que estamos trabajando)
+crear nueva rama desde cero:git branch nombreRama
+pasar de una rama a otra rama: git checkout nombreDeOtraRama
+eliminar ramas:  git branch -d nombreDeRama
+pasar unaRama a la rama master: git merge unaRama  (esto debe hacerse estando parado en la rama master con branch checkout master)
+
+-----------------------
+
+
+---------------------github------------------
+para subir archivos.
+NO HACER NADA EN LOCAL, PRIMERO SE INICIA EL REPOSITORIO EN REMOTO, SIN README.md
+1.crear el repositorio en github con nombrerepositorio sin README.md
+2. en git escribir los comandos para conectar remotamente:
+echo "# nombrerepositorio" >> README.md
+git init (aca se inicia en local el archivo.git)
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/musiciancoder/nombrerepositorio.git
+git push -u origin master
+
+luego intentar un cambio pequeño y guardarlo en local con git add* , luego git commit -m"primer cambio"
+
+Finalmente guardar este cambio en remoto: con git push origin master
+
+para bajar archivos
+1.crear algun archivo en github (y obviamente guardar los cambios en github)
+2.escribir git fetch --all (entonces me guarda los archivos en local)
+3.para guardar algun cambio desde remoto a local: con git pull origin master
+
+
+
+
+  f33538f video 97 bueno
+
+
+
+
+
+
+
+
