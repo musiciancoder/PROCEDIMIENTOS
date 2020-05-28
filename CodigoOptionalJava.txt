@@ -1,0 +1,7 @@
+	public Categoria buscarPorId(Integer idCategoria) {
+		Optional <Categoria> optional= categoriasRepo.findById(idCategoria);
+		if (optional.isPresent()) {
+			return optional.get();
+		}
+		return null;
+	}

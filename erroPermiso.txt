@@ -1,0 +1,9 @@
+Installation of Chocolatey to default folder requires Administrative permissions. Please run from elevated prompt.
+Please see https://chocolatey.org/install for details and alternatives if needing to install as a non-administrator.
+En C:\Users\Andres\AppData\Local\Temp\chocolatey\chocInstall\tools\chocolateysetup.psm1: 212 Carácter: 5
++     throw "Installation of Chocolatey to default folder requires Admi ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Installation of...-administrator.:String) [], RuntimeException
+    + FullyQualifiedErrorId : Installation of Chocolatey to default folder requires Administrative permissions. Please
+    run from elevated prompt. Please see https://chocolatey.org/install for details and alternatives if needing to in
+  stall as a non-administrator.

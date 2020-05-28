@@ -1,3 +1,6 @@
+VOLVER A LA LINEA DE COMANDOS: FLECHA ARRIBA (TECLA ENTRE CTRL Y BLOQ MAYUS Y LETRA "Q" AL MISMO TIEMPO)
+
+
 
 Andres@LAPTOP-0JOL34HF ~
 $ git --version
@@ -57,7 +60,7 @@ con git diff nombredearchivo muestra los cambios en el archivo (esto debe hacerc
 Una vez hecho esto si escribimos git status va a salir "On branch Manager", nothing to commit working directory clean
 
 git log   (para ver el commit en la rama master)
-git log --oneline para ver el código del commit
+git log --oneline para ver el cï¿½digo del commit
 
 $ git commit -am "Algun comentario de la modificacion" (esto es para guardar directamente algun cambio en el archivo en la rama principal sin tener que hacer git add.
 
@@ -72,7 +75,7 @@ git reset --hard claveDeCommitAEliminar elimina ese commit (no se vuelve al esta
 
 
 ---------------------------abrir un commit anterior--------------------------
-cerrar el archivo, escribir git checkout codigoCommit (en este caso fb0a834), entonce se cambiará el HEAD al que nos interesa y al abrir el archivo en la ventana de windows aparecera con los cambios.
+cerrar el archivo, cerrar el servidor y escribir escribir git checkout codigoCommit (en este caso fb0a834), entonce se cambiarï¿½ el HEAD al que nos interesa y al abrir el archivo en la ventana de windows aparecera con los cambios.
 
 Luego de lo anterior, 
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
@@ -81,7 +84,7 @@ $ git branch rama20 fb0a834
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
 $ git status
 HEAD desacoplada en fb0a834
-nada para hacer commit, el árbol de trabajo está limpio
+nada para hacer commit, el ï¿½rbol de trabajo estï¿½ limpio
 
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
 $ git checkout rama20
@@ -90,7 +93,7 @@ Cambiado a rama 'rama20'
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
 $ git status
 En la rama rama20
-nada para hacer commit, el árbol de trabajo está limpio
+nada para hacer commit, el ï¿½rbol de trabajo estï¿½ limpio
 
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
 $ git log --oneline
@@ -104,7 +107,7 @@ PARA SUBIR LA RAMA Q HEMOS CREADO EN LOCAL A REMOTO: git push -u origin rama20
 
 
  
-git reset HEAD~1 vuelve atras el ultimo commit, git reset HEAD~2 vuelve atras el penultimo commit, etc. Al darle git status aparecera en rojo, es decir en el estado anterior a add. Los archivos se podrán volver atras en el editor (pregunta si o no en el mismo editor)
+git reset HEAD~1 vuelve atras el ultimo commit, git reset HEAD~2 vuelve atras el penultimo commit, etc. Al darle git status aparecera en rojo, es decir en el estado anterior a add. Los archivos se podrï¿½n volver atras en el editor (pregunta si o no en el mismo editor)
 
 ---------------------Buscar commit-------------
 $ git log --grep=palabraencomentario : busca segun el titulo/comentario
@@ -138,7 +141,7 @@ git commit -m "first commit"
 git remote add origin https://github.com/musiciancoder/nombrerepositorio.git
 git push -u origin master
 
-luego intentar un cambio pequeño y guardarlo en local con git add* , luego git commit -m"primer cambio"
+luego intentar un cambio pequeï¿½o y guardarlo en local con git add* , luego git commit -m"primer cambio"
 
 Finalmente guardar este cambio en remoto: con git push origin master
 

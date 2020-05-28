@@ -1,2 +1,0 @@
-File->Import->General->Existing project into workspace.
-En la siguiente pantalla solo seleccionar el directorio donde tenemos el proyecto, click en aceptar y click en finish

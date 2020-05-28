@@ -1,0 +1,16 @@
+1. java.lang.ClassNotFoundException: org.springframework.web.context.ContextLoaderListener
+
+I had a similar problem when running a spring web application in an Eclipse managed tomcat. I solved this problem by adding maven dependencies in the project's web deployment assembly.
+
+Open the project's properties (e.g., right-click on the project's name in the project explorer and select "Properties").
+Select "Deployment Assembly".
+Click the "Add..." button on the right margin.
+Select "Java Build Path Entries" from the menu of Directive Type and click "Next".
+Select "Maven Dependencies" from the Java Build Path Entries menu and click "Finish".
+You should see "Maven Dependencies" added to the Web Deployment Assembly definition.
+
+
+
+2. org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'contactoController': Unsatisfied dependency expressed through field 'servicePeliculas'; nested exception is org.springframework.beans.factory.NoUniqueBeanDefinitionException: No qualifying bean of type 'net.itinajero.app.service.IPeliculasService' available: expected single matching bean but found 2: peliculasServiceImpl,peliculasServiceJPA
+
+Error porque Spring es singleton y hay dos clases q implementan una interfaz. Se soluciona con agregar @Primary en la clase que a mi me interesa o borrando @Service

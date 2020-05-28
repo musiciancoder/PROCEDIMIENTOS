@@ -1,0 +1,66 @@
+actualizar e instalar paquetes para poder usar la consola ubuntu: sudo apt-get update
+ir a carpeta exacta: cd /nombrecarpeta/
+mostrar lo que hay en la carpeta: ls
+mostrar lo que hay en la carpeta como lista: ls -l (dir en windows)
+mostrar donde estoy parado: pwd
+descomprimir archivo: tar xvf nombrecarpeta
+abrir archivo: nano nombrearchivo
+ctrl+o :guardar en archivo
+ctrl+x: salir de archivo
+verificar lo que hay en el archivo archivo: source /etc/profile
+iniciar servidor: ./startup.sh (desde carpeta bin)
+detener servidor: ./shutdown.sh (desde carpeta bin)
+cd .. vuelve un directorio atras (no olvidar el espacio entre cd y los puntos!)
+tail -f nombredearchivo: muestra las ultimas lineas que han sido visualizadas ese archivo
+instalar: apt-get install mysql-server (en este caso va a instalar mysql en el servidor)
+ingresar a mysql: mysql -u root -p (usuario root y password a escribir a continuacion)
+salir mysql: exit
+crear directorio: mkdir nombrearchivo
+copiar un archivo de un directorio a otro: cp -r webapps/manager/ puntoventa_webapps/
+ufw allow 80 : habilitar puerto 80
+ufw status verbose : cuantos puerto hay habilitados
+/etc/apache2/sites-available/ad80.info.conf
+/opt/apache-tomcat-8.5.47
+/var/www/html/ad80.info/public_html
+rm nombredirectorio: borra directorio (si el directorio no esta vacio no lo borra)
+ rm -rf probando :borra directorios no vacios, incluyendo todos los archivos contenidos en el
+del nombrearchivo: borra archivo
+copiar archivos en windows (desde la ruta de archivo a copiar): copy nombrearchivo rutarelativa\copianombrearchivo (barra invertida!!)
+en windows tecla tab (flechas) sirve para autocompletar
+en windows ipconfig: informacion acerca de mi coneccion de red
+en windows y linux:help: da todos los vomandos en windos
+git --version: qué version de git tengo
+time: da la hora
+help nombredelcomando: te dice para que sirve ese comando
+tasklist: muestra todas las tareas en ejecucion
+TASKKILL /IM notepad.exe  forzar el cierre de una tarea en ejecucion (notepad.exe, por ejemplo)
+find "cadenadetexto" *.txt  : Encuentra una cadena de texto en el archivo .txt (puede ser en cualquer extension) , ya sea en el nombre del archivo o en el interior de él. BUSCA SOLO EN LOS ARCHIVOS SUELTOS DE LA CARPETA, NO EN LOS ARCHIVOS QUE SE ENCUENTRAN EN SUBCARPETAS!!
+mostrar archivo de texto en windows: more archivo.txt
+history : muestra todos los comandos recientemente usados
+clear limpia pantalla
+nano nombrearchivo.txt: crear archivo texto
+linux: mv unacarpeta/archivo.txt otracarpeta :mueve archivo.txt desde unacarpeta a otracarpeta (hay que escribir las rutas relativas de las carpetas)
+df -h: particiones y espacio disponible en discoduro
+du -h /rutacarpeta muestra cuanto espacio ocupa lacarpeta
+useradd -u 0 -o -g 0 nombreusuario crea un usuario nuevo
+passwd nombreusuario (enter) para asignar password
+ cat etc/passwd : muestra todos los usuarios
+ls -lh: ver permisos para los archivos de la carpeta en que nos encontramos
+-rw-r--r-- permiso de root: rw-;permiso de grupo:r--;permiso de resto de usuarios:r--. 
+chmod 700 nombrearchivo: el root tiene todos los permisos, grupo ningun permiso, resto de usuarios ningun permiso
+stat nombrearchivo: muestra estadistics del archivo
+ver todos los software instalados: dpkg --get-selections
+instalar software (paquetes) :sudo install apt.get nombredelpaquete sudo executes your actions as the root user, so you don't get privilege problems, same as entering your password when installing something off the Software Center. apt-get is what you are executing - the program, if you will, which handles apt files and most installation. install is the argument for the execution, telling it to install something, and then aptitude is the package name which you are installing.
+desinstalar: sudo apt-get --purge remove nombredelprogramaadesinstalar. Tambien se puede usar  sudo apt-get -- remove nombredelprogramaadesinstalar
+ps -ef: para ver todos los procesos que estan en ejecucion
+kill numerodePID (el PID es el numero que encontramos al lado de cada proceso con el comando ps -ef)
+ sort /etc/passwd : archivo ordenado alfabeticamente (en este caso el archivo passwd)
+tail -n 3  /etc/passwd: muestra las tres (-n 3) ultimas lineas del archivo 
+head -n 6  /etc/passwd: muestra las seis (-n 3) primeras lineas del archivo 
+wc /etc/passwd: cuantas lineas tiene
+grep palabraabuscar /etc/passwd : busca palabraabuscar al interior de passwd
+grep -c palabraabuscar /etc/* : numero de coincidencias de la palabraabuscar en cada archivo de *
+find / -name public_html :encuentra desde la raiz en cualquier subcarpeta el nombre de archivo public_html
+find / -name '*.txt' -exec grep 'palabraabuscar' {} \; -print  : busca cualquier palabra al interior de cualquier archivo en cualquier subcarpeta desde la raiz
+ifconfig: informacion ubuntu basica
+copiar directorio: estando en el directorio q contiene el archivo a copiar: cp -r nombreCarpetaACopiar rutaDondeQuieroCopiar

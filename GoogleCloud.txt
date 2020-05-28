@@ -1,0 +1,2 @@
+gcloud config set project rest-courses-and-students
+gcloud config list
