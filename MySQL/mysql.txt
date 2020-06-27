@@ -6,6 +6,8 @@ password:Drooko2019.
 
 http://g2pc1.bu.edu/~qzpeng/manual/MySQL%20Commands.htm
 
+EN GOOGLE CLOUD: gcloud sql connect coursesstudents --user=segundousuario
+
 Description	Command
 To login (from unix shell) use -h only if needed.	[mysql dir]/bin/mysql -h hostname -u root -p
 Create a database on the sql server.	create database [databasename];

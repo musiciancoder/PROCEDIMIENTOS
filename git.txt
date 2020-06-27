@@ -151,6 +151,8 @@ para bajar archivos
 3.para guardar algun cambio desde remoto a local: con git pull origin master
 
 
+DECCARTAR CAMBIOS EN UN ARCHIVO: git restore ruta absoluta del archivo
+
 
 
   f33538f video 97 bueno

@@ -1,0 +1,13 @@
+node -v : version
+npm install -g nombredeprograma: instalar programa
+npm install -g typescript
+npm install -g @angular/cli
+ng new nombredelproyecto: crea proyecto
+ng serve -o: para abrir en local (localhost 4200). En webstorm no es necesario, solo
+ con apretar el boton play y esperar un buen rato se hace correr.
+ng g c nombreComponente: crea todo el componente (con html y css incluidos). Debe hacerse no en la carpeta src, sino en la carpeta principal de mas arriba (donde se guarda git)
+(esto se hace desde una carpeta de un componente antiguo) ng g c nombreNuevoComponente/form --flat: Para crear un componente dentro de un directorio de otro componente antiguo (video45)
+ng g class nombreClase: crear una clase 
+ng g service nombreClaseServicio: crear clase servicio
+
+ng g c clientes/form --flat

@@ -1,0 +1,65 @@
+DROP TABLE IF EXISTS `courses`;
+CREATE TABLE IF NOT EXISTS `courses` (
+  `code` int(4) NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) NOT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `courses`
+--
+
+INSERT INTO `courses` (`code`, `name`) VALUES
+(1, 'Advanced Portuguese'),
+(2, 'Intermediate Spanish'),
+(5, 'Beginner Italian'),
+(7, 'Beginner French'),
+(8, 'Intermediate English'),
+(9, 'Intermediate German'),
+(10, 'Beginner German'),
+(11, 'Advanced German');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `students`
+--
+
+DROP TABLE IF EXISTS `students`;
+CREATE TABLE IF NOT EXISTS `students` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `rut` varchar(15) NOT NULL,
+  `name` varchar(30) NOT NULL,
+  `lastname` varchar(30) NOT NULL,
+  `age` int(3) NOT NULL,
+  `code` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_students_courses1_idx` (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `students`
+--
+
+INSERT INTO `students` (`id`, `rut`, `name`, `lastname`, `age`, `code`) VALUES
+(1, '17.241.567-k', 'David', 'Beckham', 45, 2),
+(2, '12.567.768-k', 'Marcelo', 'Salas', 45, 5),
+(3, '11.456.786-2', 'Ivan', 'Zamorano', 53, 5),
+(4, '8.241.567-2', 'Elias', 'Figueroa', 72, 1),
+(5, '16.289.335-1', 'Jorge', 'Valdivia', 72, 1),
+(7, '17.455.375-k', 'Mauricio', 'Isla', 30, 7);
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `students`
+--
+ALTER TABLE `students`
+  ADD CONSTRAINT `fk_students_courses1` FOREIGN KEY (`code`) REFERENCES `courses` (`code`);
+
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

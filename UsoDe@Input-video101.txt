@@ -1,0 +1,6 @@
+Para mostrar un cliente seleccionado arriba de la lista de clientes:
+1. Escribir el selector del componente hijo en el padre.
+2. Escribir el @Input de la propiedad que nos interesa traspasar en tsd del hijo.
+3.Con un click en el html del padre seleccionar un metodo a crear.
+4.Crear en el .ts del padre el metodo en el paso anterior, con objeto de pasar como parametro la propiedad de interes this.clienteSeleccionado = cliente 
+5.En el selector del hijo (en el html del padre) escribir  algo tipo *ngIf="clienteSeleccionado"  [cliente]="clienteSeleccionado", para que aparezca en forma condicional el selector
