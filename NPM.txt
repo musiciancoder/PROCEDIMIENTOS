@@ -10,4 +10,5 @@ ng g c nombreComponente: crea todo el componente (con html y css incluidos). Deb
 ng g class nombreClase: crear una clase 
 ng g service nombreClaseServicio: crear clase servicio
 
-ng g c clientes/form --flat
+ng g c clientes/form --flat: crear directorio clientes con componente form adentro de él
+

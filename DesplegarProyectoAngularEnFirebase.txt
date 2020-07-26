@@ -1,0 +1,10 @@
+1. En la carpeta principal del proyecto, desde consola preparar el despliegue con: ng build --prod , con esto se crea la carpeta dist en el proyecto.
+2. En el src/app del proyecto crear carpeta config. Esta carpeta solo debe tener el archivo config.ts con una variable que contenga la URL del backend.
+3. Cambiar en cada archivo de nuestro proyecto la variable del backend, desde local a remoto (la variable que creamos en el paso 2).
+4. En la carpeta dist crear carpeta public, y cortar y pegar todo el contenido de la carpeta dist a public.
+5. Luego instalamos firebase en la carpeta global del proyecto con npm install -g firebase-tools e iniciamos sesión con firebase login.
+6.Entramos a carpeta dist con cd dist, y creamos el repositorio de firebase, con comando firebase init, luego seleccionamos la alternativa "Hosting" (con las flechas nos movemos arriba abajo, con space seleccionamos y con return confirmamos).
+7.Luego en la consola da la opción para crear el proyecto, lo creamos (se puede hacer desde consola o desde el sitio web de firebase). 
+8.Desde carpeta dist, con  el comando firebase use --add asociamos nestra carpeta firebase de nuestro proyecto local con el proyecto en remoto que acabamos de crear.
+9.Desplegar con comando firebase deploy. 
+
