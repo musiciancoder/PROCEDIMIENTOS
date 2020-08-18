@@ -12,3 +12,20 @@ ng g service nombreClaseServicio: crear clase servicio
 
 ng g c clientes/form --flat: crear directorio clientes con componente form adentro de él
 
+
+REACT
+
+npx create-react-app: nombreProyecto
+npm start: iniciar
+npm install react-router-dom
+npm install axios
+npm i react-transition-group:animaciones
+
+Node
+npm init: genera package json
+npm -D nodemon: cada vez que haya un cambio va a reiniciar el servidor. Ademas crea carpeta node_modules
+npm i mongoose express dotenv: mongoose es la BBDD, express es el servidor, dotenv maneja variables de entorno (variables q en desarrollos son unas y en produccion son otras)
+
+
+
+

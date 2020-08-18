@@ -1,0 +1,7 @@
+Encontrar puerto activo netstat: -ano | findstr :numeroDePuerto
+Encontrar procesos activos: tasklist
+Matar un proceso: C:\>TASKKILL /F /IM node.exe /T (Donde node.exe seria el proceso a matar)
+
+
+Hola, te envío los archivos, para que por favor los revises.
+Probé con los archivos de proyecos que tu proporcionas y me da el mismo error.

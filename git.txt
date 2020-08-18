@@ -158,6 +158,16 @@ DECCARTAR CAMBIOS EN UN ARCHIVO: git restore ruta absoluta del archivo
   f33538f video 97 bueno
 
 
+CLONAR DESDE GITHUB
+
+Crear una carpeta cualquiera
+Copiar el link del proyecto en github
+Ingresar por consola a la carpeta creada y escribir: git clone linkDelProyecto
+
+Nueva rama remota:
+ git push --set-upstream origin branch2
+
+
 
 
 

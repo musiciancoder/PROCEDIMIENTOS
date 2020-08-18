@@ -1,0 +1,48 @@
+*Que la informacion se vea en un input: [value]="object.title"
+*Función evento : (click)="nombreFuncion()"   obien (keyup)="onKeyUp()"
+*Nombrar un Input: para ser llamado por este nombre #titleInput (puede ser cualquier nombre e vez de titleInput)
+
+<input (keyup)="onKeyUp(titleInput.value)"
+[value]="data.title" #titleInput>
+
+En el componente: onKeyUp(newTitle:string){
+this.data.title=newTitle;
+}
+
+https://angular-university.io/lesson/angular-beginners-component-inputs
+*Pasar una variable entre componentes: con export/import{Variable} from 'ubicacion archivo'. 
+IMPORTANTE: Luego de importar, se debe asignar una variable en el archivo que importa a la variable importada.
+
+https://angular-university.io/lesson/angular-beginners-component-inputs
+*Pasar una variable desde componentepadre a componentehijo (similar a props en React)
+
+En componentepadre.html tenemos:
+
+<componentehijo [title]="algo"></componentehijo>
+
+En componentehijo.ts tenemos:
+@Input()
+title:string;
+
+En componentehijo.html tenemos:
+<div>{{title}}</div>
+
+
+https://angular-university.io/lesson/angular-beginners-component-outputs
+*Para pasar un evento al componente padre al hacer click en el componente hijo:
+En componentehijo.ts tenemos:
+@Output()
+
+*NgFor, NgIf ver pantallazos
+
+*Renderizar imagenes de array: <img [src]="array.imagen">
+
+https://angular-university.io/lesson/angular-beginners-ngclass
+*Dar estilo en forma dinámica: [NgClass]; Dar estilo en forma estática: con <div class=""></div> o bien con [ngStyle]
+
+*Un valor que toma varios valores, renderizarlos en forma dinámica: [NgSwitch] en div padre; *ngSwitchCase en div hijos (similar al switch de javascript)
+
+https://angular-university.io/lesson/angular-beginners-pipes
+*Dar formato a fechas, numeros, strings, etc. que estan siendo renderizados dinámicamente en etiquetas div: Con AngularBuilt-In-Pipes
+
+

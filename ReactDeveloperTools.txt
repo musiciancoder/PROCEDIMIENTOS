@@ -1,0 +1,7 @@
+RDT
+
+No olvidar usar la lupa para buscar un componente, es mas rapido
+
+En <NombreState> se puede ver el estado inicial.
+En <ContextProvider> se puede ver todo lo que pasamos como values en NombreState y ademas el estado inicial.
+En <NombreComponente que tiene useContext> se puede ver los valores de values que recuperamos con useContext y el state local si hemos usado useState o useEffect
