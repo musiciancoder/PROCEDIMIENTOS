@@ -1,6 +1,7 @@
+ctrl+c: volver a la linea de comandos
 actualizar e instalar paquetes para poder usar la consola ubuntu: sudo apt-get update
 ir a carpeta exacta: cd /nombrecarpeta/
-mostrar lo que hay en la carpeta: ls
+mostrar lo que hay en la carpeta: ls /
 mostrar lo que hay en la carpeta como lista: ls -l (dir en windows)
 mostrar donde estoy parado: pwd
 descomprimir archivo: tar xvf nombrecarpeta
@@ -64,3 +65,34 @@ find / -name public_html :encuentra desde la raiz en cualquier subcarpeta el nom
 find / -name '*.txt' -exec grep 'palabraabuscar' {} \; -print  : busca cualquier palabra al interior de cualquier archivo en cualquier subcarpeta desde la raiz
 ifconfig: informacion ubuntu basica
 copiar directorio: estando en el directorio q contiene el archivo a copiar: cp -r nombreCarpetaACopiar rutaDondeQuieroCopiar
+
+Hindú
+ls / listar archivos
+cat> myfile.txt crear archivo de texto (en la siguiente linea comenzar a escribir lo q ira dentro del archivo
+cat myfile.txt ver archivo
+ls -a ver archivos ocultos
+ls -r ver subdirectorios
+cp texto1.txt texto2.txt copiar texto a otro archivo
+mv texto1.txt otroDirectorio mover a otro directorio
+rm nombreArchivo eliminar archivo
+rm -r nombreDirectorio eliminar directorio
+yum repolist: listar repositorios
+ yum list installed: muestra los software q ya estan instalados
+yum grouplist: muestra los grupos de software instalados
+yum install nombreSoftware: instalar software
+service nombreSoftware start: comenzar el software
+yum install httpd: instalar servidor hhtp
+yum install curl: comando para modificar puerto y configurar
+curl localhost 80
+stop httpd.service: detener servicio
+yum remove nombreSoftware; desinstalar
+ tail -5 /var/log/yum.log: ver las ultimas lineas (lo q se ha instalado y lo que no)
+yum history: historial de lo instalado y desinstalado
+yum search java: todos los paquetes instalados (de java en este caso)
+
+vi editor:
+vi nombreArchivo.txt crea un archivo donde se puede escribir (es mas comodo) q cat
+editando vi nombreArchivo.txt: esto se realiza con INSERT al final del archivo. Presionar shift+I si no aparece. Esc para salir del modo edicion shift+I para entrar modo edicion; En modo comando(presionar esc) o crea otra linea; shift+e va al final del archivo, s borra caracter
+dd borra linea (modo comand)
+modo ejecutar: esc y despues shift+:  en este modo se puede guardar con wq; con q! se sale sin guardar nada; en este modo se puede buscar con /nombre de lo q se desea buscar
+

@@ -1,0 +1,4 @@
+Metodos de express()
+listen(puerto);//asignar el puerto
+get(URL,(req,res)=>{res.send("algo")})
+Router(): da las rutas

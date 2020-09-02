@@ -1,4 +1,5 @@
 node -v : version
+npm nombrearchivo run: Para correr cualquier archivo en consola
 npm install -g nombredeprograma: instalar programa
 npm install -g typescript
 npm install -g @angular/cli
@@ -21,10 +22,23 @@ npm install react-router-dom
 npm install axios
 npm i react-transition-group:animaciones
 
-Node
+
+
+
+
+Node (Juan Pablo)
 npm init: genera package json
 npm -D nodemon: cada vez que haya un cambio va a reiniciar el servidor. Ademas crea carpeta node_modules
 npm i mongoose express dotenv: mongoose es la BBDD, express es el servidor, dotenv maneja variables de entorno (variables q en desarrollos son unas y en produccion son otras)
+para generar el servidor, en package.json escribir  "scripts": {
+    "start": "node .",
+    "dev": "nodemon ."
+  },
+luego en linea comandos: npm run dev. Con esto cada vez q hay cambios se reinicia el servidor
+npm i bcryptjs: hashear password
+npm i express-validator: para validacion del usuario q estamos recibiendo
+npm i jsonwebtoken
+npm i cors
 
 
 

@@ -1,0 +1,28 @@
+sirve para generar tokens de autenticacion de usuarios en el BACKEND.
+
+El token q se genera consta de una codificacion para Headers, otra para Payload (generalmente el id de usuario) y la firma.
+
+El codigo en Node es el siguiente (va en el controlador de autenticacion):
+
+ // Crear y firmar el JWT
+        const payload = {
+            usuario: {
+                id: usuario.id //id del usuario que se está guardando
+            }
+        };
+
+        // firmar el JWT
+        jwt.sign(payload, process.env.SECRETA, {
+            expiresIn: 3600 // 1 hora
+        }, (error, token) => {
+            if(error) throw error;
+
+            // Mensaje de confirmación
+           // res.json({msg: 'Token creado con exito'});
+            res.json({ token });
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).send('Hubo un error');
+    }
