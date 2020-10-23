@@ -167,6 +167,17 @@ Ingresar por consola a la carpeta creada y escribir: git clone linkDelProyecto
 Nueva rama remota:
  git push --set-upstream origin branch2
 
+Clonar rama git clone --branch nombreRama urlProyecto    
+
+Actualizar proyecto desde rama remota
+git pull origin nombreRamaRemota hace mergin automatico
+git fetch origin nombreRamaRemota hace mergin manual
+
+
+Alguien creo otra rama y yo quiero meter esa rama en una rama local y poder verla
+git checkout --track origin/daves_branch (esto crea una rama local del mismo  nombre da la remota q queremos ver)
+
+
 
 
 

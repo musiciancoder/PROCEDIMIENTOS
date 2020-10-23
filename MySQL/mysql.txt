@@ -1,3 +1,5 @@
+Asegurarse primero q wamp esta ejecutandose
+
 Iniciar mysql en php myadmin: usuario: root
 contraseña:no tiene
 

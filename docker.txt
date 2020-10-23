@@ -1,0 +1,118 @@
+NOTA: CONTAINER E IMAGEN NO ES LO MISMO!
+
+yum install docker: instalar en linux
+docker --version: cersion
+service docker start : iniciar
+docker info : mostrar informacion sobre containers
+docker run --help : mostrar comandos
+service docker start: comenzar el docker daemon
+docker images muestra las imagenes
+docker run hello-world   corre la imagen hello-world (viene por defecto con docker daemon)
+docker exec -it imageName bash :  Esto permite correr comandos desde el interior del container docker. Con comando exit se sale del container y se vuelve a linux
+docker pull imageName (ejemplo docker pull mysql 5.7) : extrae la imagen imageName. Solo la extrae, para correr es siempre con docker run
+history: ultimos comandos
+docker run -i -d -t -p 80:80 nginx(i interact dentro del container d detach perno no dentro de el desde linea de comandos t terminal p port, el primer 80 es de maquina local o de linux nginx nombre de la instancia) : correr nginx desde nuestro container con puerto 80 para que corra nginx en el browser
+docker ps : ver status (muestra entre otras cosas el idContainer)
+docker stop idContainer : detener container
+docker start idContainer : reiniciar container
+docker ps -a : para ver todos los containers
+docker rm idContainer  : remover container
+docker rmi imageId : remover imagen (hay que detenerlo primero)
+docker run -i -t -d nginx es lo mismo que docker run -itd nginx
+docker run -dit --name=mycontainer nginx : para darle un nombre al container al correrlo
+docker stop containerName :  parar
+docker start containerName : reiniciar
+docker run -dit --name=mycontainer -p 8000:80 nginx : todo lo anterior, pero que corra en local en el 8000
+docker pause containerName :  pausar
+docker unpause containerName :  continuar
+
+CREAR UN CONTAINER
+COMIT (cada uno de estas lineas son pasos)
+La idea es crear un container personalizado que contenga la imagen de apache2
+docker exec -it containerId bash : ir a bash terminal (ir dentro del container)
+apt-date update apache2: actualizar apache (hay q estar dentro de un container)
+apt-date install apache2: instalarar apache (hay q estar dentro de un container)
+service apache2 status 
+service apache2 start
+exit (salir del container)
+docker commit containerId nombreQueQuieroDarAImagen : esto permite crear templates container/imagen
+docker run -dit --name myName nombreQueYaDiAImagen : correr lo anterior, nombrando "myName" al container
+verificar con docker -ps
+
+Iniciar mysql
+docker run -dit -p 6666:3306 --name=andres-mysql --env="MYSQL_ROOT_PASSWORD=test1234" --env="MYSQL_DATABASE=emp" mysql
+
+Persistir informacion en el Host.
+Para esto se usan los volumes, almacenados en /var/lib/docker/volumes
+docker volume ls : lista los volumenes
+docker volume create myvol : crear volumen
+docker run -dit --mount source=myvol, destination=/tmp nginx : pull la imagen/container nginx, correr imagen/container y montar en el volumen myvol carpeta /tmp
+ls /var/lib/docker/volumes/myvol/_data/ aca se guarda la informacion de un volumen
+ir al container con docker exec -it containerId bash
+ls
+ir a carpeta /tmp con cd /tmp (debiera estar vacia)
+touch 1.txt (crear archivo cualquiera)
+exit (salir)
+volver a revisar la carpeta _data cd /var/lib/docker/volumes/myvol/_data/ y notar que estan los archivos que guardamos e /tmp
+
+use bind mounts
+ docker run -dit -v /root/mydata:/tmp ubuntu
+ir al container con docker exec -it containerId bash
+ls
+ir a carpeta /tmp con cd /tmp (debiera estar vacia)
+touch 1.txt (crear archivo cualquiera)
+exit (salir)
+volver a revisar contenido carpeta
+
+
+
+
+
+
+Docker Layers
+Esto es para ver los comandos y capas relacionadas a una imagen (en este caso ubuntu es la imagen)
+docker pull ubuntu
+docker history ubuntu : para ver las capas asociadas a la imagen. La de mas abajo es kernel, la que sigue hacia arriba es sistema operativo y luego hacia arriba otras capas que contienen software como Apache
+docker info: va a mostrar la ubicacion del archivo en Docker Root Dir (copiarla). Tambien se puede ver con docker ps, luego pwd y luego dir (o ls en linux)
+cd pegar ruta anterior : con esto va a mostrar la carpeta con los directorios importantes (overlay2 es la de las capas)
+cd image/
+cd overlay2/
+cat repositories.json: se encarga de almacenar informacion de las imagenes
+
+Docker Network 
+Esto es para asignar ips que seran usadas al configurar un microservicio
+docker network ls : lista todas las networks q vienen por defecto
+docker network networkName: detalles de networkName
+docker network create nombreNetwork --subnet=172.19.0.0/16 : crear nuevo rango de network
+docker run --name containerName --net nombreNetwork --ip 172.19.0.2 -h web.bharath.com -p 82:80 -ti nombreImagen bin/bash:asignar una network (dentro del rango seteado anteriormente) a un container
+docker network disconnect nombreNetwork nombreContainer: desconectar
+docker inspect nombreContainer: para verificar que no hay networks asociadas
+docker network connect nombreNetwork nombreContainer: volver a conectar
+
+Docker File
+Sirve para crear nuestras propias imagenes y correrlas en uno o varios contenedores
+en google: sampledockerfile para ver dockerfiles disponibles
+ver pantallazo
+FROM
+VOLUME
+RUN
+EXPOSE
+CMD
+docker build -t nombreImagen
+
+Docker Compose
+Es para gestionar varios microservicios al mismo tiempo desde el archivo docker-compose.yaml
+VER PANTALLAZO DE archivo. YAML
+
+docker-compose --help :lista de comandos
+docker-compose up: ejecutar el archivo docker-compose.yaml
+
+
+
+
+
+
+
+
+
+

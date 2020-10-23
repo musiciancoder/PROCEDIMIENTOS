@@ -1,0 +1,39 @@
+Setear Maven en el IDE
+1.Descargar Maven
+2.Verificar que el archivo settings.xml esta dentro de carpeta conf en donde se descargó maven
+3.Si estamos trabajando para una empresa cambiar user y password en settings.xml
+4.Agregar variables de entorno del sistema JAVA_HOME ruta de nuestro jdk
+5.En eclipse, run-->run as-->Maven build...-->en viñeta main, en goals escribir clean install y en User Settings apuntar hacia nuestro settings.xml, incluyendo en la ruta el settings.xml (no olvidar que las barras de ruta van hacia atras)
+
+
+CrearUnProjectoJavaConMaven desde consola:
+
+1)con linea de comando en carpeta nueva (C:\java-project), cortar y pegar: 
+mvn archetype:generate -DgroupId=com.bharath -DartifactId=java-project -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false (por defecto genera war, 
+si queremos generar jar se agrega -Dversion=jar)
+
+mvn archetype:generate -DgroupId=com.bharath -DartifactId=java-web-project -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+
+2) ir a carpeta del proyecto con cd java-web-project
+
+3) Luego generar carpeta target (que permite correr programas con linea de comandos) en la carpeta del proyecto con: mvn install
+
+Correr programa desde linea de comando: java -cp target/java-project-1.0-SNAPSHOT.jar com.bharath.App
+
+Correr un jar: en carpeta target desde linea de comandos escribir: java -jar nombredelJar.jar
+
+
+Importar un proyecto maven ya existente:
+1)File-->import-->existing maven project
+2)Seleccionar la carpeta donde tenemos el proyecto
+3)Si no se ve el JRE System Library lo agregamos com boton dercho sobre el proyecto, Build Path-->Congigure Buil Path-->Libraries-->doble click en JRE System Library y agregamos el JRE correspondiente a nuestro JDK
+4)Si seguimos teniendo problemas, boton derecho sobre el proyecto -->properties-->escribir maven en el buscador en properties-->borrar el archivo que sale como pom
+
+
+
+
+
+
+
+
+

@@ -96,3 +96,9 @@ editando vi nombreArchivo.txt: esto se realiza con INSERT al final del archivo. 
 dd borra linea (modo comand)
 modo ejecutar: esc y despues shift+:  en este modo se puede guardar con wq; con q! se sale sin guardar nada; en este modo se puede buscar con /nombre de lo q se desea buscar
 
+
+equifax
+crear private key para desencriptar mensajes en apache: (desde /etc/apache2/ssl) sudo open ssl genrsa -out nombreLlave.privkey 4096
+generar certificate signing request csr: sudo openssl req -new -key nombreLlave.privkey -out nombreLlave.csr -sha512 (va a peedir datos de empresa)
+sudo open ssl x509 -req -days 365 -in nombreLlave.csr -signkey nombreLlave.privkey -out nombreLlave.privkey.crt -sha512 
+
