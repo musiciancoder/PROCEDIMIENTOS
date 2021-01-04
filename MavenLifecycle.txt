@@ -1,0 +1,8 @@
+Al generar um proyecto mvn solo se genera el pom y el .iml (external libraries se genera igual incluso si ni siquiera es un proyecto mvn).
+clean: no pasa nada si no se tiene nada de algun build anterior (elimina todos los archivos generados en el build siguiente)
+compile:pasa a codigo maquina. Descarga desde Nexus. Segun la documentacion, en la etapa anterior (process-resources) debiera descargar de Nexus, pero en la practica no es asi.
+test: corre los tests en JUNIT. No genera nada
+package: genera el jar
+verify: corre losresultados de las pruebas de integracion
+install:permite instalar el paquete en un repositorio local, para ser usado como dependencia en otros proyectos en forma local
+deploy:despliegue (nexus)

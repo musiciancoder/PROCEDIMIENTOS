@@ -1,0 +1,11 @@
+JVM: se necesita para correr un programa de java.
+JRE: contiene el JVM + otros archivos necesarios para interpretar/ejecutar archivos bytecodes .class
+JDK: se necesita para poder desarrollar Java. contiene al JRE + compilador y otros archivos necesarios para compilar.
+
+en Java existen dos pasos:
+1. compilacion, donde se genera un archivo intermedio llamado Bytecodes (10001001), cuya extension es .class. Esto lo hace el compilador del JDK
+2. interpretacion, donde se ejecuta el programa. Acá el archivo .class generado en la compilacion pasa a código maquina ( 10001001, pero sin extension .class).
+
+Es el archivo intermedio .class el que permite que java pueda ser multiplataforma, ya que puede ser interpretado/ejecutado en cualquer ambiente (linux,mac,windows, etc).
+
+Los IDEs al ejecutar un programa lo compilan automaticamente.
