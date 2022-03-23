@@ -1,0 +1,9 @@
+1. Se debe contar con la libreria hibernate validation v.6.0 en Maven (juan solo probó con jars, no con maven) o bien con Jakarta validation (lo probé y no funcionó)
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>6.0.10.Final</version>
+</dependency>
+2.En argumentos del controlador se debe contar con la anotacion @Valid
+3.En la clase bean, en el campo que queremos poner las validaciones se pone @NotNull, @Size, etc
+https://reflectoring.io/bean-validation-with-spring-boot/

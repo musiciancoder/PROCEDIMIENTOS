@@ -1,4 +1,0 @@
-1.Crear una interfaz con los metodos a implementar (IPeliculasService)
-2.Crear una clase q implemente la interfaz anterior (PeliculasServiceJPA)
-3.Crear un una clase Repositorio (PeliculasRepository) q extienda JPARepository
-4.Hacer inyeccion de dependencias de una instancia de la clase Repositorio en la clase creada en el paso 2, para tener los metodos del repositorio disponibles (fin, findall, etc)

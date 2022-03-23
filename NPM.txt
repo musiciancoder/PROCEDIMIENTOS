@@ -3,6 +3,7 @@ npm nombrearchivo run: Para correr cualquier archivo en consola
 npm install -g nombredeprograma: instalar programa
 npm install -g typescript
 npm install -g @angular/cli
+npm i bootstrap jquery popper.js : Instalar bootstrap jquery popper
 ng new nombredelproyecto: crea proyecto
 ng serve -o: para abrir en local (localhost 4200). En webstorm no es necesario, solo
  con apretar el boton play y esperar un buen rato se hace correr.
@@ -10,6 +11,7 @@ ng g c nombreComponente: crea todo el componente (con html y css incluidos). Deb
 (esto se hace desde una carpeta de un componente antiguo) ng g c nombreNuevoComponente/form --flat: Para crear un componente dentro de un directorio de otro componente antiguo (video45)
 ng g class nombreClase: crear una clase 
 ng g service nombreClaseServicio: crear clase servicio
+
 
 ng g c clientes/form --flat: crear directorio clientes con componente form adentro de él
 

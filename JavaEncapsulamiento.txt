@@ -1,0 +1,10 @@
+campo private: acceso solo en la misma clase a través de "this". NO permite acceso mediante ningun objeto de esta clase instanciado en una clase del mismo paquete o de otro paquete.
+campo protected: acceso en la misma clase a traves de "this"; en objetos de esta clase instanciados en una clase que hereda de esta de otro paquete; en objetos de esta clase instanciados en una clase del mismo paquete
+campo default:  acceso en la misma clase a traves de "this"; NO permite acceso en objetos de esta clase instanciados en una clase que hereda de esta de otro paquete; Sí permite en objetos de esta clase instanciados en una clase del mismo paquete
+campo public: acceso en la misma clase a traves de "this" y en cualquier otra clase mediante objetos de esta clase;
+
+Para modificar campos o atributos privados utilizar siempre métodos getter y setter.
+
+metodo privado: acceso solo en la misma clase a través de "this" y en ninguna otra clase, por lo que no se recomienda.
+metodo protected:  acceso solo en la misma clase a través de "this" y en ninguna otra clase, por lo que no se recomienda.
+metodo public: permite acceso siempre desde objetos de esta clase instanciados en otras clases.

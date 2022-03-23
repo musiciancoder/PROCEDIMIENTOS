@@ -1,0 +1,8 @@
+
+En clase java de configuracion, con @PropertySource se hace referencia a la ruta de un archivo externo 
+@PropertySource("classpath:datosEmpresa.propiedades")
+
+En Cualquier otra clase se hace referencia a valores dentro de este archivo mediante:
+@Value("${email}")
+ private String email; //no necesariamente tienen que coincidir los nombres del campo con los del value
+

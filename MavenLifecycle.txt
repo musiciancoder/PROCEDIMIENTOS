@@ -1,8 +1,17 @@
-Al generar um proyecto mvn solo se genera el pom y el .iml (external libraries se genera igual incluso si ni siquiera es un proyecto mvn).
-clean: no pasa nada si no se tiene nada de algun build anterior (elimina todos los archivos generados en el build siguiente)
-compile:pasa a codigo maquina. Descarga desde Nexus. Segun la documentacion, en la etapa anterior (process-resources) debiera descargar de Nexus, pero en la practica no es asi.
-test: corre los tests en JUNIT. No genera nada
-package: genera el jar
-verify: corre losresultados de las pruebas de integracion
-install:permite instalar el paquete en un repositorio local, para ser usado como dependencia en otros proyectos en forma local
-deploy:despliegue (nexus)
+Al generar un proyecto "external libraries" se genera igual incluso si ni siquiera es un proyecto mvn, ya que obviamente existen librerias del core de java.
+La librerías externas nunca están en el proyecto, sino en .m2/repository y el proyecto las extrae de ahi.
+Cuando uno agrega manualmente una libreria en el pom y actualiza el proyecto, esta libreria se decarga en primera instancia desde el repositorio local, y si no esta ahi desde un repositorio remoto (para el caso de equifax este repo remoto esta en Nexus, porque asi se configuró en el settings.xml) y se instala en external libraries junto con las otras librerias que ya estaban. Esto es independiente del ciclo de vida de maven, no confundir!
+clean: elimina el target (si hay)
+validate: que lo que hay escrito en pom esté bien escrito.
+compile:compila a codigo bytes .class y genera un target
+
+ sin .jar dentro de él
+test: para pruebas unitarias
+package: genera el jar en el target
+verify: para pruebas integrales de QA
+install: guarda el proyecto en el repositorio local (este repositorio esta en la misma ruta del settings.xml (dentro de .m2 en el caso particular de equifax)); esto permite que el proyecto pueda ser llamado desde otros proyectos a traves de su groupId, artifact y version en el pom del otro proyecto
+deploy: despliega al repositorio remoto.
+
+
+
+

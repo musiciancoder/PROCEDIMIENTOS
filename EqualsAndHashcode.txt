@@ -1,0 +1,7 @@
+¿Cuando conviene sobreescribir el método equals?
+Cuando queremos asegurarnos de que no pueden haber clones, es decir no pueden haber dos objetos desiguales con los mismos valores de atributos; por ejemplo no pueden haber dos 
+o mas guitarras fender stratocaster rojas.
+
+¿Cuando conviene sobreescribir el método hashcode?
+Siempre y toda vez que se sobreescribe el metodo equals debemos sobreescribir hashcode. Si no lo hacemos el mismo objeto va a tener dos referencias en memoria distintas, lo que es una aberracion porque 
+entonces va a buscar dos objetos distintos en memoria heap a partir de dos referencias distintas en memoria stack

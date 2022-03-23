@@ -1,0 +1,15 @@
+https://www.youtube.com/watch?v=w2jlkcdvBSg
+
+La JVM esta dentro de JRE y este a su vez esta dentro de JDK.
+JRE permite ejecutar Java pero no programar, ya que no tiene un compilador.
+JDK si permite programar, ya que ademas del JRE para ejecutar contiene un compilador que permite compilar de codigo fuente (.java) a java.class
+
+Normalmente dentro del JDK hay una carpeta con nombre explicito JRE, pero no siempre es asi (en OpenJDK 14 por ejemplo no está). Independientemente de eso el JRE esta siempre embebido en el JDK
+
+CODIGO FUENTE (nombre.java)-->COMPILADOR-->BYTECODE, que no son 0 y 1 sino columnas de numeros y letras (nombre.class)-->JVM (contenido dentro de JRE)-->código ejecutado interpretado en tiempo real sobre windows, linux, etc. Este si son 0 y 1.
+
+Los IDE (Eclipse, IntelliJ, etc) ya vienen con un compilador, por lo que técnicamente para desarrollar sólo necesitamos descargar un JRE, que queda almacenado en una carpeta llamada "Java" dentro de la carpeta "Archivos de Programa". Sin embargo, en vez de descargar e instalar el JRE es mas recomendable
+descargar un JDK. Para usar este JDK debemos setear JAVA_HOME con la ruta del JDK y el PATH apuntando al bin (una de las subcarpetas del JDK). 
+
+En el runner del IDE debe apuntarse al JRE que esta dentro del JDK, o bien setear la version de java mas correcta lo que se puede ver con los comandos de consola java -version o set.
+

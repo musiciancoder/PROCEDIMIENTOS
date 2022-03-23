@@ -1,0 +1,6 @@
+@Pattern(regexp="[0-9] {5}",message="Solo 5 valores numericos") //expresiones regulares, con esto se admiten solo 5 caracteres del 0 al 9
+	private String codigoPostal;
+
+
+
+

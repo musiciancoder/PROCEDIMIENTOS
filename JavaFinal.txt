@@ -1,0 +1,3 @@
+clase final: NO se puede heredar
+método final: NO puede ser sobrescrito
+campo final: debe ser declarado e inicializado en la misma linea y el valor NO puede cambiarse mas adelante (constante)

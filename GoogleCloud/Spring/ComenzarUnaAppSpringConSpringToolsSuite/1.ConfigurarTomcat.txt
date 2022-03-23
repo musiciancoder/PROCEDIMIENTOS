@@ -1,0 +1,13 @@
+1. Descargar tomcat de la pagina oficial (yo tengo tomcat 9)
+2.Habilitar el servidor en el IDE. En Spring Suite Tools presionar window->show view->others->servers; luego de esto aparecerá la ventana servers (q se puede personalizar su ubicacion en pantalla)
+3.Hacer una prueba del servidor presionando el boton verde "run". Debe arrojar un error 404, porque aun n hay ninguna app.
+4.Crear una app. Para ello, click en file->new->other->maven project. En ventana siguiente click en checkbox "create a simple project", click en next. 
+En la siguiente pantalla, GroupId es Nombre de empresa, ArtifactId es nombre del Proyecto. Click en finish y en la pantalla de proyectos ya tengo la app (con c de maven).
+5.Seleccionar tecnologias para el proyecto. Click derecho en el proyecto y luego seleccionar "properties". En la pantalla siguiente seleccionar "Convert to faceted from".
+En la pantalla siguiente Seleccionar "Dynamic web module" (java esta seleccionado por defecto, dejarlo tal cual). Click en "Further configurations", en donde se puede cambiar el nombre de la carpeta WebContent q contiene los jsp.
+click en "apply". Entonces debera estar disponible la carpeta WebContent.
+6.Seleccionar version de java. Click derecho en JRESystem y seleccionar la version de java q tenemos instalada en nuestro equipo.
+7.Asignar un servidor web para la aplicacion en particular. Para ello click derecho en el proyecto, Properties->Java Build Path->Libraries->Add Library->Server Runtime->seleccionar Apache Tomcat->Finnish->Apply and Close (en la pantalla anterior).
+8.Crear un JSP de Prueba. Click derecho en carpeta WebContent->new->other->web->JSP File->nombrar el archivo "index.jsp". En la carpeta de proyectos abrir index.jsp y ecribir un hola mundo en el body, para probar. Guardar y ejecutar el servidor (click derecho sobre el proyecto->run as->run on server->seleccionar nuestra apliacacion (dejerla en la parte Configured). Al hacer click en finish ya debemos ver en el propio SpringToolsSuite una ventana con el hola mundo..
+
+Nota: A pesar que el archivo config/server.xml es el que supuestamente configura los puertos, estos se pueden cambiar directamente en el IDE, haciendo click en tomcat9.0 en la seccion de servers. Notar que extrañamente si los cambios se hacen con el IDE, el server.xml permanece inmutable y aún asi la app corre bien de todas maneras

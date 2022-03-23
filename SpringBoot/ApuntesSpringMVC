@@ -1,0 +1,20 @@
+Crear proyecto MVC
+
+1:Como lo explicó pildoras (sin maven)
+
+https://www.youtube.com/watch?v=dvEmxrsp4os&list=PLU8oAlHdN5Blq85GIxtKjIXdfHPksV_Hm&index=27
+
+1.Se crea un proyecto web en eclipse con File-->New-->Dynamic Web Project
+2.En carpeta Webinf debe ir archivos de configuracion para servlet y web
+3.Se pegan las librerias a mano
+4.Se arranca con Run as -->run on server
+
+2:Con maven (otro método)
+File-->Maven-->maven-archetype-webapp, creará obviamente un pom que manejará las dependencias
+
+Proyecto MVC
+El proyecto MVC es un proyecto para despliegue web, que no necesita de un servicio, solo de un controlador.
+Las vistas están dadas por archivos JSF que debeben ubicarse en una subcarpeta dentro de web-content/web-inf
+Además debe contar con un archivo de configuración .xml (normalmente llamado web.xml) en la carpeta web-inf
+
+Las etiquetas (tags) de spring para los JSF se encuentran en javapoint,por ejemplo

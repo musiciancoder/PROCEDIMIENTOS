@@ -1,0 +1,6 @@
+@Qualifier 
+Si varias clasesimplementan la misma interfaz, al hacer la inyeccion de dependencias el programa no va a saber quéclase ocupar y saldrá un error:
+
+Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No qualifying bean of type 'es.pildoras.pruebaannotations.CreacionInformeFinanciero' available: expected single matching bean but found 4: informeFinancieroTrim1,informeFinancieroTrim2,informeFinancieroTrim3,informeFinancieroTrim4
+
+Esto se soluciona con @Qualifier("nombreDeLaClaseConMinuscula") justo en la linea mas abajo de la anotacion @Autowired

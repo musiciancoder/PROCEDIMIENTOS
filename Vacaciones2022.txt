@@ -1,0 +1,15 @@
+Thailandia
+Avion: 1.064.000
+Hostel: 78.000
+
+Francia
+Avion: 700.000
+Hostel: 442.000
+
+Egipto
+Avion: 1.077.507
+Hostel: 156.000
+
+Madrid-Marruecos-Egipto
+Avion:1.450.000
+

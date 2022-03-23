@@ -1,7 +1,0 @@
-	// @InitBinder permite customizar el formato de entrada de algun dato (en este
-	// caso la fecha del formulario)
-	@InitBinder
-	public void initBinder(WebDataBinder webDataBinder) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-		webDataBinder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
-	}

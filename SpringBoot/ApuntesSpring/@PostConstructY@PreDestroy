@@ -1,0 +1,15 @@
+	//ejecucion de código despues de la creacion del Bean, equivalente al método Init del ciclo de vida de un bean
+	@PostConstruct //solo se puede usar con singleton, son void y no reciben argumentos
+	
+	//ejecucion de código despues de apagado contenedor Spring, equivalente al metodo Destroy del ciclo de vida de un bean
+	@PreDestroy //tambien solo se puede usar con singleton, son void y no reciben argumentos
+	
+Ciclo de vida de un bean
+1.Inicializacion del Contenedor de Spring
+2.Instanciación de Bean
+3.Inyeccion de dependencias
+4.Procesado del Bean
+5.Ejecucion del metodo Init (debe ser configurado en el contenedor de beans (xml o java)
+6.Bean listo para su uso
+7.Contenedor Spring apagado
+8.método destroy (debe ser configurado en el contenedor de beans (xml o java)

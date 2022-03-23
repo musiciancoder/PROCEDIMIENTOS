@@ -163,8 +163,10 @@ CLONAR DESDE GITHUB
 Crear una carpeta cualquiera
 Copiar el link del proyecto en github
 Ingresar por consola a la carpeta creada y escribir: git clone linkDelProyecto
+Ingresar donde en la carpeta donde esta el src y escribir git init (se sigue siempre trabajando en esta carpeta). NO se necesita hacer pull.
+Para saber si hay un remoto asociado: git config --get remote.origin,url
 
-Nueva rama remota:
+Nueva rama remota (primero crear rama local llamada "branch2"):
  git push --set-upstream origin branch2
 
 Clonar rama git clone --branch nombreRama urlProyecto    
@@ -176,6 +178,9 @@ git fetch origin nombreRamaRemota hace mergin manual
 
 Alguien creo otra rama y yo quiero meter esa rama en una rama local y poder verla
 git checkout --track origin/daves_branch (esto crea una rama local del mismo  nombre da la remota q queremos ver)
+
+
+token para push: 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
 
 
 

@@ -1,2 +1,0 @@
-1.Cortar el archivo rootContext desde la carpeta web-Inf y pegarla en src/main/resources. De este modo va a funcionar en local. Si queremos que funcione desplegado en a web, debemos volver a dejar el archivo en la carpeta webinf.
-2.Correr la app como java application

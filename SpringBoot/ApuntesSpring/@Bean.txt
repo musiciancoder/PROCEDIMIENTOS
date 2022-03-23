@@ -1,0 +1,138 @@
+Ver proyecto beansex en el workspace
+
+Un bean es un objeto que se crea de manera mas eficiente que la convencional.
+
+Un bean es un objeto de una clase que se crea instanciandolo no de manera convencional, sino por medio de la anotación @Bean, lo que permite guardarlo en el contenedor
+de Beans en la clase de configuracion de finida con @Configuration: 
+
+package com.andres.beansex;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class Config {
+    @Bean(name = "myBean")
+    public Address getAddress() {
+        return new Address("High Street", 1000);
+        
+    }    
+}
+
+Naturalmente la clase Address debe haber sido previamente establecida en forma convencional:
+
+package com.andres.beansex;
+
+public class Address {
+    private String street;
+    private int number;
+
+    public Address(String street, int number) {
+        this.street = street;
+        this.number = number;
+    }
+
+	public String getStreet() {
+		return street;
+	}
+
+	public void setStreet(String street) {
+		this.street = street;
+	}
+
+	public int getNumber() {
+		return number;
+	}
+
+	public void setNumber(int number) {
+		this.number = number;
+	}
+
+	@Override
+	public String toString() {
+		return "Address [street=" + street + ", number=" + number + "]";
+	}
+	
+}
+
+
+De esta manera el objeto queda disponible para ser llamado en cualquier clase del proyecto, como en la clase Company por ejemplo, que hace uso de Adress:
+
+package com.andres.beansex;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class Company {
+	
+    private Address address;
+
+    public Company(Address address) {
+        this.address = address;
+    }
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+
+	@Override
+	public String toString() {
+		return "Company [address=" + address + "]";
+	}
+}
+
+La llamada al bean se hace efectiva haciendo alusión al bean mismo (nombre del bean) y a la clase que lo consume (company, en este caso):
+
+package com.andres.beansex;
+
+
+
+
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+
+@SpringBootApplication
+public class BeansexApplication {
+
+	public static void main(String[] args) {
+		ApplicationContext apc = SpringApplication.run(BeansexApplication.class, args);
+		int i=0;
+		for (String s : apc.getBeanDefinitionNames()) {
+			System.out.println("Bean" + i+": " +s);
+			i++;
+		}
+		System.out.println(" ");
+		
+		Company company = apc.getBean("myBean", Company.class);
+	
+		System.out.println(company.toString());
+		
+		System.out.println("Address: " + company.getAddress());
+		  
+		 
+		}
+}
+
+--------------------------------------------------
+https://www.youtube.com/watch?v=I1EQV5MSwl4&list=PLU8oAlHdN5Blq85GIxtKjIXdfHPksV_Hm&index=24
+
+Segun Pildoras para crear un bean debe crearse una interfaz, luego una clase que implemente esta interfaz y sobreescriba los métodos de esta. Posteriormente en la clase
+de configuracion se guarda el bean con:
+
+@Bean 
+NombreInterfaz nombreClaseImplementadora (){
+return new NombreClaseImplementadora
+}
+
+
+
+

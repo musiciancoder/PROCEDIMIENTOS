@@ -1,0 +1,16 @@
+@InitBinder : Permite poner una validación previa de la llamada entre la llamada y el controlador. Esta anotacion por lo mismo casi siempre va en el controlador
+	
+Ejemplo1:
+@InitBinder
+	public void initBinder(WebDataBinder webDataBinder) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		webDataBinder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
+	}
+Ejemplo2:
+@InitBinder
+	public void initBinder(WebDataBinder webDataBinder) {
+		StringTrimmerEditor recortaEspacionEnBlanco = new StringTrimmerEditor(true);
+		vinder.registerCustomEditor(String.class, recortaEspacionEnBlanco);
+}
+
+

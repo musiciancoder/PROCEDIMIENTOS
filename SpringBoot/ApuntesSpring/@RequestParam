@@ -1,0 +1,3 @@
+Para obtener algun parametro de la peticion (por ejemplo algun campo llenado en un formulario) se usa @RequestParam como argumento de método en el controlador
+@Controller
+public String otroProcesoFormulario(@RequestParam("nombreAlumno") String nombre, Model modelo){codigo}

@@ -1,4 +1,4 @@
-Encontrar puerto activo netstat: -ano | findstr :numeroDePuerto
+Encontrar puerto activo: netstat -aon | findstr :8080
 Encontrar procesos activos: tasklist
 Matar un proceso: C:\>TASKKILL /F /IM node.exe /T (Donde node.exe seria el proceso a matar)
 

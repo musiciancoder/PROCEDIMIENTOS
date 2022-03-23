@@ -1,0 +1,13 @@
+INTERFAZ LIST (permiten registros duplicados)
+*ArrayList: eficiente leyendo, no tanto agregando o eliminando elementos
+*LinkedList: agregando o eliminando elementos, no tanto leyendo
+
+INTERFAZ SET (no permiten registros duplicados(siempre y cuando se sobrescriban equals y hashcode), poca eficiencia al ordenar)
+*HashSet: igual a ArrayList
+*LinkedHashSet: igual a Linkedlist
+
+INTERFAZ MAP (asociacion tipo clave valor, no permite claves duplicadas. No acepta primitivas en la clave ni en el valor, solo wrapping clases)
+*HashMap
+*HashLinkedMap
+
+*INTERFAZ QUEUE (rapido al acceder al primer o ultimo valor, lento para acceder a valores intermedios)

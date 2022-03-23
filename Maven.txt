@@ -1,34 +1,157 @@
+
+
+INSTALACION
+
 Setear Maven en el IDE
 1.Descargar Maven
 2.Verificar que el archivo settings.xml esta dentro de carpeta conf en donde se descargó maven
-3.Si estamos trabajando para una empresa cambiar user y password en settings.xml
-4.Agregar variables de entorno del sistema JAVA_HOME ruta de nuestro jdk
+3.Si estamos trabajando para una empresa cambiar user y password en settings.xml. Normalmente el lider técnico de la empresa debiera entregar otro settings.xml 
+distinto al que descargamos, el que normalmente se debe guardar en la carpeta C/Usuarios/ahd1/.m2
+4.Agregar variables de entorno:
+
+		MAC:
+
+			export M2_HOME=/Users/bharaththippireddy/Documents/apache-maven-3.3.9/
+			export PATH=$M2_HOME/bin:$PATH
+		
+		Windows:
+
+			Select Start, go to Control Panel. double click System, and select the Advanced tab.
+			Click Environment Variables.
+			Select the PATH environment variable and edit it to include the <MavenHome>/bin folder
+			Reopen Command prompt window, and run your java code.
+			
+			Con el comando C\:mvn -version se ve si tenemos maven instalado o no
+
 5.En eclipse, run-->run as-->Maven build...-->en viñeta main, en goals escribir clean install y en User Settings apuntar hacia nuestro settings.xml, incluyendo en la ruta el settings.xml (no olvidar que las barras de ruta van hacia atras)
 
 
-CrearUnProjectoJavaConMaven desde consola:
+CREAR UN PROJECTO JAVA CON MAVEN DESDE CONSOLA
 
 1)con linea de comando en carpeta nueva (C:\java-project), cortar y pegar: 
-mvn archetype:generate -DgroupId=com.bharath -DartifactId=java-project -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false (por defecto genera war, 
-si queremos generar jar se agrega -Dversion=jar)
+mvn archetype:generate -DgroupId=com.bharath -DartifactId=java-project -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false 
+
+
+archetype:generate es un ejemplo de "goal"; en este caso el goal es generar un proyecto.
+por defecto genera war, si queremos generar jar se agrega -Dversion=jar
+
+-DgroupId=com.bharath en el nombre de la compañía (por ejemplo com.equifax)
+
+-DartifactId=java-project es el nombre del proyecto
+
+-DarchetypeArtifactId=maven-archetype-quickstart es el tipo de proyecto que estamos creando
+
+-DinteractiveMode=false  elimina caracteristicas por defecto, ya que estamos proporcionando groupId y artifactId
 
 mvn archetype:generate -DgroupId=com.bharath -DartifactId=java-web-project -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+
+Tanto en IntelliJ como en Eclipse están especificadas las librerias externas que corresponden al Core Java (JRE en eclipse o JDK en Intellij) o a librerias de terceros agregadas en el pom (Maven) .
+Recordar que una dependencia en el pom puede tener varios jar, la relación no es uno a uno.
 
 2) ir a carpeta del proyecto con cd java-web-project
 
 3) Luego generar carpeta target (que permite correr programas con linea de comandos) en la carpeta del proyecto con: mvn install
+
+EJECUTAR PROGRAMAS DESDE JAR
+
+1. Crear carpeta target con mvn install
 
 Correr programa desde linea de comando: java -cp target/java-project-1.0-SNAPSHOT.jar com.bharath.App
 
 Correr un jar: en carpeta target desde linea de comandos escribir: java -jar nombredelJar.jar
 
 
-Importar un proyecto maven ya existente:
+IMPORTAR UN PROYECTO MAVEN YA EXISTENTE
+
 1)File-->import-->existing maven project
 2)Seleccionar la carpeta donde tenemos el proyecto
 3)Si no se ve el JRE System Library lo agregamos com boton dercho sobre el proyecto, Build Path-->Congigure Buil Path-->Libraries-->doble click en JRE System Library y agregamos el JRE correspondiente a nuestro JDK
 4)Si seguimos teniendo problemas, boton derecho sobre el proyecto -->properties-->escribir maven en el buscador en properties-->borrar el archivo que sale como pom
 
+
+ARCHIVO POM
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion> --> POM = Project Object Model; Este Model es 4.0.0 para que sea compatible con maven 3.  
+  //Los siguientes cuatro son obligatorios y componen las coordenadas que usa maven para generar el jar propio
+  <groupId>com.bharath</groupId> --> Empresa
+  <artifactId>hellomaven</artifactId> -->Nombre Proyecto
+  <packaging>jar</packaging> -->Tipo de package
+  <version>1.0-SNAPSHOT</version> -->Version
+  //los siguientes dos son opcionales
+  <name>hellomaven</name>
+  <url>http://maven.apache.org</url>
+  //Ejemplo de dependencia
+  <dependencies>
+    <dependency>
+ //Los siguientes tres son obligatorios para dependencias externas
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope> //no es obligatorio
+    </dependency>
+  </dependencies>
+</project>
+
+PLUGGIN
+Un pluggin es un grupo de goals o tareas a ser realizadas.
+Maven está compuesto de varios pluggin. 
+La nomenclatura para ejecutar un goal es plugginID:goalID (esto raramente se ocupa, como se explica mas abajo en el ciclo de vida). Por ejemplo, para generar un proyecto, cuando escribimos archetype:generate archetype es el pluggin
+y generate es el goal. Sin embargo usualmente un plugin no se compone de un solo goal sino de varios.
+
+CICLO DE VIDA
+Existen tres tipos de ciclos de vida: Build (este es por defecto), Clean y Site. Cuando se habla de ciclo de vida a secas (y de ahora en mas en nuestro caso) se refiere al Build
+Cada fase del ciclo de vida de maven está asociado a uno o mas pluggins (aunque generalmente esta relacion es 1:1) y a su vez los pluggins pueden tener uno o mas goals.
+Cuando definimos un packaging en el pom con  <packaging>jar</packaging> (puede ser un war tb) estamos asociando implicitamente las fases del ciclo de vida
+a pluggin y goals, por lo que para ejecutar una fase simplemente se hace con el comando mvn nombreDeFase, es decir no se llaman pluggins ni goals en la linea de comandos 
+Fases del ciclo de vida         Pluggin:Goal
+process-resources     resources:resources
+compile		      compiler:compiler
+test		      surefire:test
+package		      jar:jar
+Lo anterior será efectivo para el 99% de los proyectos, sin embargo hay un 1% de proyectos que no lleva packing y debemos especificar pluggins, o bien que aunque lleve packing debemos especificar pluggins
+de todos modos. En estos casos podemos invocar al pluggin o al goal directamente con plugginID:goalID. Por ejemplo para el plugin del compiler que se muestra mas abajo se llama con mvn compiler:compile
+
+DEPENDENCIAS
+Para dependencias en el pom solo tres elementos son necesarios: groupId, artifactId y version.
+Las dependencias que estan en nuestro pom jamás se guardan en nuestro proyecto como carpetas ni jar propiamente tal (aunque el IDE lo muestra abajo del proyecto), en vez 
+de eso la primera vez quedamos un mvn install descarga directamente las dependencias desde el repositorio de la web de maven y lo guarda en la carpeta repository de m2. La siguiente vez, si no
+hay una modificacion de esta dependencia en el pom no hace nada, porque la libreria ya esta en el pom, solo si hay alguna modificacion de esta libreria se va nuevamente
+al repositorio de la web de maven.
+Cuando queremos agregar una dependencia nueva, se copia directamente desde el mvn repository de la web en el pom, y al guardar el proyecto (no al actualizar maven como al agregar un plugin) se
+apareceran automaticamente las librerías respectivas en en el IDE y se guardatán en nuestro repositorio local si es que no las teníamos.
+
+CAMBIAR CONFIGURACION DE UN PLUGIN
+La configuracion de los plugins por defecto no aparece en el pom.xml, sino en el Effective POM.
+Si queremos cambiar la configuracion de un plugin debemos agregarlo expresamente en el POM. 
+Por ejemplo para cambiar la configuracion del compilador java a 1.8, debemos agregar:
+  <build>
+   <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.2</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+Luego de agregarlo debemos actualizar maven
+Las opciones de configuration (<source> y <target> en nuestro ejemplo) se pueden obtener en la documentacion al hacer click en el goal de cada pluggin (ver https://www.youtube.com/watch?v=6ySq0a6YFjA minuto 7:55)
+
+SCOPES
+Los scopes de cada dependencia externa se usan para definir en quégoal se ejecuta la dependencia.
+Por ejemplo:
+<scope>test</scope> para que se ejecute solo en pruebas (normalmente esto va normalemnte en la dependencia de Junit
+<scope>provide</scope> scope can be used to tell maven that we do not need a dependency to be packaged in to a war that will be deployed to a container which will already have that jar/dependecy
+Se usa en los goals test y run, pero no en el build (no va en el war). Por eso para generar el war se debe hacer explícito en la dependencia servlet-api con scope provided para aplicaciones web.
+<scope>compile</scope> la dependencia se ejecuta en los goal build, test y run. Si no especificamos ningun scope, este es el scope por defecto.
+<scope>runtime</scope> la dependencia se ejecuta en los goals test y run, pero no en el goal compile, por lo que no se ejecuta al compilar.
+
+PROFILES
+Es para adquirir portabilidad, es decir poder setear configuraciones de BBDD y url en etapas local, pruebas y produccion en forma independiente con el application.properties
 
 
 
