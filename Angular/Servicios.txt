@@ -1,0 +1,5 @@
+El servicio es código en común entre dos o mas componentes, que debe ser inyectado en cada uno de ellos.
+Se crean con ng g s nombreservicioService, y debe verificarse su inclusión en los providers del app.module.ts
+La clase de servicio debe siempre ir con @Injectable() seguido de los métodos a ser llamados desde los componentes en que se inyecta el servicio.
+Para inyectactar el servicio en el componente se debe crear una instancia del servicio en el parentesis del constructor del componente, entonces los
+métodos del servicio quedan disponibles en el componente por inyeccion de dependencias. 

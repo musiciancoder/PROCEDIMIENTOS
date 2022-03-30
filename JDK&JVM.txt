@@ -11,5 +11,7 @@ CODIGO FUENTE (nombre.java)-->COMPILADOR-->BYTECODE, que no son 0 y 1 sino colum
 Los IDE (Eclipse, IntelliJ, etc) ya vienen con un compilador, por lo que técnicamente para desarrollar sólo necesitamos descargar un JRE, que queda almacenado en una carpeta llamada "Java" dentro de la carpeta "Archivos de Programa". Sin embargo, en vez de descargar e instalar el JRE es mas recomendable
 descargar un JDK. Para usar este JDK debemos setear JAVA_HOME con la ruta del JDK y el PATH apuntando al bin (una de las subcarpetas del JDK). 
 
+Para cambiar variables del sistema sin pedirle a Ulises -->desde "Este equipo" -->Configuracion avanzada del sistema
+
 En el runner del IDE debe apuntarse al JRE que esta dentro del JDK, o bien setear la version de java mas correcta lo que se puede ver con los comandos de consola java -version o set.
 

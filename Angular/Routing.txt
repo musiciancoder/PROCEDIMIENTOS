@@ -1,0 +1,17 @@
+0.Crear los componentes que se desean enrutar
+
+1. Crear un array de rutas en el app.module.ts
+
+const appRoutes:Routes=[
+
+  {path:'',component:HomeComponentComponent},
+  {path:'proyectos',component:ProyectosComponentComponent},
+  {path:'quienes',component:QuienesComponentComponent},
+  {path:'contacto',component:ContactoComponentComponent}
+
+]
+
+2. En el mismo app.module.ts pasar por argumento este array en los imports
+  imports: [ RouterModule.forRoot(appRoutes) ]
+
+3.En el html del app.component setear las rutas con href="/proyectos", por ejemplo y escribir al final de este html <router-outlet></router-outlet> 
