@@ -1,0 +1,14 @@
+NOTA: Esto corresponde al curso de amigoscode
+
+1.Generar el proyecto en spring inizializr solo con la dependencia de spring web
+2.Generar clase de prueba (student) y clase controlador (studentController) y probar en el navegador con http://localhost:8080/api/v1/students/1
+3.Escribir dependencia de springweb en el pom, actualizar, correr de nuevo y probar con localhost:8080/login con usuario=user y contraseña=la generada en el log del IDE al correr el proyecto
+4.Con respecto al punto 3, podemos desloguearnos con http://localhost:8080/logout, una vez deslogueado, si entramos a http://localhost:8080/api/v1/students/1 va a pedir que nos loguiemos. Todo el tráfico se ve en herramientas del desarrollador-->network-->payload
+
+Autenticacion con BASIC AUTH
+Pide credenciales para todas y cada una de las peticiones
+1.En adicion a todo lo anterior, escribir clase de configuracion ApplicationSecurityConfig
+2.Escribir localhost:8080/login/ en el navegador deberá aparecer un popup para loguearse, pero al loguearnos sale "Whitelabel Error Page", entonces debemos simplemente escribir http://localhost:8080/api/v1/students/1. Notar que no podemos desloguearnos con basic auth
+3.Es mejor chequear en postman con un get http://localhost:8080/api/v1/students/2 y las credenciales en Authentication
+4.Si tenemos landing pages sin autenticacion, estas se pueden accesar directo sin credenciales previo escribir antMatches en la clase de configuracion
+5.Crear usuarios de prueba enduro por medio de un bean tipo UserDetailsService en la clase de configuracion. Recordar que el password debe ir encriptado siempre.Para encriptar, debemos usar passwordEncoder.encode("´passwordQueElijamos")

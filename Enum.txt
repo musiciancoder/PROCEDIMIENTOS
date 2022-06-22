@@ -1,0 +1,40 @@
+NOTA: paquete mienum en proyecto PruebasGeneralesJava
+
+Es un tipo especial de clases que sirve para generar instancias de clase cuyas propiedades son siempre constantes (es decir que sus atributos nunca varian).
+Debido a lo anterior nunca se instancian con la palabra reservada new, sino que en la misma clase, por lo que las clases enumeradas son siempre static. Ademas son finales (no pueden ser sobrescritas) y publicas.
+Generalmente constan de un constructor y un getter.
+
+package mienum;
+
+
+
+import java.util.Scanner;
+
+public enum UsosTallas {
+
+        TALLA_PEQUENA("S"), MEDIANO("M"), GRANDE("G"); //CONSTANTE("VARIABLE")
+
+    private final String miabreviatura; //campo de clase para generar constructor
+    
+
+    UsosTallas(String miabreviatura) { //constructor
+        this.miabreviatura=miabreviatura;
+       
+    }
+
+    public String getMiabreviatura() { //getter
+        return miabreviatura;
+    }
+
+
+
+
+
+
+    public static void main (String[] args){
+
+        System.out.println(TALLA_PEQUENA);
+        System.out.println(UsosTallas.TALLA_PEQUENA);
+        String talla= UsosTallas.TALLA_PEQUENA.toString();
+        System.out.println("talla: " + talla);
+

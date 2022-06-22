@@ -1,0 +1,8 @@
+Existen dos tipos de librerias externas (las librerias son siempre externas, nunca "internas") en un proyecto:
+1.Las generadas por el JRE (En intellij en External Libraries -->1.8, en eclipse JRE System Library).
+2.Las generadas por las dependencias del pom de maven (En intellij en External Libraries -->Maven, en Eclipse en Maven Dependencies).
+Una librería es un archivo .jar. Una dependencia de maven puede tener una o mas librerías (o archivos .jar).
+Estos archivos .jar (=librerias) poseen dentro de ellos varios paquetes, que son facilmente visualizables en Eclipse (paquete café), pero en Intellij estos paquetes
+se visualizan como carpetas. Por ejemplo: junit y org.junit son paquetes de la libreria junit:junit:4.11, generada por la dependencia en el pom con groupId:junit,artifactId:junit, version:4.11.
+A nuestras clases podemos importar todos estos paquetes con el nombreDelPaquete.*; o bien nombreDelPaquete.clase; Las clases disponibles de cada paquete se pueden ver facilmente en cada paquete.
+Al posicionar el mouse sobre un import podemos ver a qué librería pertenece.
