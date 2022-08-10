@@ -1,3 +1,4 @@
+
 Existen dos tipos de librerias externas (las librerias son siempre externas, nunca "internas") en un proyecto:
 1.Las generadas por el JRE (En intellij en External Libraries -->1.8, en eclipse JRE System Library).
 2.Las generadas por las dependencias del pom de maven (En intellij en External Libraries -->Maven, en Eclipse en Maven Dependencies).

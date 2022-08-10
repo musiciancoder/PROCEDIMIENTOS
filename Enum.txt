@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 NOTA: paquete mienum en proyecto PruebasGeneralesJava
 
 Es un tipo especial de clases que sirve para generar instancias de clase cuyas propiedades son siempre constantes (es decir que sus atributos nunca varian).

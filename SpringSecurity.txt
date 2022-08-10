@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 NOTA: Esto corresponde al curso de amigoscode
 
 Comienzo
@@ -39,3 +40,4 @@ Data Base Authentication.
 Los dos ejemplos anteriores fueron probados con datos en memoria.Para probar con Base de datos se escribió el paquete auth (ver rama /7-Database_Authentication).
 Este paquete contiene un patrón de diseño Dao para base de datos en duro en FakeApplicationUserDao (ojo! en ningún momento amigoscode probó con base de datos externa en posgres o mysql por ejemplo). Además se modificó la clase ApplicationSecurityConfig.
   
+
