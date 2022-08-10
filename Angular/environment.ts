@@ -1,0 +1,2 @@
+Sirve para configurar valores concernientes a los diferentes ambientes de prueba. Awui van las URL de loss ambientes basicamente.
+Estas URL pueden ser llamadas en clases .ts del proyecto importando environment.ts como clase typescript

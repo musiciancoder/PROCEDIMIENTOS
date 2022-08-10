@@ -1,0 +1,15 @@
+DAO data access object
+
+Video de mitocode para patrones de diseño DAO
+
+Es un patrón de diseño para accesar bases de datos. Generalmente se prueba primero su funciomamiento con datos "enduro" en la misma clase.
+1.Construir una clase bean (Persona) con sus seters y getters
+2.Construir una interfaz (PersonaDAO) con metodos correspondiente a todas las acciones que Persona puede realizar.
+3.Crear una clase que implemente la interfaz anterior (PersonaDAOImpl) y sobreescriba sus metodos. Dentro de cada uno de estos metods ir llamando a los setters de Persona para ir poblando la BD "enduro"
+4.Crear una clase principal, instanciar PersonaDAOImpl y probar.
+
+
+
+
+
+

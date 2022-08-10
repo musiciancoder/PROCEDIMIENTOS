@@ -1,0 +1,2 @@
+-.IDEA: Se trata de una carpeta de IntelliJ que contiene archivos para poder correr y debuguear programas
+-.gitignore: Es un archivo que le dice a git qué archivos ignorar si se cambian. Generalmente aqui van archivos propios de los IDEs, como la carpeta .IDEA 

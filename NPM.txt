@@ -42,6 +42,7 @@ npm i express-validator: para validacion del usuario q estamos recibiendo
 npm i jsonwebtoken
 npm i cors
 
+522519749
 
 
 

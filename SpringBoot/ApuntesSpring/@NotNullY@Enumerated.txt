@@ -1,0 +1,2 @@
+ @NotNull //la columna debe ser not null
+    @Enumerated(EnumType.STRING) //la columna debe ser alfanumerica

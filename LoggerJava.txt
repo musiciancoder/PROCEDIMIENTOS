@@ -1,0 +1,2 @@
+import org.slf4j.Logger; 
+private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);

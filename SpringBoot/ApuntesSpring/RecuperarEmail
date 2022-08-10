@@ -1,0 +1,16 @@
+Probar un servicio aparte que envíe emails. Para ello:
+1. Configurar el appications properties
+2. En Seguridad de tu cuenta en google tener habilitada la seguridad en dos pasos (para poder probar la aplicacion). Se genera un password que se pega en el application properties (ver video 22, minuto 3:30)
+3. Crear la clase de configuracion
+4. Crear la clase de servicio con el metodo para probar email
+5. Crear el controlador 
+6. Probar el envio de correo en postman
+7. Crear una plantilla html en Thymeleaf en la que poder tipear el nombre de usuario para recuperar la contraseña
+8. Escribir un dto con los datos de usuario entre los que debe ir el nombre de usuario que el usuario escribe para recuperar la contraseña.
+9. Crear un metodo en el servicio que reciba por parametro este dto
+10. Crear la llamada en el controlador donde se ocupe este servicio y probar.
+
+Probar en el proyecto mismo (video 24):
+1. Modificar el repositorio y el servicio para que no solo se pueda recuperar los datos del usuario por usuario sino por usuario e email
+2. 	Crear un campo  private String tokenPassword en la clase de entidad (clase Usuario en nuestro caso) //token para recuperar la contraseña si se olvida. Debe estar como nulo hasta que el usuario pida recuperar contraseña
+    

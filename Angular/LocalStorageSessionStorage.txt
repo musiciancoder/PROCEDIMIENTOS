@@ -1,0 +1,1 @@
+La propiedad sessionStorage es similar a localStorage , la única diferencia es que la información almacenada en localStorage no posee tiempo de expiración, por el contrario la información almacenada en sessionStorage es eliminada al finalizar la sesion de la página.

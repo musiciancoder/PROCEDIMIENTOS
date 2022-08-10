@@ -1,0 +1,2 @@
+@CrossOrigin //para que las politicas de CORS no bloqueen las peticiones desde el front.
+Se usa en el controller a nivel de clase

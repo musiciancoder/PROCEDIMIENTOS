@@ -1,0 +1,3 @@
+Instalar pluggin compare
+Abrir solo los dos archivos a comparar
+Dar click a compare y listo

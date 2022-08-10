@@ -1,0 +1,38 @@
+
+URL: https://jwt.io/  
+
+Una vez que se ha iniciado sesion exitosamente esto se puede ver en el KEY/VALUE EN Application-->Session Storage 
+KEY:AuthToken
+VALUE (esto es el JWT codificado):eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+JWT decodificado: Consta de un Header (donde va el tipo de algoritmo), Payload (json donde van los datos del usuario a autenticar) y Firma. 
+No se guarda nada en las cookies, sino que el cliente si se autentica exitosamente se genera un token desde el servidor y este se comparte al cliente. En toda peticion sucesiva del cliente deberá ir este token.
+
+
+https://www.youtube.com/watch?v=zMoWEZaTQvs
+
+Para hacerlo correr abrir en C:\Users\Andres\eclipse-workspace el proyecto con el mysql abierto
+Los comentarios estan en el proyecto C:\tutorialJwt 
+
+El proyecto esta diseñado para escribir todas las tablas y columnas al correr la aplicacion por primera vez, NO al crearlas manualmente en la BBDD
+
+
+Primero se crean las entidades de roles y usuarios.
+Luego se crea la clase de UsuarioPrincipal, que es el que tiene las autorizaciones para cada usuario.
+Se crea la interfaz que extiende a JpaRepository y se sobrescriben los metodos en las clases de servicio  que implementan esta interfaz (como siempre).
+Luego se crea una clase UserDetailsServiceImpl en donde se ocupa el metodo build de UsuarioPrincipal que es el metodo q contiene las autorizaciones. Esta clase convierte a un usuario en usuario principal con las autorizaciones.
+A continuacion se crean las clases JwtEntryPoint (que ve que sie el token no es valido devuelve un estado 401 no autorizado), PwtProvider (que contiene los metodos para validar si el token es valido) y JwtTokenFilter (que consume los metodos del provider para cada request)(en ese orden).
+Posteriormente se escribe la clase de configuracion (en este caso main security) sobreescribiendo los métodos.
+La clase JWTDto se crea de tal forma que contenga el token, para que se pueda ver en el Herramientas-->Application como clave valor-. Esto se ocupa en el controlador, que es lo último que se escribe.
+
+Para probar en postman:
+Loguearse exitosamente y copiar el token.
+en las siguientes llamadas (put,delete, etc.)en Authorization-->Bearer Token y escribir Bearer ecvvkkfkkfkfddhd (Bearer token, basicamente)
+
+Video 14. Con la aplicacion corriendo,nos vamos a https://jwt.io/ , escribimos el secret y el token obtenido del postman y probamos. 
+
+Video 18. Refrescar el token.  Cada 20 segundos vence el token (obviamente en un caso real van a ser mas segundos pero él lo probó con 20 segundos) y se debe hacer refreshtoken en el postman, escribiendo el token vencido en el body con la url localhost:8080/auth/refresh
+Para ello se escribe un metodo en el provider y se ejecuta en el controlador (AuthController).
+
+En el back seben crearse los servicios y consumirse en los interceptors
+    
+

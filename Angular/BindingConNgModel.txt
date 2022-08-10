@@ -1,0 +1,6 @@
+En formulario html o campo a llenar html:
+<div class = "form-group">
+                        <label for="nombreUsuario">Nombre de Usuario</label>
+                        <input type="text" name="nombreUsuario" id="nombreUsuario" class="form-control"
+                        [(ngModel)] = "nombreUsuario" required>
+En ts: nombreUsuario: string;

@@ -1,0 +1,41 @@
+NOTA: Esto corresponde al curso de amigoscode
+
+Comienzo
+1.Generar el proyecto en spring inizializr solo con la dependencia de spring web
+2.Generar clase de prueba (student) y clase controlador (studentController) y probar en el navegador con http://localhost:8080/api/v1/students/1
+3.Escribir dependencia de springweb en el pom, actualizar, correr de nuevo y probar con localhost:8080/login con usuario=user y contraseña=la generada en el log del IDE al correr el proyecto
+4.Con respecto al punto 3, podemos desloguearnos con http://localhost:8080/logout, una vez deslogueado, si entramos a http://localhost:8080/api/v1/students/1 va a pedir que nos loguiemos. Todo el tráfico se ve en herramientas del desarrollador-->network-->payload
+
+Autenticacion con BASIC AUTH
+Pide credenciales para todas y cada una de las peticiones (en authorization o en los headers), no existe el logout.
+1.En adicion a los tres puntos del "Comienzo", escribir clase de configuracion ApplicationSecurityConfig usando .httpBasic() en la clase configure.
+2.Escribir localhost:8080/login/ en el navegador deberá aparecer un popup para loguearse, pero al loguearnos sale "Whitelabel Error Page", entonces debemos simplemente escribir http://localhost:8080/api/v1/students/1. Notar que no podemos desloguearnos con basic auth
+3.Es mejor chequear en postman con un get http://localhost:8080/api/v1/students/2 y las credenciales en Authentication
+4.Si tenemos landing pages sin autenticacion, estas se pueden accesar directo sin credenciales previo escribir antMatches en la clase de configuracion
+5.Crear usuarios de prueba enduro por medio de un bean tipo UserDetailsService en la clase de configuracion. Recordar que el password debe ir encriptado siempre.Para encriptar, debemos usar passwordEncoder.encode("´passwordQueElijamos")
+6.Asignación de roles.
+6.1.Escribir clases (enum) de permisos (ApplicationUserPermission) y roles (ApplicationUserRole) y asignarlos en la clase Config (ApplicationSecurityConfig)
+6.2.Probar en postman los accesos a http://localhost:8080/api/v1/students/2 escribiendo en Autorizacion (en postman) las credenciales de los usarios que tienen roles con permisos (de lectura por ejemplo)
+6.3.Crear una API sencilla (StudentManagementController) e ir probando los distintos roles (con authorization en postman), ya sea por medio de antMatchers en clase Config (ApplicationSecurityConfig) o bien por medio de @PreAuthorization en el controlador (StudentManagementController)
+6.4.CSRF
+Cuando un usuario está logueado en un sitio, un hacker puede enviar un link al usuario y si este link es abierto, como el usuario esta logueado al sitio (por ejemplo un sitio de compras o un banco) 
+el hacker usa las credenciales del usuario para enviar dinero o articulos de compra a su cuenta personal. Esto se evita con un token, que es enviado desde el sitio (servidor) al usuario (cliente) en la primera petición que el usuario hace al sitio.
+En todas las subsiguientes peticiones el usuario deberá enviar de vuelta este token al servidor. Como el hacker no tiene este token no podrá mandar peticiones y le saldrá siempre un estado 403.
+Siempre que se hace login por navegador se recomienda incorporar CSRF (es un tipo de token) en la clase de configuración y configurar postman para probarlo por medio de cookies (esto último no me funcionó en el curso).Si se trata de un servicio q no usa navegador, esto no es necesario.
+
+
+Autenticacion con Form Based Auth
+Pide user name y password (al igual q basic auth). Es el estandar en la mayoria de sitios web. Sí tiene logout.
+El cliente envía un post para loguearse la primera vez, y si el logueo es exitoso el servidor manda al cliente como respuesta un estado 200 ok junto con una cookie con un SessionID.
+Este sessionId deberá ser reenviado del cliente al servidor en cada llamada, por lo que no se necesita enviar las credenciales al servidor cada vez, solo el sessionID que dura 30 minutos.
+1.En adicion a los tres puntos del "Comienzo", escribir clase de configuracion ApplicationSecurityConfig usando .httpBasic() en la clase configure y probar autenticacion con localhost:8080/login.
+2.Chequear que la cookie esta mandando la sesionID. Esto se ve en herramientas del desarrollador -->Application-->Cookies
+3.1:Para que se recuerden las credenciales del usuario por 30 dias: Escribir el Remember Me en el formulario de logueo y los métodos and().rememberMe() en el metodo configure de la clase de configuracion. y chequearlo en Network-->click en "login"-->payload (debe decir remember-me on")
+3.2:Cuando hacemos lo anterior, tras bambalinas se genera una segunda cookie (la de login es la primera). Esta segunda cookie (de remember me) almacena el username y el expirationtime y guarda en memoria de la base de datos del servidor o bien en una base de datos postgress por ejemplo,
+los que deben ir encriptado con md5. La ventaja de udar postgress en vez de la base de datos en memoria es que si el usuario ha previamente seleccionado la opcion Remember Me esto quedará guardado en la BBDD, no asi en memoria si el servidor se cae.
+3.3.Escribir los metodos para hacer logout en metodo configure() de ApplicationSecurityConfig, crear el html logout.html y probar en el navegador que cuando nos desloguiemos las cookies anteriores hayan desaparecido
+
+Data Base Authentication.
+Los dos ejemplos anteriores fueron probados con datos en memoria.Para probar con Base de datos se escribió el paquete auth (ver rama /7-Database_Authentication).
+Este paquete contiene un patrón de diseño Dao para base de datos en duro en FakeApplicationUserDao (ojo! en ningún momento amigoscode probó con base de datos externa en posgres o mysql por ejemplo). Además se modificó la clase ApplicationSecurityConfig.
+  

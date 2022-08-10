@@ -1,0 +1,5 @@
+        Optional<Usuario>usuarioOpt = usuarioService.getByNombreUsuarioOrEmail(dto.getMailTo()); 
+		if(!usuarioOpt.isPresent()){
+            return new ResponseEntity(new Mensaje("No existe ningun usuario con esas credenciales"),HttpStatus.NOT_FOUND);
+        }
+		Usuario usuario = usuarioOpt.get();

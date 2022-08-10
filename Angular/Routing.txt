@@ -15,3 +15,8 @@ const appRoutes:Routes=[
   imports: [ RouterModule.forRoot(appRoutes) ]
 
 3.En el html del app.component setear las rutas con href="/proyectos", por ejemplo y escribir al final de este html <router-outlet></router-outlet> 
+
+4.Con routerLink=['/miRuta'] en el html no se nececita <router-outlet></router-outlet> 
+
+5.Si queremos en un metodo de ts redireccionar, esto se hace con window.router.navigate(['/miRuta'])
+

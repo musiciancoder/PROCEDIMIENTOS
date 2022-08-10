@@ -1,0 +1,18 @@
+Al recibir un ticket SIEMPRE hacer un pull a development--> generar una nueva rama en local llamada feature/numerDeTicket_0--> y comenzar a trabajar en local.
+Al trabajar en local uno se puede crear las ramas que quiera feature/numerDeTicket_1, feature/numerDeTicket_2, etc, sin embargo al subir una rama a Github eesta debe llevar el siguiente nombre: feature/numerDeTicket.
+Antes de subir una rama verificar que no hayan cambios en la rama principal (development en Equifax).
+
+Una vez que se haya subido a github:
+1.Avisar al qa para q pruebe en local si quiere
+2.Compilar en Jenkins. Para esto debo:Ir a Panel de control -->cloud end user-cloud-end-user-ui-->build artifact-->end-user-ui-branch-build-artifact-testing-->build with parameters
+3.Desplegar en dev. Ir a Panel de control -->cloud end user-->cloud end user-cloud-end-user-ui-->cloud-end-user-s3-deploy-->build with parameters. Pegar donde dice 'version' la version compilada en el paso anterior
+4.Escanear en fortify.Ir a Panel de control -->cloud end user-->cloud end user-cloud-end-user-ui-->end-user-ui-fortify-zip-->build with parameters
+
+Luego de que haya desplegado en dev, probar uno mismo y avisarle al qa.
+
+Si está todo mal con lo que prueba el qa, no eliminar la rama en remoto, lo que objetó el qa guardarlo en otra rama en local (para tenerlo de respaldo) y seguir trabajando
+en la rama feature/numerDeTicket en local previo pull desde development. Cuando esté todo listo hacer un push del comit (no crear nueva rama).
+
+Avisarle al qa y volver a probar en dev.
+
+

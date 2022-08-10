@@ -1,0 +1,3 @@
+Ambos sirven para dar permisos degun roles en spring security.
+@PreAuthorize va en el controlador antes de cada peticion
+@EnableGlobalMethodSecurity va en clase de configuracion

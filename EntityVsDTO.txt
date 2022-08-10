@@ -1,0 +1,25 @@
+Entity is class mapped to table. Dto is class mapped to "view" layer mostly. What needed to store is entity & which needed to 'show' on web page is DTO.
+
+Example : If I want to store employee model as follows : Take employee as an example, I need to store gender either male/female/other. But on JSP I need to show all three values as form 'options' so user can select one.
+
+@Entity
+public class Employee{
+//annotate with @Id and others
+
+private Long id;
+private String name;
+private Gender gender; //this is enum viz Male,female
+}
+//Now extend Dto with employee
+
+public EmployeeDto extends Employee{
+Gender[] genders=Gender.values(); //put all gender types in array.
+}
+while rendering jsp we can give
+
+<select name="gender"> //pointed towards entity gender field.
+  <option value="Male">Male</option>
+  <option value="Female">Female</option>
+  <option value="Other">Other</option>
+</select>
+then in spring or some other framework whichever selected will be opted as gender in entity.This is made possible because Dto had all three values of gender in it. Similarly, as per situation things follows. As mostly we need most of entity fields on jsp we extend dto by entity.

@@ -1,5 +1,5 @@
 *Que la informacion se vea en un input: [value]="object.title"
-*Función evento : (click)="nombreFuncion()"   obien (keyup)="onKeyUp()"
+*Función evento : (click)="nombreFuncion()"   o bien (keyup)="onKeyUp()"
 *Nombrar un Input: para ser llamado por este nombre #titleInput (puede ser cualquier nombre e vez de titleInput)
 
 <input (keyup)="onKeyUp(titleInput.value)"
@@ -43,6 +43,8 @@ https://angular-university.io/lesson/angular-beginners-ngclass
 *Un valor que toma varios valores, renderizarlos en forma dinámica: [NgSwitch] en div padre; *ngSwitchCase en div hijos (similar al switch de javascript)
 
 https://angular-university.io/lesson/angular-beginners-pipes
-*Dar formato a fechas, numeros, strings, etc. que estan siendo renderizados dinámicamente en etiquetas div: Con AngularBuilt-In-Pipes
+*Dar formato a fechas, numeros, strings, etc. que estan siendo renderizados dinámicamente en etiquetas div: Con AngularBuilt-In-Pipes.
+
+
 
 

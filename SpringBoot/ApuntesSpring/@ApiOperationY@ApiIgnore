@@ -1,0 +1,4 @@
+    @ApiOperation("Muestra una lista de productos") //esto es para dar un titulo a la etiqueta de la documentacion en swagger
+	  @ApiIgnore //para que no aparezca en Swagger
+    
+   

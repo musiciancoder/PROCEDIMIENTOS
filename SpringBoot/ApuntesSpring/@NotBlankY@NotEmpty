@@ -1,0 +1,3 @@
+@NotBlank -->ni nulo ni en blanco
+@NotNull -->no nulo
+@NotEmpty --> no en blanco

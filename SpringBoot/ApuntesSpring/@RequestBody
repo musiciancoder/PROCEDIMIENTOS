@@ -1,0 +1,3 @@
+    @PostMapping("/change-password")
+    public ResponseEntity<> changePassword(@RequestBody ChangePasswordDTO dto, BindingResult bindingResult){
+        return null;

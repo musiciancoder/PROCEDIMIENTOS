@@ -1,0 +1,21 @@
+
+Providers are usually singleton (one instance) objects, that other objects have access to through dependency injection (DI).
+
+If you plan to use an object multiple times, for example, the Http service in different components, you can ask for the same instance of that service (reuse it). You do that with the help of DI by providing a reference to the same object that DI creates for you.
+
+@Component){
+  ..
+  providers: [Http]
+}
+..instead of creating new object every time:
+
+@Component){}
+class Cmp {
+  constructor() {
+    // this is pseudo code, doens't work
+    this.http = new Http(...options);
+  }
+}
+This is an approximation, but that's the general idea behind Dependency Injection - let the framework handle creation and maintenance of reusable objects... Provider is Angular's term for these reusable objects (dependencies).
+
+Nota:en el ejemplo de angular con spring security hay un interceptor que es un tipo de provider (se declara y se ocupa multiples veces en varios componentes)

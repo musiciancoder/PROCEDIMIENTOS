@@ -1,0 +1,19 @@
+
+Swagger es para documentar y hacer pruebas similares a las de postman. Se prueba con el proyecto corriendo en localhost:8080/swagger-ui/index.html
+
+Deben importarse las siguientes dependencias:
+		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter para swagger-->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		
+		Ademas debe implementarse la clase ConfigSwagger (ver proyecto de springsecurity JWT)
