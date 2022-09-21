@@ -9,3 +9,4 @@ COMPONENTES
 Los componentes pueden recibir directamente información desde su respectiva plantilla html sin pasar por necesariamente por un controlador, en el caso de llenar un formulario, por ejemplo.
 Para ello se crean clases dto con los campos a llenar en el formulario que se ocupan en el servicio al crear los métodos y luego se le pasa por parámetros
 en el front el dto que es justamente lo que el usuario está llenando en el formulario  (ver ChangePasswordComponent del proyecto de JWT).
+

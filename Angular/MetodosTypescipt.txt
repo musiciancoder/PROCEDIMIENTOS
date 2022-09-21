@@ -1,1 +1,2 @@
 activatedRoutes.snapshot():obtener la ruta actual
+instanciaDeEventEmitter.emit(objeto a enviar al padre):para mandar de hijo a padre con output 

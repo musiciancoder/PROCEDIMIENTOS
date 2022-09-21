@@ -1,9 +1,20 @@
+El comando (sudo su) permite a los usuarios ejecutar programas con los privilegios de seguridad de otro usuario (normalmente el usuario root) de manera segura, convirtiéndose así temporalmente en súper usuario.
+Sintaxis: sudo [opciones]
+Opciones comando sudo:
+Ejemplo 1:
+En este primer ejemplo el comando (sudo) con la opción (su) sirve para ingresar a súper usuario, en el momento de ingresar el comando (sudo su) nos va pedir la contraseña para de esta manera poder tener permiso y acceder a este.
+Es importante saber que el súper usuario se identifica por el símbolo (#), mientras que cuando estamos en usuario normal lo podemos identificar por el símbolo ($).
+$: Se utiliza para representar o decir que estamos logueados con un usuario normal o diferente a root.
+#: Se utiliza para saber que hemos entrado con privilegios de administrador o súper usuario o root.
+
 ctrl+c: volver a la linea de comandos
 actualizar e instalar paquetes para poder usar la consola ubuntu: sudo apt-get update
 ir a carpeta exacta: cd /nombrecarpeta/
 mostrar lo que hay en la carpeta: ls /
 mostrar lo que hay en la carpeta como lista: ls -l (dir en windows)
 mostrar donde estoy parado: pwd
+mostrar discos locales (cuando estoy parado en root): ls /mnt/
+acceder a disco local c (cuando estoy parado en root): cd /mnt/c
 descomprimir archivo: tar xvf nombrecarpeta
 abrir archivo: nano nombrearchivo
 ctrl+o :guardar en archivo
@@ -26,6 +37,7 @@ ufw status verbose : cuantos puerto hay habilitados
 rm nombredirectorio: borra directorio (si el directorio no esta vacio no lo borra)
  rm -rf probando :borra directorios no vacios, incluyendo todos los archivos contenidos en el
 del nombrearchivo: borra archivo
+mv nombreAntiguo mv nombreNuevo: renombrar archivo
 copiar archivos en windows (desde la ruta de archivo a copiar): copy nombrearchivo rutarelativa\copianombrearchivo (barra invertida!!)
 en windows tecla tab (flechas) sirve para autocompletar
 en windows ipconfig: informacion acerca de mi coneccion de red
@@ -39,7 +51,9 @@ find "cadenadetexto" *.txt  : Encuentra una cadena de texto en el archivo .txt (
 mostrar archivo de texto en windows: more archivo.txt
 history : muestra todos los comandos recientemente usados
 clear limpia pantalla
-nano nombrearchivo.txt: crear archivo texto
+free: muestra espacio disponible en memoria
+nano nombreArchivo: abrir archivo (se edita solo con teclado, no con mouse; se guarda con ctrl + o y se sale con ctrl + x
+nano nombrearchivo.txt: crear archivo texto 
 linux: mv unacarpeta/archivo.txt otracarpeta :mueve archivo.txt desde unacarpeta a otracarpeta (hay que escribir las rutas relativas de las carpetas)
 df -h: particiones y espacio disponible en discoduro
 du -h /rutacarpeta muestra cuanto espacio ocupa lacarpeta

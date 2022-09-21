@@ -1,0 +1,3 @@
+Primero pasar de archivoDescargado.pem a archivoDescargado.ppk con puttygen
+Luego en Putty escribir el host (por ejemplo ec2-3-82-65-241.compute-1.amazonaws.com), puerto 22. 
+Auth-->Browse-->buscar el archivo .ppk y click en Open

@@ -12,6 +12,7 @@ ng g c nombreComponente: crea todo el componente (con html y css incluidos). Deb
 ng g class nombreClase: crear una clase 
 ng g service nombreClaseServicio: crear clase servicio
 
+Metodo Fernando (no recomendado!) ng g m carpeta/nombreModulo:generarModulo (debe tener creada la carpeta de antemano manualmente). Posteriormente debe generarse un componente dentro de la carpeta, en el modulo local nobreModulo exportar el componente creado y en app component importar el nombreModulo 
 
 ng g c clientes/form --flat: crear directorio clientes con componente form adentro de él
 

@@ -1,4 +1,0 @@
-1.Crear carpeta nueva y clonar con git clone httpRepositorioGit
-2.En Eclipse, en la vista de Git Repositories en eclipse, seleccionar Add an existing local repository to view, entonces se mostrara el proyecto en la vista Git Repositories (no en Project Explorer).
-3. Para poder verlo en el Project Explorer, click derecho en el proyecto en Git Repositories, importar.
-4.Para seleccionar una rama, en la vista Git Repositories, en branches remote tracking seleccionar la rama de interés (va a pedir confirmar y crear rama local, darle si a todo nomas). Luego actualizar el Project Explorer y se verá el proyecto en la rama de interes

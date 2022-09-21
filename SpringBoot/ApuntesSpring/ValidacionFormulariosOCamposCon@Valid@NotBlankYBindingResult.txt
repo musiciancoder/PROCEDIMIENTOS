@@ -1,0 +1,25 @@
+1) Curso JWT Español para validar formulario (no funcionó!)
+
+1. Se debe contar con la libreria hibernate validation v.6.0 en Maven (juan solo probó con jars, no con maven) o bien con Jakarta validation (lo probé y no funcionó)
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>6.0.10.Final</version>
+</dependency>
+2.En argumentos del controlador se debe contar con la anotacion @Valid
+3.En la clase bean, en el campo que queremos poner las validaciones se pone @NotNull, @Size, etc
+https://reflectoring.io/bean-validation-with-spring-boot/
+
+2) Curso Kubernates A.Guzman para validar campos a ser guardados en entidades, video "validando los datos del json" (si funcionó!)
+1.Importar dependencia:
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+2.En argumentos del controlador en el post se debe contar con la anotacion @Valid y BindingResult
+3.Crear el metodo "validar" en el controlador
+4.En la entidad configurar los campos con @NotBlank, @NotNull, etc.
+
+NOTA: En ninguno de los dos casos se requiere el uso de excepciones
+
+

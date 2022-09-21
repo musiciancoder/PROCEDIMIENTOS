@@ -1,0 +1,35 @@
+1. En el servicio hacer privado el objeto original que se desea enviar al componente. Esto se hace por seguridad y significa que ninguna clase va a tener acceso al objeto original mediante inyeccion por dependencia, por lo q el objeto original no podrá ser modificado.
+2. En el servicio hacer una copia del objeto original mediante spread operator. Este es el objeto que se va a pasar.
+3. En el servicio hacer un getter q retore la copia. De esta manera la copia queda visible para cualquier componente mediante inyeccion por dependencia.
+
+Ejemplo:
+
+import { Injectable } from '@angular/core';
+import { Personaje } from '../interfaces/dbz.interface';
+
+
+@Injectable()
+export class DbzService {
+
+    private _personajes: Personaje[] = [ 
+        {
+          nombre: 'Goku',
+          poder: 15000
+        },
+        {
+          nombre: 'Vegeta',
+          poder: 7500
+        }
+    ];
+
+    get personajes(): Personaje[] {
+        return [...this._personajes];
+    }
+
+    constructor() {}
+
+    agregarPersonaje( personaje: Personaje ) {
+        this._personajes.push( personaje );
+    }
+
+}

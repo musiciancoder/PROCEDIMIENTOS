@@ -1,0 +1,2 @@
+Con la aplicacion corriendo, poner un breakpoint en el devTools o en el código en sources-->main.js (se puede hacer con la palabra reservada debugger en vez de breakpoint tambien).
+Luego ejecutar la acción a debugear (apretar un boton por ejemplo) 

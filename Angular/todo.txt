@@ -1,0 +1,4 @@
+Pipe
+Como manipular dom con Angular
+Como gestionar mejor dependencias con package.json
+Como hacer testing con Angular

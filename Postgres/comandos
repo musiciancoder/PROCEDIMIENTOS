@@ -1,0 +1,5 @@
+\l : lista de bbdd
+\c nombreBBDD : ver bbdd
+\dt: detalle de la bbdd
+d+ nombreTabla : detalle de la tabla
+exit: salir de la linea de comandos

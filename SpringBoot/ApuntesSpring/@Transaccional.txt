@@ -1,247 +1,49 @@
-El tratar transacciones con Spring es una de las características más utilizadas por los proyectos de programación y aun así continúa siendo una de las menos conocidas y sobre las que hay poca aplicación, en lo personal creo que es por falta de conocimiento.
 
 Una transacción de base de datos es un conjunto de instrucciones que se ejecutan en bloque. Por ejemplo, hago una consulta, modifico un registro A en la base de datos y elimino un registro B. Si en alguna de estas instrucciones se produce un error todo el proceso se echa atrás. De esta manera si luego consulto la base de datos veré que el registro A no ha sido alterado. 
 
 Este proceso de “tirar atrás” las instrucciones realizadas se le dice hacer unrollback, mientras que el proceso de confirmar todas las instrucciones en bloque una vez hemos visto que no se ha producido ningún error se le llama hacer un commit.
 
 
-Las transacciones se empiezan y terminan a nivel de servicio, nunca a nivel de DAO. Si lo pensamos tiene lógica, el servicio es el que se encarga de gestionar toda la lógica de negocios: llamará a los DAOs que necesite para consultar, guardar o modificar registros y lo ha de hacer de manera atómica. 
+Ejemplo:
 
+package org.adiaz.springcloud.msvc.usuarios.services;
 
+import org.adiaz.springcloud.msvc.usuarios.models.entity.Usuario;
+import org.adiaz.springcloud.msvc.usuarios.repositories.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-Por ejemplo, supongamos un proceso batch que trabaja por la noche y que se encarga de recalcular la hipoteca de los clientes. 
-En el primer paso obtiene el registro de la hipoteca
-El segundo recalcula la hipoteca
-El tercero actualiza el registro del cliente con una marca para señalar que el proceso ya ha procesado ese cliente. 
+import java.util.List;
+import java.util.Optional;
 
-Nota: El DAO se encarga de la consulta, de la actualización de la hipoteca y de la actualización del registro con la marca de manera individual, primero con un método que lance una query, después con un update de la hipoteca y posteriormente con un update de la tabla de avisos del cliente. 
+@Service
+public class UsuarioServiceImpl implements UsuarioService {
 
-Pero es el servicio, o su equivalente batch, el que se encarga de que todo este proceso se trate como una unidad. Si empezase la transacción a nivel del DAO no tendría manera de controlar la atomicidad de todo el proceso.
-
-Una transacción es descrita tradicionalmente en desarrollo de software por medio de cuatro factores (ACID)
-Atómico: Las transacciones están compuestas de una o más actividades agrupadas como una sola unidad de trabajo. Este factor asegura que todas las operaciones en una transacción ocurrirá si la todas las operaciones terminan su ejecución correctamente o ninguna de ellas ocurrirá si cualquiera de estas actividades termina su ejecución incorrectamente, en cuyo caso se deshacen todos los cambios efectuados por las operaciones de la transacción.
-Consistente: Una vez que una transacción termina su ejecución, ya sea correcta o incorrectamente, el sistema es dejado en un estado consistente con el negocio que modela.
-Aislado: Las transacciones debe permitir a varios usuarios trabajar con los mismos datos, sin que cada trabajo de un usuarios se enrede con el de los demás. Por lo tanto, las transacciones deben ser aisladas unas de las otras, previendo de esta manera la lectura y/o escritura concurrente de los datos.
-Durable: Una vez que una transacción concluye, el resultado de una transacción debe persistir y debe sobrevivir a cualquier tipo de fallo del sistema.
-
-Spring provee soporte para administración de transacciones declarativas y programables, además estas no requieren implementar JTA, esto es, si la aplicación utiliza solamente un simple recurso persistente, Spring puede utilizar el soporte transaccional ofrecido por el mecanismo de persistencia, como JDBC, Hibernate o JPA, pero si la aplicación utiliza varios recursos, Spring soporta transacciones distribuidas, XA, utilizando alguna implementación JTA de terceros.
-
-La administración de transacciones programables ofrecen la flexibilidad y control más preciso de definir los limites de la transacción en el código, mientras que las transacciones declarativas, basadas en Spring AOP, ayudan a desacoplar una operación de las reglas de la transacción. Que enfoque utilizar es una decisión de control contra conveniencia.
-
-Spring no administra las transacciones directamente si no que esta incorporado con una selección de administradores de transacciones para delegar esta responsabilidad a la implementación de la plataforma especifica provista ya sea por JTA o por el mecanismo de persistencia, cada uno de estos mecanismos actúa como un facade y son listados a continuación:
-
-
-
-
-
-org.springframework.jca.cci.connection.CciLocalTransactionManager
-org.springframework.jdbc.datasource.DataSourceTransactionManager
-org.springframework.jms.connection.JmsTransactionManager
-org.springframework.jms.connection.JmsTransactionManager102
-org.springframework.orm.hibernate3.HibernateTransactionManager
-org.springframework.orm.jdo.JdoTransactionManager
-org.springframework.orm.jpa.JpaTransactionManager
-org.springframework.transaction.jta.JtaTransactionManager
-org.springframework.transaction.jta.OC4JJtaTransactionManager
-org.springframework.transaction.jta.WebLogicJtaTransactionManager
-org.springframework.transaction.jta.WebSphereUowTransactionManager
-
-
-Transacciones con Spring
-La manera más común de tratar las transacciones en Spring es mediante la anotación@Transactional en la cabecera del método de una clase (nunca un interfaz) gestionada por Spring:
-@Transactional
-public void hazAlgoTransaccionalmente() {
-    // Soy transaccional!
-}
-Nota: la anotación sólo funcionará en métodos públicos desde los cuales se acceda a la clase. Pero si definimos un metodo privado y aplicamos la notación para transacciones que sucede ?.  Lo peor no es que no funcione, lo peor es que no funcionará y no te avisará de que te estás equivocando. Y es que la anotación @Transactional es tratada como un metadato, si lo puede aprovechar lo hace pero si no lo ignora, por decirlo de una forma seriamos locos pensando que el metodo esta transaccionando, cuando no estaria funcionando y lo peor es que nos daremos cuenta tarde. 
-La regla es simple, la anotación sólo tiene efecto en la cabecera de un método por el cual se acceda a la clase. Evidentemente se puede marcar todos los métodos como transaccionales, e incluso la propia clase (con lo que todos sus métodos públicos lo serán) pero como veremos más adelante eso nos puede dar algún problema por lo que hay que ser cautos.
-
-
-Ámbito de la transacción
-Una cosa que se ha de tener clara es cuanto dura una transacción. Esto es, cuando empieza y cuando termina. Si tenemos anotado un método con @Transactional, la transacción empezará justo antes de la primera línea del método y terminará justo después de la última. Si dentro de esto método existen llamadas a otros métodos estos otros métodos son llamados dentro de la transacción sin necesidad de anotarlos con @Transactional.
-Ahora bien ¿qué sucede cuando un método anotado con @Transactional llama a otro método anotado también con @Transactional?
-public class A {
- 
     @Autowired
-    private B b;
- 
-    @Transactional
-    public void hazAlgoA() {
-        b.hazAlgoB();
-    }
- 
-}
- 
-public class B {
- 
-    @Transactional
-    public void hazAlgoB() {
-        hazAlgoTransaccionalmente();
-    }
-}
+    private UsuarioRepository repository;
 
-Se mantiene la misma transacción? ¿Se abre una nueva?… 
-Bueno, a esto se le llama propagación de la transacción. 
-
-Por defecto una transacción tiene una propagación de PROPAGATION_REQUIRED, si la transacción no existe la crea y si la tiene la aprovecha. Según esto, el primer método abre la transacción y el segundo la aprovecha por lo que todo está dentro de la misma transacción.
-Ahora supongamos que queremos justo lo contrario. Necesitamos que el método de la claseB utilice una nueva transacción, de esta manera si algo falla en B, la transacción de A no hace rollback. Tal como está actualmente no nos sirve por lo que hemos de modificar la propagación de B de la manera siguiente.
-@Transactional( propagation = Propagation.REQUIRES_NEW )
-public void hazAlgoB() {
-    hazAlgoTransaccionalmente();
-}
-Ahora, al entrar en B, sí se generará una nueva transacción.
-Spring soporta las siguientes propagaciones:
-PROPAGATION_REQUIRED - Es la que viene por defecto, así que no es necesaria especificarla. Si existe transacción la aprovecha y sino la crea
-REQUIRES_NEW - Abre una transacción nueva y pone en suspenso la anterior. Una vez el método marcado como REQUIRES_NEW termina se vuelve a la transacción anterior.
-PROPAGATION_SUPPORTS - Si existe transacción la aprovecha, sino no crea ninguna.
-PROPAGATION_MANDATORY - Si no existe una transacción abierta se lanza una excepción. Hay gente que anota sus DAO con esta opción.
-PROPAGATION_NEVER - Si existe una transacción abierta se lanza una excepción. No se me ocurre ningún ejemplo donde esto sea necesario pero seguro que alguno hay.
-PROPAGATION_NOT_SUPPORTED - Si existe una transacción la pone en suspenso, la transacción se reactiva al salir del método.
-Commit y Rollback
- Ahora lo que queremos es controlar el commit o elrollback de nuestra transacción. La cosa es simple, si un método anotado como@Transaccional lanza una excepción que herede de RuntimeException se producirá un rollback. En caso contrario, un commit.
-Ok, vamos a dar vueltas a esto. Primero lo más evidente:
-public class A {
- 
-    @Autowired
-    private B b;
- 
-    public void hazAlgoA() {
-        try {
-            b.hazAlgoB();
-        }
-        catch( NullPointerExecption e) {
-        }
+    @Override
+    @Transactional(readOnly = true) //por si hay algun error en proceso de lectura
+    public List<Usuario> listar() {
+        return (List<Usuario>) repository.findAll();
     }
- 
-}
- 
-public class B {
- 
+
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<Usuario> porId(Long id) {
+        return Optional.empty();
+    }
+
+    @Override
     @Transactional
-    public void hazAlgo(Entidad entidad) {
-        // inserto un dato en bbdd
- 
-        throw new NullPointerException();
- 
-        // inserto otro dato en bbdd
+    public Usuario guardar(Usuario usuario) {
+        return repository.save(usuario);
     }
-}
-lanza una NullPointerException, que hereda de RuntimeException, luego se produce un rollback y la primera inserción no se realiza (ni la segunda, claro).
-Veamos esto
-public class A {
- 
-    @Autowired
-    private B b;
- 
-    public void hazAlgoA() {
-        try {
-            b.hazAlgoB();
-        }
-        catch( FileNotFoundException e) {
-        }
-    }
- 
-}
- 
-public class B {
- 
+
+    @Override
     @Transactional
-    public void hazAlgo(Entidad entidad) {
-        // inserto un dato en bbdd
- 
-        throw new FileNotFoundException();
- 
-        // inserto otro dato en bbdd
+    public void eliminar(Long id) {
+        repository.deleteById(id);
     }
 }
-¿Qué hará? ¿Inserta un dato? ¿Dos? ¿Ninguno? Veamos, FileNotFoundException no hereda de RuntimeException por lo que no debería hacer rollback, pero lanzamos la excepción antes de insertar el segundo dato así que el flujo del programa no llegaría al código de insertarlo, pero si hace el primero. Podemos imaginar que hay algo así:
-
-
-public void hazAlgo(Entidad entidad) {
-    try{
-        tx.begin
- 
-        // inserto un dato en bbdd
-        throw new FileNotFoundException();
- 
-        // inserto otro dato en bbdd
-    }
-    catch(Exception e ) {
-        if( e instanceof RuntimeException ) {
-            tx.rollback();
-            tx.close();
-        }
-        else {
-            tx.commit();
-            tx.close();
-        }
-        throw e;
-    }
-}
-¡Esto no es el código que hay realmente! Tan sólo es poner en pseudocódigo lo explicado anteriormente.
-Compliquemoslo un poco más:
-public class A {
- 
-    @Autowired
-    private B b;
- 
-    public void hazAlgoA() {
-        b.hazAlgoB();
-    }
- 
-}
- 
-class B {
- 
-    @Autowired
-    private C c;
- 
-    @Transactional
-    public void hazAlgoB() {
-        // inserto un dato en bbdd
-        try {
-            c.hazAlgoC();
-        catch( NullPointerExecption e) {
-        }
-        // inserto otro dato en bbdd
- 
-    }
-}
- 
-class C {
- 
-    @Transactional
-    public void hazAlgoC() {
-        // inserto un dato en bbdd
- 
-        throw new NullPointerException();
- 
-        // inserto otro dato en bbdd
-    }
-}
-Esta es más interesante. La clase C lanza una NullPointerException que hereda unaRuntimeException ergo debería hacer un rollback. Pero, pero, pero, la clase B, donde se inicia la transacción ya tenía previsto este error, así que captura la excepción y no la vuelve a lanzar. ¿Hará un rollback? ¿Hará un commit? Hagan sus apuestas.
-Bueno, hace un rollback. El punto es que si una RuntimeExcepcition sale de un método anotado como @Transactional, toda la transacción queda marcada como rollback. No importa que no fuese el método desde el que se inició la transacción, si su propagación es normal (esto es, no es una REQUIRES_NEW), en cuanto lanzamos la excepción estamos vendidos.
-Esto es importante por un motivo, hay gente que, ante la duda, anota todos los métodos o las clases con @Transactional pero esto supone un problema de concepto de construcción. El encargado de saber si la transacción ha de marcarse como rollback ocommit es siempre el método desde donde se inicia la transacción, nunca uno de los métodos a los que llama. Si yo llamo a un método externo que está marcado como transaccional y este por algún motivo me lanza una RuntimeExcepción, automáticamente me obliga a hacer un rollback. No me deja la opción de que sea yo el que valore si puedo continuar o no, quizás ya tenía previsto que podía saltar esa excepción y la capturaba para tratarla. Lamentablemente, al utilizar una librería que anotó su método con@Transactional me limita de cualquier intento de recuperarme de la excepción.
-Moraleja, sólo hay que poner @Transactional en métodos donde se abre, cierra y controla la transacción. En el resto de métodos su colocación puede ser contraproducente.
-Controlar las excepciones que hagan commit o rollback
-El hecho anterior, que una transacción haga rollback si se lanza una RuntimeExcecption y commit si no, es algo demasiado rígido para muchos casos. Hay momentos que no queremos que se haga un rollback para alguna excepción en concreto o lo contrario, no queremos que haga un commit cuando se lanza una excepción que no herede de RuntimeException. Para esto tenemos las propiedades noRollbackFor yrollbackFor, con estas opciones podemos configurar el commit y el rollback según nuestras necesidades.
-Por ejemplo:
-@Transactional(noRollbackFor={NumberFormatException.class,ArithmeticException.class})
-public void hazAlgoTransaccionalmente() {
-    // Soy transaccional!
-}
-Hará un commit incluso si lanza las excepciones NumberFormatException oArithmeticException o excepciones que hereden de estas. Lo de las excepciones que hereden de esta es muy importante para tener en cuenta su alcance. Hay gente que lo aprovecha para hacer cosas del tipo:
-
-
-@Transactional(noRollbackFor={RuntimeException.class})
-public void hazAlgoTransaccionalmente() {
-    // Soy transaccional!
-}
-lo cual es una muy pésima idea porque implica que el método nunca hará un rollback.
-Tal como he dicho existe la propiedad inversa, rollbackFor. Con esta podremos conseguir que la transacción haga un rollback para las excepciones que no hereden deRuntimeException.
-Por ejemplo
-@Transactional(rollbackFor={FileNotFoundException.class})
-public void hazAlgoTransaccionalmente() {
-    // Soy transaccional!
-}
-hará un rollback si lanza una FileNotFoundException a pesar de que esta no hereda de RuntimeException.

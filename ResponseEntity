@@ -1,0 +1,23 @@
+Ojo con Response entity, porque hay dos maneras de trabajarlo en el controlador..
+1) No poner un genérico, sino la clase con la que estamos trabajando (proyecto del español springSecurity):
+    @ApiIgnore //para que no aparezca en Swagger
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<Producto> getById(@PathVariable("id") int id){
+        if(!productoService.existsById(id))
+            return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
+        Producto producto = productoService.getOne(id).get();
+        return new ResponseEntity(producto, HttpStatus.OK);
+		
+2)Poner el genérico en el método y trabajarlo con ResponseEntity devolviendo métodos estáticos (proyecto curso kubernates Andres Guzman):
+ @GetMapping("{id}") //lo pasa por url
+    public ResponseEntity<?> detalle(@PathVariable Long id){
+        Optional <Usuario> usuarioOptional = service.porId(id);
+        if(usuarioOptional.isPresent()){
+            return ResponseEntity.ok(usuarioOptional.get()); //ok es metodo estático, por eso no ocupa new ResponseEntity
+        }
+        //return null;
+        return ResponseEntity.notFound().build(); //not found es metodo estático
+    }
+
+		
+		

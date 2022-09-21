@@ -1,0 +1,61 @@
+Estructura básica de un proyecto en Angular
+Estructura básica proyecto en Angular
+Al realizar un nuevo proyecto, Angular Cli nos genera un nuevo espacio de trabajo,ng new. Aquí te explico cómo instalar Angular Cli
+
+*e2e: esta carpeta, denominada “end to end”, engloba unas series de ficheros cuya función es la realización de test automáticos, como si un usuario interactuase con la app. Se ejecuta con el comando ng e2e.
+
+*node_modules: es la carpeta que contiene todas las dependencias de nuestro proyecto.
+
+
+*src: es el directorio donde trabajaremos nuestros módulos. Además, es el más importante, ya que contiene todo el código.
+Directorio src proyecto en Angular
+Carpeta app
+Aquí se encuentra la carpeta app donde se ubica toda la implementación de los componentes principales, junto a su template html y archivos de estilos css.
+
+Carpeta assets
+Contendrá todos los asset y archivos adicionales para hacer que el proyecto funcione.
+
+Carpeta enviroments
+Donde se encuentra las configuraciones y variables de entorno para poner el proyecto tanto en desarrollo (environment.ts) como en producción (environment.prod.ts)
+
+Archivo favicon.ico
+Es el archivo del icono del proyecto.
+
+Archivo index.html
+Es el archivo de la página principal del proyecto.
+
+Archivo main.ts
+Es el archivo Type Script inicial del proyecto para decirle al programa el ambiente donde esta corriendo (navegador web, native sript, etc). No se modifica!
+
+Archivo polyfills.ts
+This file is used to compile our TypeScript to specific JavaScript methods. Provides compatibility support for Browser versions.
+Polyfills in angular are few lines of code which make your application compatible for different browsers. The code we write is mostly in ES6(New Features: Overview and Comparison) and is not compatible with IE or firefox and needs some environment setups before being able to be viewed or used in these browsers.
+Polyfills.ts was provided by angular to help you do away with need to specifically setup everything.
+
+Archivo styles.css
+Se usa para escribir estilos globales del proyecto, asi como para importar otros archivos de estilo.
+
+Archivo test.ts
+Es para ejecutar pruebas unitarias.
+This file is required by karma.conf.js and loads recursively all the .spec and framework files
+What is karma.conf.js?
+Karma is a console tool for running tests, which can track source code changes and display the percentage of code tests coverage. It is adjusted using the configuration file karma. conf. js, where the paths to tested files and to the files with tests should be specified.
+
+Archivo .browserslist.rc
+Es un archivo usado para que cuando se construya el proyecto (build project) se pueda ajustar CSS y JavaScript para poder soportar cada uno de los navegadores que aparece en la lista de este archivo. Es complementario a Polyfills, pero funciona a diferencia de este al construir el proyecto
+
+Archivo editorconfig: es la configuración de nuestro editor de código. https://editorconfig.org/
+Archivo .gitignore: son las carpetas o archivos que debe ignorar el git cuando lo añadamos al repositorio.
+Archivo angular.json: contiene la configuración de Angular para cargar en el proyecto nuestros assets (iconos, imagenes), estilos, etc.
+
+Archivo karma.conf: karma es una herramienta que genera un simulador de un servidor web que ejecuta código fuente contra código de testing para cada uno de los navegadores conectados. 
+El resultado de cada prueba test en cada navegador de examina y se devuelve como linea de comando al desarrollador, para que este pueda ver qué navegador y qué test está aprobando o fallando.
+https://karma-runner.github.io/1.0/intro/how-it-works.html
+
+
+Archivo package.json: es la configuración de nuestra aplicación. Contiene el nombre de la app, las dependencias necesarias para su correcta ejecución y muchas otras cosas. No debería editarse manualmente!
+Archivo package.lock.json: Contiene mayorinformacion sobre las dependencias que el package.json. Tampoco se toca!
+Archivo README.md: aquí podemos añadir información sobre la aplicación. Este archivo es leído por GIT y los muestra en el repositorio.
+Archivo tsconfig.json: contiene la configuración de TypeScript.
+Archivo tsconfig.spec.json: contiene la configuración de TypeScript para pruebas unitarias (notar q extiende tsconfig.json)
+Archivo tslint.json: archivo de configuracion con reglas de sintaxis de typescript para poder usar funciones de flecha y muchas otras caracteristicas de sintaxis. Esta deprecado actualmente

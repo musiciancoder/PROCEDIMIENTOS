@@ -1,0 +1,11 @@
+Un Bean es un tipo paricular de un POJO.
+Las principales diferencias son:
+Un POJO puede implementar Serializable, mientras que un BEAN debe implementar Serializable.
+En un POJO campos o atributos podrían tener modificadores de accesos no privados, lo que implica que estos campos o atributos no privados pueden ser accedidos desde fuera de la clase con innstanciaDeClase.nomBreCampo
+En un bean en cambio, lo anterior no es posible, ya que todos los campos o atributos deben ser privados, por lo que la unica forma de acceder a ellos es mediante setter y getter.
+En un POJO algunos campos podrían no tener setters y solo getters (el seteo se daría con un constructor que recibe parametros). En un Bean debe ir si o si getter y setter para cada uno de los atributos.
+En un POJO puede ir o no un constructor sin argumentos. En un BEAN en cambio debe ir si o si un constructor sin argumentos. 
+El constructor que recibe parametros es opcional tanto para POJO como para BEAN, aunque generalmente es mas comun para un POJO.
+
+https://www.geeksforgeeks.org/pojo-vs-java-beans/
+https://www.youtube.com/watch?v=T3z9Rwbz-c8
