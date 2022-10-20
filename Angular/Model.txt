@@ -1,0 +1,61 @@
+Se utiliza con primeNg (desconozco si se podra usar tambien con otras librerias) para dar formatos de estilos HTML. 
+
+html:
+<p-menubar [model]="items">
+    <img src="./favicon.ico">
+</p-menubar>
+
+ts:
+import { Component, OnInit } from '@angular/core';
+import { MenuItem } from 'primeng/api';
+
+@Component({
+  selector: 'app-menu',
+  templateUrl: './menu.component.html',
+  styles: [
+  ]
+})
+export class MenuComponent implements OnInit {
+
+items:MenuItem[]=[];
+
+  constructor() { }
+
+  ngOnInit(): void {
+    this.items = [
+      {
+      //Esto viene de antemano de primeNG
+     label: 'Pipes de Angular',
+     icon: 'pi pi-desktop',
+     items: [
+      {
+      label:'Textos y Fechas',
+      icon: 'pi pi-align-left',
+      //notar q los routerlink debemos pasarlo aqui para que funcione en el componente p-menubar de primeng
+      routerLink: '/' //basicos
+     },
+     {
+      label:'Numeros',
+      icon: 'pi pi-dollar',
+      routerLink: 'numeros'
+     },
+     {
+      label:'No comunes',
+      icon: 'pi pi-globe',
+      routerLink: 'no-comunes'
+     },
+     {
+      label:'Pipes personalizadoss',
+      icon: 'pi pi-cog',
+     
+     }
+    ]
+  },
+
+];
+  }
+
+}
+
+
+contacto@sill.cl

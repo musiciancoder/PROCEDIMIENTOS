@@ -1,6 +1,10 @@
+Notar que los parentesis redondos en el html envian hacia el respectivo ts, en cambio parentesis cuadrados en el html reciben desde el respectivo ts
+
 En formulario html o campo a llenar html:
 <div class = "form-group">
                         <label for="nombreUsuario">Nombre de Usuario</label>
                         <input type="text" name="nombreUsuario" id="nombreUsuario" class="form-control"
+                        [placeholder]="miplaceholder"
                         [(ngModel)] = "nombreUsuario" required>
 En ts: nombreUsuario: string;
+En ts: miplaceholder:string = "Escriba aqui..."

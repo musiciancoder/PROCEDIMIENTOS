@@ -1,6 +1,6 @@
-*Los campos y métodos estáticos se guardan en memoria Stack que es más rápida que la memoria Heap, lo que permite ahorrar memoria y optimizar rendimiento.
 *Se cargan cuando se carga la clase, por lo que es mas rápido que los campos y métodos no estáticos que se cargan cuando se crea un objeto.
+*Los atributos static pertencen a la clase y no al objeto, es decir todas las instancias lo tienen, por lo que no se pasan como argumento en el constructor.
 *Se llaman con nombreClase.nombreCampo, nombreClase.nombreMetodo
-*NO se puede inicializar ni dar valores a un campo no estático desde un método estático.
-*El uso de la palabra reservada this sólo se puede ocupar en métodos no estáticos para invocar a otros métodos o campos no estáticos en una clase, pero no se puede usar en métodos no estaticos.
-*¿Cuando preferir campos y métodos no estáticos? Cuando estamos seguros que el valor no va a cambiar en el tiempo, por ello normalmente para variables constantes se usa en combinacion con "final" 
+*NO se puede inicializar ni dar valores a un campo no estático desde un método estático con el uso de this.
+*¿Cuando preferir campos y métodos no estáticos? Cuando estamos seguros que el valor no va a cambiar en el tiempo, por ello normalmente para variables constantes se usa en combinacion con "final".
+*Todas las variables static se almacenan en memoria HEAP!

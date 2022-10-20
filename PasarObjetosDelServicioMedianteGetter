@@ -33,3 +33,9 @@ export class DbzService {
     }
 
 }
+
+4.En el componente obtener personajes tambien mediante un getter
+
+get personajes:Personaje[]{
+  this.dbzService.personajes;
+}

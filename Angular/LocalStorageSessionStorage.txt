@@ -1,1 +1,3 @@
 La propiedad sessionStorage es similar a localStorage , la única diferencia es que la información almacenada en localStorage no posee tiempo de expiración, por el contrario la información almacenada en sessionStorage es eliminada al finalizar la sesion de la página.
+Ambos solo pueden almacenar strings, por lo que se debe pasar cualquier objeto a tring con stringify antes de guardarlo y se retira del strorage con JSON Parse para pasarlo a objeto.
+Es muy comun que el objeto a guardar (setItem) vaya en un metodo en un servicio, mientras que el objeto a retirar (getItem) vaya en el constructor del servicio, ya que el constructor se ejecuta cuando el servicio es llamado por algun componente la primera vez, entonces ya queda disponible siempre.

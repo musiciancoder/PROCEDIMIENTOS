@@ -1,0 +1,49 @@
+import { Injectable } from '@angular/core';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { Country } from '../interfaces/pais.interface';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PaisService {
+
+  //esta es la url base (el dominio)
+  private apiUrl:string = 'https://restcountries.com/v2';
+
+get httpParams(){
+return new HttpParams().set('fields','name,capital,alpha2Code,flag,population,cca2'); //con esto filtramos solo los campos que nos interesan en la respuesta, mejorndo el rendimiento
+ }
+
+  constructor( private http:HttpClient) { }
+
+  buscarPais (termino:string):Observable<Country[]>{
+    const url = `${this.apiUrl}/name/${termino}`;
+    return this.http.get<Country[]>(url,{params:this.httpParams}) //el tipo Country lo obtuvo de appquicktype.com
+/*     .pipe(
+      catchError(err =>of([''])) //que retorne un array vacio. Como agregamos un array vacio en el pipe, ya no va a tomar el err en el subscribe del componente, sino va a retornar un array vacio si hay algun error.
+    ); */
+
+  }
+
+  buscarCapital (termino:string):Observable<Country[]>{
+    const url = `${this.apiUrl}/capital/${termino}`;
+    return this.http.get<Country[]>(url,{params:this.httpParams}) //el tipo Country lo obtuvo de appquicktype.com
+  }
+
+  //para escribir el pais no en los inputs, sino en la url
+  getPaisPorAlpha(id:string):Observable<Country>{
+    const url = `${this.apiUrl}/alpha/${id}`;
+    return this.http.get<Country>(url) ;
+ }
+
+  buscarRegion(region:string):Observable<Country[]>{
+    const url = `${this.apiUrl}/region/${region}`;
+    return this.http.get<Country[]>(url, {params:this.httpParams})  //Con esto, la llamada en postman para buscar Oceania queda de esta forma: https://restcountries.com/v2/region/oceania?fields=name,capital,alpha2Code,flag,population,cca2
+    .pipe(
+      tap(console.log)
+    ) ;
+  }
+}

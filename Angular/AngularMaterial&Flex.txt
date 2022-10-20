@@ -1,0 +1,27 @@
+Instalar: ng add @angular/material
+Instalar Flex: npm i @angular/flex-layout (ojo que angular material tiene su grid tambien, solo que él prefirió trabajar con la grilla de flex).
+
+1. Buscar el recurso html de material que se quiere agregar en: https://material.angular.io/components/toolbar/api (aca vamos a agregar un toolbar)
+2. Importar el recurso en el modulo de material que creamos anteriormente en la aplicacion (en nuestro caso es material.module.ts) con import {MatToolbarModule} from '@angular/material/toolbar'; No olvidar exportar el componente que estamos importando con 
+@NgModule({
+ exports: [
+  MatSidenavModule,
+  MatToolbarModule,
+  MatButtonModule,
+  MatIconModule
+  ]
+})
+3. Importar el modulo material.module.ts en el modulo del componente donde deseamos ocupar el recurso html
+4. En el html escribir el código html sugerido en el sitio web y probar. Por ejemplo:
+<mat-drawer-container fullscreen>
+    <mat-sidenav #sidenav>
+        <h1>Sidenav</h1>
+    </mat-sidenav>
+
+    <mat-toolbar>
+        <button mat-icon-button (click)="sidenav.toggle()">
+            <mat-icon>menu</mat-icon>
+        </button>
+    </mat-toolbar>
+
+</mat-drawer-container>

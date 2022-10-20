@@ -11,12 +11,21 @@ const appRoutes:Routes=[
 
 ]
 
+1.5.Existe tambien el {path:'**',redirectTo:AlgunComponente} o bien {path:'404',redirectTo:AlgunComponente}. ** es cualquier endpoint que no esté definido en nuestra aplicacion
+
 2. En el mismo app.module.ts pasar por argumento este array en los imports
   imports: [ RouterModule.forRoot(appRoutes) ]
 
 3.En el html del app.component setear las rutas con href="/proyectos", por ejemplo y escribir al final de este html <router-outlet></router-outlet> 
 
-4.Con routerLink=['/miRuta'] en el html no se nececita <router-outlet></router-outlet> 
+4.Con routerLink=['/miRuta'] se setean mejor las rutas.
+
+
 
 5.Si queremos en un metodo de ts redireccionar, esto se hace con window.router.navigate(['/miRuta'])
+
+6.Opcionalmente a lo anterior (este es el metodo Fernando)  podemos crearnos un routing.module.ts (a la misma altura de app.module.ts en los directorios) y escribir aqui los pasos 1 y 2. Luego importar Routes y RouterModule y en el app.module.ts importar el routing.module.ts y el RouterModule.
+Los routerlinks van asi: routerLink="region"
+
+
 

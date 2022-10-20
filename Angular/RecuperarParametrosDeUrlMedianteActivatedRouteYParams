@@ -1,0 +1,37 @@
+Sirve para recuperar parametros de forma parametrizada en los endpoints
+
+En commponente:
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { PaisService } from '../../services/pais.service';
+
+@Component({
+  selector: 'app-ver-pais',
+  templateUrl: './ver-pais.component.html',
+  styles: [
+  ]
+})
+export class VerPaisComponent implements OnInit {
+
+  constructor(
+    private activatedRoute:ActivatedRoute,
+    private paisService:PaisService
+    ) { }
+
+  ngOnInit(): void {
+    this.activatedRoute.params //los params es lo que pasamos como parametro en en endpoint
+   .subscribe( //con esto confirmó qué parametros devolvía el params (ya sabia q era el id lo que venia)
+      params=>{console.log(params); //con url http://localhost:4200/pais/:123 escribe en la consola id:123, ya q en el app.routing.module tenemos path:pais/:id
+   
+      }
+    
+	}}
+	
+	
+	En app.routing.module.ts:
+	
+	    {
+        path:'pais/:id', //para que todo lo que venga despues de pais/ en la url se llame id; de esta forma se puede recuperar en el servicio con activatedRoute
+        component:VerPaisComponent
+    },

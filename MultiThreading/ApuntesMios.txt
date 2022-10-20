@@ -1,0 +1,74 @@
+*Cuando se inicializa un programa, el SO genera un un PROCESO (tambien llamado contexto) que es una instancia del programa.
+*Los hilos son porciones de código que al ejecutarse realizan alguna funcion del programa. Cada proceso a su vez puede o no tener uno o varios hilos en ejecución.
+*Los hilos de un mismo proceso siempre comparten memoria heap; cada hilo en cambio tiene siempre su propia y exclusiva memoria stack y su propio y exclusivo pointer.
+*Dos o mas hilos corriendo en un solo nucleo pueden 'simular' multithreading; Dos hilos corriendo en dos nucleos en forma separada pueden en cambio ejecutar un 'real' multithreading
+*Cada vez que se inicializa la ejecucion de un segundo hilo la CPU  debe detener antes la ejecucion del primera hilo (este primer hilo vuelve a correr milesimas de segundo despues que el segundo hilo ya esta en ejecucion). Este es el principal precio a pagar debido a la concurrencia y es conocido como Context Switch.
+*Un context switch de dos hilos de un mismo proceso es menos costoso que un context switch de dos hilos pertenecientes a dos procesos distintos.
+*Solo si dos tareas de un proceso tienen mucha data en comun o si la seguridad es una prioridad, se aconseja ocupar programacion concurrente.
+*The SO maintains a dynamic priority for each thread to prioritize interactive threads and to avoid starvation for any particular thread in the sistem. La elección de de hilos por parte del SO no es aleatoria!!
+
+*Interrumpir la ejecución de un Thread.
+Razones para interrumpir un thread ya que Esta consumiendo memoria y recursos de CPU innecesariamente: 
+- El thread ya ha terminado, sin embargo la aplicacion sigue corriendo. Se debe limpiar los recursos que ha ocupado este thread.
+- El thread no responde porque algun calculo de la tarea demora demasiado, por ejemplo, o bien esta requiriendo recursos a un servidor que no responde.
+Para interrumpir un thread, se debe enviar una señal desde otro hilo (normalmente el hilo principal) con el método interrupt o bien con thread.setDaemon(true) le decimos que termine el programa cuando se termine de ejecutar el hilo principal; 
+
+*Detener la ejecución de un thread para esperar a los demas hilos
+Si el valor de una variable o condición en un hilo depende de la ejecucion de un segundo hilo puede ser recomendable esperar el primer hilo hasta que el segundo hilo termine su ejecucion.
+Esto lo logramos con el método join() en el hilo que queremos pausar.
+
+*Rendimiento
+Existen dos unidades de medidas para rendimiento, ambas independientes una de otra; 
+Latencia: tiempo para que una tarea que se divide en varias subtareas termine su ejecución
+Thrughput: cantidad de tareas (o hilos) independientes terminadas/unidad de tiempo
+
+1.Latencia.
+Si subdivimos una tarea grande en varias subtareas mas pequeñas corriendo concurrentemente, el parametro ideal para medir rendimiento es la latencia
+Supongamos que tenemos una Tarea grande. Sin concurrencia, la latencia seria simplemente el tiempo que demora esta tarea en terminar.
+Ahora supongamos que la tarea global la subdividimos en N subtareas y que cada una de ellas corren concurrentemente; la latencia teorica seria: L=(tiempo1+tiempo2+...tiempoN)/N
+Raramente esta latencia teorica es alcanzada, sin embargo debemos apuntar a ello determinando un N apropiado. El N óptimo es cuando el numero de subtareas es igual al numero de cores fisicos de la CPU (lamentablemente nosotros no sabemos esto, solo podemos intuirlo).
+Si el numero de threads sobrepasa el de los cores de la cpu entonces se vuelve contraproducente al producir una latencia levemente mayor debido al context switch.
+
+2.Thrughput
+Cuando corremos varias subtareas independientes que no apuntan a un resultado global entre todas ellas el parametro ideal para medir rendimiento es el thugput.
+Se define como el numero de tareas por segundo.
+Supongamos que tenemos varias peticiones http a un servidor. El thrugput es entonces en este caso (numero de peticiones)/segundo. 
+Con Jmeter se observa que El thrugput aumenta consistentemente en forma lineal a medida que aumentamos el numero de hilos hasta que sigue aumentando linealmente pero con menos pendiente. Ese es el punto en que se alcanza el numero de cores fisicos. 
+Pasado ese punto sigue aumentando con pendiente menor debido a los cores virtuales hasta alcanzar un maximo de Thhrugput y luego se mantiene constante.
+
+*Sincronizacion, atomicidad y volatilidad
+Un recurso (variable o método, por ejemplo) es atómico si y solo si puede ser ocupado por un hilo a la vez, ya sea porque por definición es atómico (definicion de primitivas, getters y setters) o bien porque nosotros se lo especificamos con las palabras reservadas syncronized o volatile.
+Por lo general lo que buscamos es que los recursos sean atómicos, aún cuando buscamos concurrencia.
+Para volver atómico un método que es compartido por varios hilos, debemos especificarlo con la palabra reservada Sincronized, de esta forma el método queda bloqueado para el resto de los hilos hasta que el hilo que lo esta ocupando llega al final del método.
+Ademas, con Syncronized podemos no solo volver atomico un metodo, sino que cualquier pedazo de codigo, con Object lock = new Object(); y syncronized(lock);
+Con la palabra reservada volatile en la definicion de una variable long o double, volvemos atomicas estas dos primitivas (que por definicion no lo son)
+Con volatile en la definicion de cualquier variable evitamos el data race, o sea cuando la CPU comienza a correr variables en orden aleatorio (esto a veces la CPU lo hace para optimizar rendimiento).
+
+*Locking.
+Ya está dicho que cuando un recurso (variable, metodo) es compartido por dos o mas hilos debemos intentar sincronizar. Sin embargo mientras mas codigo sincronizamos (usando sincronized en la declaracion del metodo por ejemplo), pagamos el precio en rendimiento y tiempo ya que mas cerca lo dejamos de una aplicacion no concurrente. Esto se conoce como Coarse Grinding
+Mientras menos código sincronizamos (usando sincronized dentro del metodo, por ejemplo), permitimos mas concurrencia (esto es conocido como fine-grinding), pero pagamos el precio en context switch y ademas corremos el riesgo de un Deadlock.
+Deadlock: Supongamos que el Hilo1 y el Hilo2 corren concurrentemente ocupando los recursos compartidos A y B que hemos protegido o sincronizado. 
+El Hilo1 ocupa el recurso A por lo que lo bloquea para el hilo2. El hilo2 corre a su vez ocupando y bloqueando el recurso B, hasta que llega al recurso A y no puede seguir hasta que el hilo1 lo libere.
+Sin embargo el hilo1 cuando llega a su vez al recurso B no puede seguir porque el hilo1 lo tiene bloqueado. Ambos hilos quedan detenidos. Esto se conoce como deadlock y naturalmente debe ser solventado.
+El tipo de deadlock descrito es el mas comun y se soluciona especificando que los recursos protegidos a ser usados deben seguir siempre el mismo orden en todos los hilos, es decir en nuestro caso el hilo2 no puede ocupar el recurso B antes del recurso A.
+
+
+1.ReentrantLock
+Esta clase posee las mismas caracteristicas que Sincronized, pero ademas tiene:
+-query methods para probar el estado interno del codigo/recurso protegido.
+getQueuedThreads()-devuelve lista de hilos esperando a usar el codigo/recurso protegido.
+getOwner()- devuelve el hilo que esta ocupando el codigo/recurso protegido en este momento.
+isHeldByCurrentThread()- nos dice si el codigo/recurso protegido esta siendo ocupado o no por ese hilo.
+isLocked()- nos dice el codigo/recurso protegido esta siendo ocupado por algun hilo.
+Y ademas cuenta con los siguuientes metodos:
+ReentrantLock(true): permite distribuir equitativamente entre hilos, sin preferencia. Esto podria reducir el throughput.
+-Lock(): bloque código/recurso para dos o mas hilos. Cumple la misma funcion que sincronized(lock)
+-LockInterruptibility() para parar externamente un hilo que esta pasando por codigo protegido
+-tryLock() para proteccion condicional de código. Retorna true y permite acceder a codigo/recurso si esta disponible.Retorna false y se no queda esperando si el codigo/recurso no esta disponible, sino que se mueve al else del if y podría volver al codigo/recurso despues una vez que este se libere. Esta es la gran diferencia comparado con el metodo lock() (que tambien pertenece a rla clase reentrantLock), que sí se queda esperando hasta que el codigo/recurso se libere.
+
+2.ReentrantReadWriteLock
+Para operaciones de lectura deseamos por lo general que los procesos sean concurrentes, es decir que puedan haber varios clientes, servicios, etc. leyendo desde una bddd aunque los hilos compartan recursos entre ellos.
+Si bien esto se puede llevar a cabo con el metodo lock() de la clase ReentrantLock, es mucho mas rapido y eficiente hacerlo con el metodo readLock() de la clase ReentrantReadWriteLock.
+Por otro lado al escribir o borrar de la bbdd generalmente deseamos bloquear el codigo/recurso para el resto de los hilos ya sea de escritura o de lectura. Esto tambien se puede hacer con lock() de la clase ReentrantLock, es mucho mas rapido y eficiente hacerlo con el metodo writeLock() de la clase ReentrantReadWriteLock
+
+

@@ -1,0 +1,1 @@
+Ver pluggins instalados:Ctrl+Shift+X

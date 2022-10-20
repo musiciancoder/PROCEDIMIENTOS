@@ -1,0 +1,62 @@
+LazyLoad o carga bajo demanda consiste en cargar módulos o componentes cuando son requeridos por el usuario, en vez de cargarlo siempre en la aplicacion no importando si el usuario requiere o no. 
+
+Por ello LazyLoad permite mejorar rendimiento.
+
+1. Definir Rutas Hijas:
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { LoginComponent } from './pages/login/login.component';
+import { RegistroComponent } from './pages/registro/registro.component';
+
+const routes:Routes = [
+  {
+    path:'',
+    children: [
+      {
+        path: 'login',
+        component: LoginComponent
+      },
+      {
+        path: 'registro',//se prueba con http://localhost:4200/auth/registro
+        component: RegistroComponent
+      },
+      {
+        path:'**',
+        redirectTo:'login'
+      }
+    ]
+  }
+]
+
+@NgModule({
+  declarations: [],
+  imports: [
+    RouterModule.forChild(routes) //forRoot se usa solo para rutas principales, no para rutas hijas. Esto es reconocido cuando se carga algun modulo por LazyLoad
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+export class AuthRoutingModule { }
+
+2.Importar el routing en el modulo correspondiente (en AuthModule en este caso)
+  imports: [
+    CommonModule,
+    AuthRoutingModule
+  ]
+})
+export class AuthModule { }
+
+
+3.Definir ruta padre y carga perezosa en app-routing-module:
+
+const routes:Routes = [
+  {
+    //Carga peresoza: va a cargar el módulo 'AuthModule' solo cuando  
+    path: 'auth', //se prueba con http://localhost:4200/auth/registro
+    loadChildren: () => import('./auth/auth.module').then(m=>m.AuthModule)
+  },
+
+
+Cuando un módulo se carga por lazyload (con la ruta auth/login por ejemplo), el modulo 'auth' queda ya disponible en el devtools, de modo que si se requiere de nuevo (con /auth/registro por ejemplo) ya estará cargado el módulo que corresponde a auth

@@ -11,10 +11,13 @@ ng g c nombreComponente: crea todo el componente (con html y css incluidos). Deb
 (esto se hace desde una carpeta de un componente antiguo) ng g c nombreNuevoComponente/form --flat: Para crear un componente dentro de un directorio de otro componente antiguo (video45)
 ng g class nombreClase: crear una clase 
 ng g service nombreClaseServicio: crear clase servicio
-
+ng g module bombreModulo (comando al nivel del proyecto de git, no de src): crear un modulo independiente. Esto se hace cuando tenemos muchos módulos de alguna librria externa a importar (primeNg, por ejemplo). Con este comando creará la carpeta nombre-modulo y dentro de ella nombre-modulo.ts. Aqui solo exportamos los modulos externos y luego importamos nombre-modulo.ts en nuestro app.module.ts  
+ng g pipe ventas2/pipes/ordenar --skipTests: crear pipe con cli (lo declara automaticamente en ventas2.module.ts
 Metodo Fernando (no recomendado!) ng g m carpeta/nombreModulo:generarModulo (debe tener creada la carpeta de antemano manualmente). Posteriormente debe generarse un componente dentro de la carpeta, en el modulo local nobreModulo exportar el componente creado y en app component importar el nombreModulo 
 
 ng g c clientes/form --flat: crear directorio clientes con componente form adentro de él
+ng g c nombreComponenteOmodulo --flat: evita que se cree la carpeta nombreComponenteOmodulo, en otras palabras creará el archivo suelto al nivel de appComponent
+-is : para no crear archivos de estilos en component 
 
 
 REACT

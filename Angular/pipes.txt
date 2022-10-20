@@ -1,0 +1,52 @@
+
+Los pipes no cambian la data, solo producen un efecto visual en el html.
+
+*Pipe de paquete de angular:
+<p>
+{{'hoLa muNdo'|titlecase}}
+</p>
+
+*Pipe personalizado:
+
+En MayusculasPipe:
+import { Pipe, PipeTransform } from "@angular/core";
+//pipe personalizado para transformar a mayusculas
+@Pipe({
+    name:'mayusculas'
+})
+
+//hay que declararlo en el modulo en donde el pipe sera usado (en este caso ventas2.module.ts)
+export class MayusculasPipe implements PipeTransform{
+
+    transform(valor:string):string {
+        console.log(valor);
+        
+    return valor.toUpperCase();
+}
+}
+En html:
+<div class="text-layout">
+    <h1>Pipes personalizados</h1>
+    <p>
+        Pipes creados por nosotros: {{'nosotros'|mayusculas}}
+    </p>
+</div>
+En componente.ts:
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-ordenar',
+  templateUrl: './ordenar.component.html',
+  styles: [
+  ]
+})
+export class OrdenarComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+
+ng g pipe ventas2/pipes/ordenar --skipTests crear pipe con cli (lo declara automaticamente en ventas2.module.ts
