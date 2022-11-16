@@ -1,6 +1,7 @@
 Instalar: ng add @angular/material
 Instalar Flex: npm i @angular/flex-layout (ojo que angular material tiene su grid tambien, solo que él prefirió trabajar con la grilla de flex).
 
+*Para usar un recurso de Material:
 1. Buscar el recurso html de material que se quiere agregar en: https://material.angular.io/components/toolbar/api (aca vamos a agregar un toolbar)
 2. Importar el recurso en el modulo de material que creamos anteriormente en la aplicacion (en nuestro caso es material.module.ts) con import {MatToolbarModule} from '@angular/material/toolbar'; No olvidar exportar el componente que estamos importando con 
 @NgModule({
@@ -25,3 +26,63 @@ Instalar Flex: npm i @angular/flex-layout (ojo que angular material tiene su gri
     </mat-toolbar>
 
 </mat-drawer-container>
+
+
+*Para autocompletar una busqueda, material usa MatAutocompleteSelectedEvent:
+En el ts:
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+
+   opcionSeleccionada(event:MatAutocompleteSelectedEvent){
+    const heroe:Heroe = event.option.value; //obtener el heroe seleccionado por el usuario
+    this.termino = heroe.superhero; //para que si yo selecciono Flash, luego de escribir f, Flash se quede en el input
+    this.heroesService.getHeroePorId(heroe.id!)
+    .subscribe(heroe=>this.heroeSeleccionado=heroe);
+  }
+En el html:
+            <input type="text"
+                   placeholder="Pick one"
+                   aria-label="Number"
+                   matInput
+                   [(ngModel)]="termino"
+                   [matAutocomplete]="auto"
+                   (input)="buscando()">
+<!-- (optionSelected) es de angular material, permite ver cual es el heroe que se seleccionó -->
+            <mat-autocomplete autoActiveFirstOption 
+            #auto="matAutocomplete"
+            (optionSelected)="opcionSeleccionada($event)"
+            >
+
+*Algunos componentes (como snackbar) se mandan a llamar en el ts, no en el html
+1.Importar y exportar en el modulo de angular material:
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+
+@NgModule({
+ exports: [
+  MatSnackBarModule
+  ]
+})
+
+2.En el componente ts tambien importarlo:
+import { MatSnackBar } from '@angular/material/snack-bar';
+Ponerlo como servicio (aunque no es servicio ) en el constructor:
+  constructor(
+              private snackBar:MatSnackBar         
+    ) { }
+Usarlo en los metodos del componente;
+  guardar(){ //guardar heroe en la bbdd
+   // console.log(this.heroe);
+    if(this.heroe.superhero.trim().length===0){ //si no hay nada escrito
+      return;
+    }
+    //Si existe un id quiere decir que estamos actualizando y no guardando u heroe por primera vez
+    if(this.heroe.id){
+      //actualizar heroe
+      this.heroesService.actualizarHeroe(this.heroe)
+      .subscribe(heroe=>
+        //console.log('Actualizando', heroe)
+        this.mostrarSnakbar('Registro actualizado')
+      )....
+
+
+
+

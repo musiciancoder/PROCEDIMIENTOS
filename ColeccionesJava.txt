@@ -6,7 +6,8 @@ INTERFAZ SET (no permiten registros duplicados, poca eficiencia al ordenar)
 *HashSet: igual a ArrayList
 *LinkedHashSet: igual a Linkedlist
 
-INTERFAZ MAP (asociacion tipo clave valor, no permite claves duplicadas)
+INTERFAZ MAP (asociacion tipo clave valor, no permite claves duplicadas por lo que si queremos guardar en un Map una clase que hemos creado nosotros debemos siempre
+sobreescribir metodos equals y hashcode)
 *HashMap
 *HashLinkedMap
 

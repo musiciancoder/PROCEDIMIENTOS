@@ -6,28 +6,46 @@
 *Un context switch de dos hilos de un mismo proceso es menos costoso que un context switch de dos hilos pertenecientes a dos procesos distintos.
 *Solo si dos tareas de un proceso tienen mucha data en comun o si la seguridad es una prioridad, se aconseja ocupar programacion concurrente.
 *The SO maintains a dynamic priority for each thread to prioritize interactive threads and to avoid starvation for any particular thread in the sistem. La elección de de hilos por parte del SO no es aleatoria!!
+*Podemos crear threads de dos formas: 
+1. Implementando la interfaz runnable sobrescribiendo el método run. Esto se aconseja cuando queremos hacer pruebas simples, ya que los threads los podemos crear en el mismo metodo main con operador new Thread (new Runnable {
+            @Override
+            public void run() {
+                System.out.println("threadA started");) 
+				}
+2. Creando una o mas clases que extiendan de la clase Thread. En el metodo main creamos una lista de instancias de estas clases y las hacemos correr. Este approach es mas recomendado para aplicaciones reales.
 
 *Interrumpir la ejecución de un Thread.
-Razones para interrumpir un thread ya que Esta consumiendo memoria y recursos de CPU innecesariamente: 
+Razones para interrumpir un thread ya que esta consumiendo memoria y recursos de CPU innecesariamente: 
 - El thread ya ha terminado, sin embargo la aplicacion sigue corriendo. Se debe limpiar los recursos que ha ocupado este thread.
 - El thread no responde porque algun calculo de la tarea demora demasiado, por ejemplo, o bien esta requiriendo recursos a un servidor que no responde.
-Para interrumpir un thread, se debe enviar una señal desde otro hilo (normalmente el hilo principal) con el método interrupt o bien con thread.setDaemon(true) le decimos que termine el programa cuando se termine de ejecutar el hilo principal; 
+Para interrumpir un thread, se debe enviar una señal desde otro hilo (normalmente el hilo principal) con thread.interrupt() y en el hilo mismo en la parte donde vemos que hay problema debemos escribir currentThread().isInterrupted(); Otra forma es hacerlo con dameon con thread.setDaemon(true) le decimos que termine el programa cuando se termine de ejecutar el hilo principal. La segunda forma es usualmente mas infalible; 
 
 *Detener la ejecución de un thread para esperar a los demas hilos
 Si el valor de una variable o condición en un hilo depende de la ejecucion de un segundo hilo puede ser recomendable esperar el primer hilo hasta que el segundo hilo termine su ejecucion.
-Esto lo logramos con el método join() en el hilo que queremos pausar.
+Esto lo logramos con el método otroHiloATerminar.join() en el hilo que queremos pausar.
 
 *Rendimiento
 Existen dos unidades de medidas para rendimiento, ambas independientes una de otra; 
-Latencia: tiempo para que una tarea que se divide en varias subtareas termine su ejecución
+Latencia: tiempo para que una tarea termine su ejecución
 Thrughput: cantidad de tareas (o hilos) independientes terminadas/unidad de tiempo
 
 1.Latencia.
-Si subdivimos una tarea grande en varias subtareas mas pequeñas corriendo concurrentemente, el parametro ideal para medir rendimiento es la latencia
-Supongamos que tenemos una Tarea grande. Sin concurrencia, la latencia seria simplemente el tiempo que demora esta tarea en terminar.
-Ahora supongamos que la tarea global la subdividimos en N subtareas y que cada una de ellas corren concurrentemente; la latencia teorica seria: L=(tiempo1+tiempo2+...tiempoN)/N
-Raramente esta latencia teorica es alcanzada, sin embargo debemos apuntar a ello determinando un N apropiado. El N óptimo es cuando el numero de subtareas es igual al numero de cores fisicos de la CPU (lamentablemente nosotros no sabemos esto, solo podemos intuirlo).
-Si el numero de threads sobrepasa el de los cores de la cpu entonces se vuelve contraproducente al producir una latencia levemente mayor debido al context switch.
+Dependiendo de la tarea, a veces podemos subdividir la tarea grande en varias subtareas mas pequeñas corriendo en paralelo y de esta forma disminuir el tiempo que le tomaría a la tarea grande en completarse, es decir podemos disminuir la latencia, aunque esto no siempre es posible.
+Supongamos que tenemos una Tarea grande. Sin multithreading, la latencia seria simplemente el tiempo que demora esta tarea en terminar.
+Ahora supongamos que la tarea global la subdividimos en N subtareas y que cada una de ellas corren en paralelo; la latencia teorica seria: L=(tiempo1+tiempo2+...tiempoN)/N
+Raramente esta latencia teorica es alcanzada, sin embargo debemos apuntar a ello determinando un N apropiado. El N óptimo es cuando el numero de subtareas (o hilos) es igual al numero de cores fisicos de la CPU (lamentablemente nosotros no sabemos esto, solo podemos intuirlo).
+Si el numero de threads sobrepasa el de los cores de la cpu entonces se vuelve contraproducente al producir una latencia levemente mayor debido al context switch. Este contraefecto se vuelve levemente mas pronunciado ala sobrepasar la cantidad de cores virtuales (8 por ejemplo) que al sobrepasar la cantidad de cores fisicos (4 por ejemplo).
+Por regla general dividir tareas pequeñas en subtasks resulta contraproducente. Solo en tareas de cierta complejidad conviene subdividirlas para usar multithreading y asi dismimuir latencia, aunque por lo general (aunque hay excepciones) una tarea solo será subdividible en forma parcial, debiendo obligatoriamente correr una parte de esta en forma secuencial. 
+
+
+¿Como medir latencia?
+En main ():
+long startTime = System.currentTimeMillis();
+metodoParaleloOSecuencialAMedir();
+long endTime = System.currentTimeMillis();
+long duration = endTime - startTime
+System.out.print(String.valueOf(duration));
+
 
 2.Thrughput
 Cuando corremos varias subtareas independientes que no apuntan a un resultado global entre todas ellas el parametro ideal para medir rendimiento es el thugput.
@@ -53,6 +71,7 @@ Sin embargo el hilo1 cuando llega a su vez al recurso B no puede seguir porque e
 El tipo de deadlock descrito es el mas comun y se soluciona especificando que los recursos protegidos a ser usados deben seguir siempre el mismo orden en todos los hilos, es decir en nuestro caso el hilo2 no puede ocupar el recurso B antes del recurso A.
 
 
+
 1.ReentrantLock
 Esta clase posee las mismas caracteristicas que Sincronized, pero ademas tiene:
 -query methods para probar el estado interno del codigo/recurso protegido.
@@ -71,4 +90,48 @@ Para operaciones de lectura deseamos por lo general que los procesos sean concur
 Si bien esto se puede llevar a cabo con el metodo lock() de la clase ReentrantLock, es mucho mas rapido y eficiente hacerlo con el metodo readLock() de la clase ReentrantReadWriteLock.
 Por otro lado al escribir o borrar de la bbdd generalmente deseamos bloquear el codigo/recurso para el resto de los hilos ya sea de escritura o de lectura. Esto tambien se puede hacer con lock() de la clase ReentrantLock, es mucho mas rapido y eficiente hacerlo con el metodo writeLock() de la clase ReentrantReadWriteLock
 
+
+3.Semaphore.
+Es otra tácnica de bloqueo y coneccion interthreads. A diferencia de los metodos locks que solo permiten un thread a la vez pasando por recurso/codigo protegido, con semaphore podemos setear un numero especifico de varios threads (number of permits) corriendo concurrentemente por ese codigo/recurso.
+int NUMBER_OF_PERMITS=1;
+Semaphore semaphore = new Semaphore(NULL);
+semaphore.aquire()//lock
+useResource(); //esto es el codigo protegido
+semaphore.release() //unlock
+Los semaphore no tienen la nocion de pertenencia que sí tienen los locks. 
+Además, cualquier thread puede liberar un semaphore que esta siendo ocupado por otro thread; esto podria crear un bug que con los locks no ocurre. 
+En un escenario de producer/consumer con recursos compartidos es mejor usar semaphore.
+
+
+4.Condition Variables.
+Es otra tácnica de bloqueo y coneccion interthreads.
+Siempre estan asociadas con un lock.
+
+Lock lock = new ReentrantLock();
+Condition condition = lock.newCondition();
+String username =null;
+String password=null;
+
+//autentica chequeando si hay credenciales
+lock.lock();
+try{
+while(username==null||password==null){
+condition.await(); //espera a la señal
+}
+}
+finally{
+lock.unlock();
+}
+doStuff();
+
+//escribe las credenciales 
+lock.lock();
+try{
+username=userTextbox.getText();
+password=passwordTextBox.getText();
+condition.signal(); //manda la señal que ya hay credenciales para q el usuario se identifique
+
+}finally{
+lock.unlock();
+}
 

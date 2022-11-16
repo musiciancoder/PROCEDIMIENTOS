@@ -1,9 +1,9 @@
 Ver proyecto beansex en el workspace
 
-Un bean es un objeto que se crea de manera mas eficiente que la convencional.
-
-Un bean es un objeto de una clase que se crea instanciandolo no de manera convencional, sino por medio de la anotación @Bean, lo que permite guardarlo en el contenedor
-de Beans en la clase de configuracion de finida con @Configuration: 
+A spring bean (do not get mixed up with java bean, which is a class) is basically an object that is managed by spring framework througout the bean container. 
+Since the object is instantiated and configured within bean container instead of a class (through operator "new"), it is always available for every class on the application and its got better performance since we do not depend on the heap.
+The configuration for generating beans within the bean container is this:
+ 
 
 package com.andres.beansex;
 
@@ -11,16 +11,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Configuration //configuration class
 public class Config {
-    @Bean(name = "myBean")
+    @Bean(name = "myBean") //we deposit the bean named "myBean" -which is an object of class Address - within the bean container
     public Address getAddress() {
         return new Address("High Street", 1000);
         
     }    
 }
 
-Naturalmente la clase Address debe haber sido previamente establecida en forma convencional:
+Naturally, class Address must be established convieniently:
 
 package com.andres.beansex;
 
@@ -57,42 +57,10 @@ public class Address {
 }
 
 
-De esta manera el objeto queda disponible para ser llamado en cualquier clase del proyecto, como en la clase Company por ejemplo, que hace uso de Adress:
+
+The retrieval of the bean is done by refering to the bean name and the class that is going to consume it (class company in this case):
 
 package com.andres.beansex;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class Company {
-	
-    private Address address;
-
-    public Company(Address address) {
-        this.address = address;
-    }
-
-	public Address getAddress() {
-		return address;
-	}
-
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-
-	@Override
-	public String toString() {
-		return "Company [address=" + address + "]";
-	}
-}
-
-La llamada al bean se hace efectiva haciendo alusión al bean mismo (nombre del bean) y a la clase que lo consume (company, en este caso):
-
-package com.andres.beansex;
-
-
-
-
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -121,6 +89,36 @@ public class BeansexApplication {
 		 
 		}
 }
+
+This way the object is available to be called out in any class of the proyect, like class Company for instance, which uses Address:
+
+package com.andres.beansex;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class Company {
+	
+    private Address address;
+
+    public Company(Address address) {
+        this.address = address;
+    }
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+
+	@Override
+	public String toString() {
+		return "Company [address=" + address + "]";
+	}
+}
+
 
 --------------------------------------------------
 https://www.youtube.com/watch?v=I1EQV5MSwl4&list=PLU8oAlHdN5Blq85GIxtKjIXdfHPksV_Hm&index=24

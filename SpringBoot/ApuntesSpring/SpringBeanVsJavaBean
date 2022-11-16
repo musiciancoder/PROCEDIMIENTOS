@@ -1,0 +1,12 @@
+*JavaBeans:
+At a basic level, JavaBeans are simply Java classes which adhere to certain coding conventions. Specifically, classes that:
+-have public default (no argument) constructors
+-allow access to their properties using accessor (getter and setter) methods
+-implement java.io.Serializable
+
+*Spring Beans:
+A Spring bean is basically an object managed by Spring. More specifically, it is an object that is instantiated, configured and otherwise managed by a Spring Framework container. Spring beans are defined in Spring configuration files (or, more recently, with annotations), instantiated by Spring containers, and then (generally) injected into applications.
+
+Note that Spring beans need not always be JavaBeans. Spring beans might not implement the java.io.Serializable interface, can have arguments in their constructors, etc.
+
+This is the very basic difference between JavaBeans and Spring beans.

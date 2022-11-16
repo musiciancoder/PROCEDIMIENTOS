@@ -1,0 +1,149 @@
+Las Template Forms se hacen del lado del HTML, NO del TS. Los reactive Forms se hacen del lado del TS, NO del HTML.
+
+1. Template Forms
+
+*Debemos importar el móduloimport { FormsModule } from '@angular/forms';
+Una vez que esta importado, al hacer submit en boton enviar no se recarga toda la pagina
+
+Para revisar el formulario en el devtools al hacer click en boton submit:
+En html:
+ <form (ngSubmit)="guardar(miFormulario)"
+              #miFormulario="ngForm"
+              autocomplete="off"> 
+			  
+			  En ts:
+			    guardar(miFormulario:NgForm){
+    console.log(miFormulario);
+    
+  }
+  
+  *Con viewchild podemos ver referencias locales del html al ts en un componente (ver archivo viewchild)
+  
+  *En template forms se tienen atributos "de paquete" listos para validar, tales como this.miFormulario.controls.precio?.touched, this.miFormulario.controls.precio?.value, con precio siendo el name del input.
+  
+  *Se recomienda probar los data binding y las validaciones con la etiqueta html <pre>.
+  Ejemplo:
+  En html:
+  <h2>Template: Switches</h2>
+<hr>
+
+<form #miFormulario="ngForm">
+
+    <!-- radio -->
+    <div class="row mb-3">
+       <label class="col-sm-3 col-form-label"></label>
+    <div class="col-sm-9">
+
+        <div class="form-check">
+            <input 
+            class="form-check-input" 
+            type="radio"
+            value="M"
+            [(ngModel)] = "persona.genero"
+            name="flexRadioDefault" 
+            id="flexRadioDefault1"
+            required
+            >
+            <label class="form-check-label" for="flexRadioDefault1">
+              Masculino
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" 
+                   type="radio" 
+                   value="F"
+                   [(ngModel)] = "persona.genero"
+                   name="flexRadioDefault" 
+                   id="flexRadioDefault2"
+                   required="" 
+                    >
+            <label class="form-check-label" for="flexRadioDefault2">
+              Femenino
+            </label>
+          </div>
+       </div> 
+    </div>
+
+        <!-- switches -->
+        <div class="row mb-3">
+            <label class="col-sm-3 col-form-label"></label>
+         <div class="col-sm-9">
+
+              <div class="form-check form-switch mt-2">
+                <input class="form-check-input" 
+                        type="checkbox" 
+                        [(ngModel)]="persona.notificaciones"
+                        name="notificaciones"
+                        id="flexSwitchCheckChecked" 
+                        checked>
+                <label class="form-check-label" for="flexSwitchCheckChecked">Quiero recibir notificaciones</label>
+              </div>
+        </div> 
+    </div>
+
+
+                <!-- switches2 -->
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label">Terminos y condiciones</label>
+                 <div class="col-sm-9">
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                                type="checkbox"
+                                name="terminos" 
+                                [(ngModel)]="terminosYCondiciones"
+                                id="flexCheckDefault"
+                                required>
+                        <label class="form-check-label" for="flexCheckDefault">
+                            Terminos y condiciones de uso
+                        </label>
+                      </div>
+                    </div>
+                </div>
+
+
+                <!-- Boton submit -->
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-primary float-end"
+                                [disabled]="miFormulario.invalid">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+</form>
+
+<h4>Valor del formulario</h4>
+<pre>{{miFormulario.value|json}}</pre>
+<br>
+<h4>Persona</h4>
+<pre>{{persona|json}}</pre>
+<br>
+<h4>Valid</h4>
+<pre>{{miFormulario.valid}}</pre>
+<br>
+<h4>Terminos</h4>
+<pre>{{miFormulario.controls?.terminos?.errors | json}}</pre>
+<br>
+<h4>Valor del formulario</h4>
+<pre>Condiciones:</pre>
+
+En ts:
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-switches',
+  templateUrl: './switches.component.html',
+  styles: [
+  ]
+})
+export class SwitchesComponent {
+
+  //esto es para el ngModel de los inputs
+  persona:any = {
+    genero:'F',
+    notificaciones:true
+  }
+
+  terminosYCondiciones:boolean = false;
+
+  

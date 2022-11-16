@@ -1,0 +1,49 @@
+*Para ocupar un módulo de angular que no hemos hecho nosotros (como el routerModule, por ejemplo):
+
+Importar en el módulo correspondiente a ese componente. Por ejemplo si tenemos un nombreComponente.module.ts al mismo nivel de la carpeta nombreComponente, lo importamos en nombreComponente.module.ts. No se exporta!
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SidemenuComponent } from './sidemenu/sidemenu.component';
+import {RouterModule} from '@angular/router';
+
+
+
+@NgModule({
+  declarations: [SidemenuComponent],
+  imports: [
+    CommonModule,
+    RouterModule
+  ],
+  exports: [
+    SidemenuComponent
+  ]
+})
+export class SharedModule { }
+
+
+*Para ocupar una directiva personalizada (custom-mindirective), debemos declararla en el módulo correspondiente:
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+import { TemplateRoutingModule } from './template-routing.module';
+import { BasicosComponent } from './basicos/basicos.component';
+import { DinamicosComponent } from './dinamicos/dinamicos.component';
+import { SwitchesComponent } from './switches/switches.component';
+import { CustomMinDirective } from './directives/custom-min.directive';
+
+
+@NgModule({
+  declarations: [BasicosComponent, DinamicosComponent, SwitchesComponent,CustomMinDirective],
+  imports: [
+    CommonModule,
+    TemplateRoutingModule,
+    FormsModule
+  ]
+})
+export class TemplateModule { }
+
+
+
+

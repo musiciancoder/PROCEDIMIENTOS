@@ -1,10 +1,21 @@
 node -v : version
 npm nombrearchivo run: Para correr cualquier archivo en consola
-npm install -g nombredeprograma: instalar programa
+npm install
+Shorthand
+# install
+npm i <package>
+
+# uninstall
+npm un <package>+
+
+# update
+npm up <package>
+npm install -g nombredeprograma: instalar programa en forma global
 npm install -g typescript
 npm install -g @angular/cli
 npm i bootstrap jquery popper.js : Instalar bootstrap jquery popper
 ng new nombredelproyecto: crea proyecto
+npm start -- --port 4301: puerto 4301
 ng serve -o: para abrir en local (localhost 4200). En webstorm no es necesario, solo
  con apretar el boton play y esperar un buen rato se hace correr.
 ng g c nombreComponente: crea todo el componente (con html y css incluidos). Debe hacerse no en la carpeta src, sino en la carpeta principal de mas arriba (donde se guarda git)
@@ -14,10 +25,11 @@ ng g service nombreClaseServicio: crear clase servicio
 ng g module bombreModulo (comando al nivel del proyecto de git, no de src): crear un modulo independiente. Esto se hace cuando tenemos muchos módulos de alguna librria externa a importar (primeNg, por ejemplo). Con este comando creará la carpeta nombre-modulo y dentro de ella nombre-modulo.ts. Aqui solo exportamos los modulos externos y luego importamos nombre-modulo.ts en nuestro app.module.ts  
 ng g pipe ventas2/pipes/ordenar --skipTests: crear pipe con cli (lo declara automaticamente en ventas2.module.ts
 Metodo Fernando (no recomendado!) ng g m carpeta/nombreModulo:generarModulo (debe tener creada la carpeta de antemano manualmente). Posteriormente debe generarse un componente dentro de la carpeta, en el modulo local nobreModulo exportar el componente creado y en app component importar el nombreModulo 
-
 ng g c clientes/form --flat: crear directorio clientes con componente form adentro de él
 ng g c nombreComponenteOmodulo --flat: evita que se cree la carpeta nombreComponenteOmodulo, en otras palabras creará el archivo suelto al nivel de appComponent
 -is : para no crear archivos de estilos en component 
+ng g guard auth/guard/auth --skipTests: genera un guard dentro de la carpeta auth (que debe estar creada de antemano).
+ng g m reactive --routing: crear modulo de routing reactive-routing.module.ts que contiene rutas hijas (forChild) para ocupar mediante LazyLoad
 
 
 REACT

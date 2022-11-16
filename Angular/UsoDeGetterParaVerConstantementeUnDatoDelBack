@@ -1,0 +1,90 @@
+La idea es mostrar algo (en este caso el usuario logueado) que esta siendo permanentemente obtenido desde el backend.
+
+1.En el servicio:
+
+import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { Auth } from '../interfaces/auth.interface';
+import { tap } from 'rxjs/internal/operators/tap';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+
+  private baseUrl: string = environment.baseUrl;
+  private _auth: Auth | undefined;
+
+  // para mostrar el usuario q esta logueado
+  get auth():Auth{ //se puede hacer un getter porque _auth es privado
+    return {...this._auth!}; //retorna una copia del _auth original
+  }
+
+  constructor(private http:HttpClient) { }
+
+
+login() {
+  return  this.http.get<Auth>(`${ this.baseUrl }/usuarios/1`)
+  .pipe(
+    tap(auth =>this._auth=auth)
+  );
+}
+
+}
+
+2.En el componente.ts:
+
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Auth } from 'src/app/auth/interfaces/auth.interface';
+import { AuthService } from '../../../auth/services/auth.service';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styles: [`.container{
+    margin:10px;
+  }`
+  ]
+})
+export class HomeComponent implements OnInit {
+
+  get auth(){
+    return this.authService.auth;
+  }
+
+  constructor(private router:Router,
+              private authService:AuthService) { }
+
+  ngOnInit(): void {
+  }
+
+  logout() {
+   
+      console.log("funciona el boton!");
+      
+      this.router.navigate(['./auth']);
+    }
+  
+
+}
+
+3. En el componente.html:
+
+
+    <mat-toolbar>
+        <button mat-icon-button
+                (click)="sidenav.toggle()">
+            <mat-icon>menu</mat-icon>
+        </button>
+
+        <!-- muestra el usuario q esta logueado -->
+        <span>{{auth.usuario}}</span>
+
+
+        <button mat-button
+        (click)="logout()">
+            logout
+        </button>
+    </mat-toolbar>

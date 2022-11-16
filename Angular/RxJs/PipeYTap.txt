@@ -1,0 +1,30 @@
+import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { Auth } from '../interfaces/auth.interface';
+import { tap } from 'rxjs/internal/operators/tap';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+
+  private baseUrl: string = environment.baseUrl;
+  private _auth: Auth | undefined;
+
+  // para mostrar el usuario q esta logueado
+  get auth():Auth{ //se puede hacer un getter porque _auth es privado
+    return {...this._auth!}; //retorna una copia del _auth original
+  }
+
+  constructor(private http:HttpClient) { }
+
+
+login() {
+  return  this.http.get<Auth>(`${ this.baseUrl }/usuarios/1`)
+  .pipe( //el pipe es cuando uno desea hacer algo mas antes de que el componente subscriba
+    tap(auth =>this._auth=auth)
+  );
+}
+
+}

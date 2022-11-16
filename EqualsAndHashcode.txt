@@ -3,5 +3,11 @@ Cuando queremos asegurarnos de que no pueden haber clones, es decir no pueden ha
 o mas guitarras fender stratocaster rojas.
 
 ¿Cuando conviene sobreescribir el método hashcode?
-Siempre y toda vez que se sobreescribe el metodo equals debemos sobreescribir hashcode. Si no lo hacemos el mismo objeto va a tener dos referencias en memoria distintas, lo que es una aberracion porque 
-entonces va a buscar dos objetos distintos en memoria heap a partir de dos referencias distintas en memoria stack
+Siempre y toda vez que se sobreescribe el metodo equals debemos sobreescribir hashcode. Si no lo hacemos el mismo objeto va a tener dos hashcode distintos, lo que es una aberracion porque 
+entonces va a buscar dos objetos distintos en memoria heap cuando es el mismo objeto.
+
+    //Casos 1 y 4 aconsejados; casos 2 y 3 desaconsejados
+    //Caso 1: Clones: Objetos con los mismos atributos, pero que NO son equals y NO tienen el mismo hashcode. Se generan cuando NO sobrescribimos equals ni hashcode. El objeto NO es el mismo en memoria, es decir cada referencia apunta a un objeto diferente
+    //Caso 2: Objetos con los mismos atributos, que SI son equals, pero que NO tienen el mismo hashcode. Se generan cuando sobrescribimos solo equals. Los objetos son los mismos en memoria, pero tienen diferentes hashcode. Es decir dos referencias apuntando al mismo objeto
+    //Caso 3: Objetos con los mismos atributos, que NO son equals, pero que SI tienen el mismo hashcode. Se generan cuando sobrescribimos solo hashcode. Los objetos no son los mismos en memoria, pero tienen el mismo hashcode. Esto está altamente desaconsejado!
+    //Caso 4: Objetos con los mismos atributos, que SI son equals, que SI tienen el mismo hashcode. Se generan cuando sobrescribimos ambos métodos. Los dos objetos son exactamente el mismo objeto.

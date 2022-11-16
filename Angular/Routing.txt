@@ -1,6 +1,6 @@
 0.Crear los componentes que se desean enrutar
 
-1. Crear un array de rutas en el app.module.ts
+1. Crear un array de rutas en el app.module.ts (o un routing.modules.ts e importarlo en el app.module.ts)
 
 const appRoutes:Routes=[
 
@@ -26,6 +26,20 @@ const appRoutes:Routes=[
 
 6.Opcionalmente a lo anterior (este es el metodo Fernando)  podemos crearnos un routing.module.ts (a la misma altura de app.module.ts en los directorios) y escribir aqui los pasos 1 y 2. Luego importar Routes y RouterModule y en el app.module.ts importar el routing.module.ts y el RouterModule.
 Los routerlinks van asi: routerLink="region"
+
+7.Rutas parametrizadas.
+En el Appmodule o en el routing.module.ts:       {
+        path:'editar/:id', // se prueba con http://localhost:4200/heroes/editar/123
+        component: AgregarComponent
+      },
+En el html del componente:
+        <button mat-button
+        color="info"
+        [routerLink]="['/heroes/editar',heroe.id]"> 
+    Editar
+</button>
+
+
 
 
 

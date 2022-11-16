@@ -1,5 +1,7 @@
 https://www.youtube.com/watch?v=1bCgzjatcr4
 
+General: Tener en cuenta siempre que la linea donde tenemos el breakpoint no se ejecuta hasta que presionamos en step over (o en step into)
+
 
 Para debugear un servicio se levanta primero el servicio con el boton debugear, luego se marcan los puntos de quiebre
 y se hace la llamada en postman el servicio debiera entonces detenerse en el punto designado.
@@ -13,3 +15,11 @@ Recordar que step into es útil solo si en la linea se esta llamando a otro mét
 Recordar que en el debugeador podemos escribir cualquier expresion que nos interese de nuestro código con watch expresion (boton +), de esta forma sera facil evaluarla cuando cambie.
 
 En bucles donde entran varios valores podemos establecer puntos de quiebre condicionales para que se detenga solo cuando se cumpla cierto valor en el bucle. Esto se logra con click derecho sobre el punto y escribiendo la expresion.
+
+*Para debugear en multithreading:
+
+View --> Tool windows -->Debug
+Cuando se abre la ventana, abajo de "debugger" está "frames" y "threads". Tenemos que abrir "threads".
+luego del start() , en los threads del debugger aparece el nuevo hilo (se recomienda siempre renombrarlo antes con setName en el codigo. Este hilo, dependiendo de su complejidad puede permanecer en el threads del debugger por mucho o poco tiempo, por lo que se recomienda darle un sout en la linea siguiente, para que si es muy pequeño 
+por lo menos aparezca cuando le damos click a step over, ya que cuando un hilo no esta corriendo NO aparece en el threads del debugger. 
+//En el debugger en el sector de "Variables" van a empezar a aparecer las variables que estan dentro del hilo al definir un new Thread, sin embargo en "threads" no va a mostrarse el thread hasta que le damos un start().

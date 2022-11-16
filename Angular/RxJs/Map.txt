@@ -1,0 +1,54 @@
+import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { Auth } from '../interfaces/auth.interface';
+import { tap } from 'rxjs/internal/operators/tap';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+
+  private baseUrl: string = environment.baseUrl;
+  private _auth: Auth | undefined;
+
+  // para mostrar el usuario q esta logueado
+  get auth():Auth{ //se puede hacer un getter porque _auth es privado
+    return {...this._auth!}; //retorna una copia del _auth original
+  }
+
+  constructor(private http:HttpClient) { }
+
+  //ojo, esto es para proteccion de rutas, nada que ver con JWT
+verificAutenticacion():Observable<boolean>{
+if(!localStorage.getItem('token')){ //Si no esta el token de autenticacion
+  return of(false); //crea un observable a partir de false
+ }
+//Si esta el token de autenticacion
+// return of(true);
+return  this.http.get<Auth>(`${ this.baseUrl }/usuarios/1`) //Notar que para proteccion de rutas con guards siempre probó con id de usuario =1 (usuarios/1); con JWT este 1 debiera cambiar y manejarse en forma dinámica
+.pipe(
+  map(auth => { //map agarra el tipo que viene en el pipe y lo convierte en otro tipo (en este caso un boolean) 
+    console.log('map',auth);
+    this._auth=auth;
+    return true;
+  })
+)
+  }
+
+login() {
+  return  this.http.get<Auth>(`${ this.baseUrl }/usuarios/1`)
+  .pipe( //el pipe es cuando uno desea hacer algo mas antes de que el componente subscriba
+    tap(auth =>this._auth=auth),
+    tap(auth=>localStorage.setItem('token',auth.id)) //guarda el id de usuario
+  )
+}
+
+logout() {
+  this._auth = undefined;
+}
+
+}
+

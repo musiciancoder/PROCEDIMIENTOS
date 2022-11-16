@@ -1,8 +1,10 @@
 
 Una transacción de base de datos es un conjunto de instrucciones que se ejecutan en bloque. Por ejemplo, hago una consulta, modifico un registro A en la base de datos y elimino un registro B. Si en alguna de estas instrucciones se produce un error todo el proceso se echa atrás. De esta manera si luego consulto la base de datos veré que el registro A no ha sido alterado. 
 
-Este proceso de “tirar atrás” las instrucciones realizadas se le dice hacer unrollback, mientras que el proceso de confirmar todas las instrucciones en bloque una vez hemos visto que no se ha producido ningún error se le llama hacer un commit.
+Este proceso de “tirar atrás” las instrucciones realizadas se le dice hacer un rollback, mientras que el proceso de confirmar todas las instrucciones en bloque una vez hemos visto que no se ha producido ningún error se le llama hacer un commit.
 
+
+https://www.baeldung.com/spring-transactional-propagation-isolation
 
 Ejemplo:
 

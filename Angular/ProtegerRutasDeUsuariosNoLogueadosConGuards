@@ -1,0 +1,117 @@
+1.En el guard:
+
+import { Injectable } from '@angular/core';
+import { CanActivate, CanLoad, Route, UrlSegment, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { AuthService } from '../services/auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+
+//LOS GUARDS SON SERVICIOS QUE EVITAN FUNCIONALIDADES DE LA APP SI EL USUARIO NO ESTA AUTENTICADO. SE OCUPAN EN EL ROUTING.MODULE.TS
+export class AuthGuard implements  CanLoad, CanActivate {
+
+  constructor(private authService:AuthService,
+              private router:Router){}
+
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    //Las siguientes lineas son para probar antes de que se creara el metodo verificAutenticacion() en el servicio   
+
+      //   if(this.authService.auth.id){ //si existe el id
+    //     return true;
+    //    }
+    //   console.log('bloqueado por el AuthGuard -CanActivate');
+      
+    //     return false; //con true permitimos acceso a la ruta de usuario no logueado, con false negamos acceso a usuario no logueado
+    // 
+    return this.authService.verificAutenticacion()
+           .pipe(
+            tap (estaAutenticado =>{
+              if (!estaAutenticado) {
+                this.router.navigate(['./auth/login']);
+              }
+            })
+           )
+
+  }
+  
+  
+  //Permite el acceso a un módulo o componente siempre y cuando este ya haya sido cargado previamente (con otro usuario logueado exitosamente en forma previa). Lo que previene canLoad qes que se pueda cargar el modulo, no que se pueda activar la ruta
+  canLoad(
+    route: Route,
+    segments: UrlSegment[]): Observable<boolean> | boolean {
+   
+      return this.authService.verificAutenticacion()
+      .pipe(
+       tap (estaAutenticado =>{
+         if (!estaAutenticado) {
+           this.router.navigate(['./auth/login']);
+         }
+       })
+      )
+   
+    // console.log('canLoad',true);
+    // console.log(route);
+    // console.log(segments);
+ //Las siguientes lineas son para probar antes de que se creara el metodo verificAutenticacion() en el servicio   
+  /*  if(this.authService.auth.id){ //si existe el id
+      return true;
+     }
+    console.log('bloqueado por el AuthGuard -CanUpload');
+    
+      return false; //con true permitimos acceso a la ruta de usuario no logueado, con false negamos acceso a usuario no logueado
+  */
+    }
+}
+
+
+
+
+
+2.En el app.routingModule:
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes, CanLoad } from '@angular/router';
+import { ErrorPageComponent } from './shared/error-page/error-page.component';
+import { AuthGuard } from './auth/guard/auth.guard';
+
+const routes:Routes = [
+  {
+    //Carga peresoza: va a cargar el módulo 'AuthModule' solo cuando  
+    path: 'auth', //se prueba con http://localhost:4200/auth/registro
+    loadChildren: () => import('./auth/auth.module').then(m=>m.AuthModule)
+  },
+  {
+    path: 'heroes',  
+    loadChildren: () => import('./heroes/heroes.module').then(m=>m.HeroesModule),
+    canLoad: [ AuthGuard ],//guard para proteger esta ruta de usuarios que no esten logueados; si algun otro usuario ha cargado el módulo exitosamente antes en el computador, un nuevo usuario que no esté logueado SI puede ver esa ruta
+    canActivate: [ AuthGuard ] //guard para proteger esta ruta de usuarios que no esten logueados; si algun otro usuario ha cargado el módulo exitosamente antes en el computador, un nuevo usuario que no esté logueado NO puede ver esa ruta
+    
+  },
+  {
+  path:'404',
+  component:ErrorPageComponent
+  } ,
+  {
+    path:'**', 
+    //component:ErrorPageComponent //cualquier otro path que no sea 404 que tambien cargue el Error Component
+    redirectTo:'404' //cualquier otro path, que redirija a http://localhost:4200/404
+  } 
+]
+
+
+
+@NgModule({
+
+  imports: [
+    RouterModule.forRoot(routes)
+  ],
+  exports:[
+    RouterModule
+  ]
+})
+export class AppRoutingModule { }

@@ -1,10 +1,12 @@
-*La captura de un error se realiza con Throw Exception en la declaración del método que arroja error y con try-catch al llamar a este método.
-* La captura con try-catch solo sirve para que el programa se siga ejecutando despues del error, sin embargo el error va a estar siempre presente. Si no ponemos el try-catch el programa muestra el error y se cae.
-* Existen dos tipos de errores (ambos heredan de la clase Exception): IOException, que son errores que no dependen del programador (puede ser un archivo que no se encuentra, por ejemplo) 
-y RunTimeException que sí dependen del programador.  IOException deben ser siempre capturados, mientras que RunTimeException pueden o no ser capturados.
+*La captura de un error se realiza con throws Exception en el metodo que llama al método que arroja error y con try-catch donde se produce el problema.
+* La captura con try-catch solo sirve para que el programa se siga ejecutando despues del error, sin embargo el error va a estar siempre presente. Si no ponemos el try-catch el programa muestra el error y se cae. Ojo, que una vez que controlamos el error el prinstacktrace puede salir al ultimo o primero en la consola.
+* Existen dos tipos de errores (ambos heredan de la clase Exception): IOException, que son errores que no dependen del programador y ocurren en tiempo de compilacion (puede ser un nombre de archivo que no se encuentra, por ejemplo), estas son las checked o handled exceptions en inglés.
+y RunTimeException que sí dependen del programador y ocurren en tiempo de ejecucion (unchecked o unhandled exceptions).  IOException deben ser siempre capturados, mientras que RunTimeException pueden o no ser capturados.
 * Notar que capturar un RunTimeException no es buena práctica ya que el error debiera ser solventado a través de código, sin embargo es un recurso válido a veces.
 * Muchas veces se desea que un programa arroje un error intencionalmente y se caiga. Esto es muy comun en una API con spring, por ejemplo, aunque pueden haber mas casos.
 Esto se logra definiendo una clase de excepción con dos constructores. Luego se invoca a esta clase desde la parte del código donde queremos que el programa se caiga con 
 if (condicion para que se caiga) {throws new NombreExcepcion("Mensaje de la razon por la cual se esta cayendo")}.
-*La arquitectura de Spring sugiere crear un paquete de excepciones, con un clase controlador de excepciones en este mismo paquete, que gestiona las excepciones individuales.
+*La arquitectura de Spring sugiere crear un paquete de excepciones customizadas, con un clase controlador de excepciones (ExceptionHandler) en este mismo paquete, que gestiona las excepciones individuales customizadas para cada tipo de respuesta (400, 401, 500, etc.).).
+*Ejemplos de handled exceptions:IOException,SQLException,MalformedURLException
+*Ejemplus de unhandled exceptions:NullPointerException,NumberFormatExceptios,ClassCastException,IndexOutOfBoundsException.
 

@@ -7,7 +7,7 @@ Es importante saber que el súper usuario se identifica por el símbolo (#), mient
 $: Se utiliza para representar o decir que estamos logueados con un usuario normal o diferente a root.
 #: Se utiliza para saber que hemos entrado con privilegios de administrador o súper usuario o root.
 
-ctrl+c: volver a la linea de comandos
+ctrl+c o q o ctrl+q: volver a la linea de comandos
 actualizar e instalar paquetes para poder usar la consola ubuntu: sudo apt-get update
 ir a carpeta exacta: cd /nombrecarpeta/
 mostrar lo que hay en la carpeta: ls /
@@ -47,6 +47,7 @@ time: da la hora
 help nombredelcomando: te dice para que sirve ese comando
 tasklist: muestra todas las tareas en ejecucion
 TASKKILL /IM notepad.exe  forzar el cierre de una tarea en ejecucion (notepad.exe, por ejemplo)
+C:\workspace>findstr /S "pichula" c:\workspace\*.* : Encuentra en subcarpetas de windows
 find "cadenadetexto" *.txt  : Encuentra una cadena de texto en el archivo .txt (puede ser en cualquer extension) , ya sea en el nombre del archivo o en el interior de él. BUSCA SOLO EN LOS ARCHIVOS SUELTOS DE LA CARPETA, NO EN LOS ARCHIVOS QUE SE ENCUENTRAN EN SUBCARPETAS!!
 mostrar archivo de texto en windows: more archivo.txt
 history : muestra todos los comandos recientemente usados

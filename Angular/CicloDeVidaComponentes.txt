@@ -1,0 +1,11 @@
+https://angular.io/guide/lifecycle-hooks
+
+Constructor se ejecuta antes de q se cargue el html
+
+OnInit se ejecuta despues de q se cargue el html
+DoCheck, AfterContentChecked y AfterViewChecked se ejecutan luego que hay algun cambio en el componente. -->
+
+OnChanges se dispara cuando se produce algun cambio en componente padre que afecte a componentes hijos al pasarles propiedades con @Input (muestra.component en este caso).
+
+OnDestroy se dispara cuando se desacopla el componente (muy bueno cuando queremos evitar fugas de memoria, por ejemplo)
+ 

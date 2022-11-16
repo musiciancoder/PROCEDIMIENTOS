@@ -1,0 +1,71 @@
+*Why do we need SpringBoot Autoconfiguration
+
+When we use Spring MVC, among other configurations we need to configure component scan, dispatcher servlet, a view resolver, web jars (for delivering static content) among other things
+Example:
+<bean class=org.springframework.web.servlet.view.InternalResourceViewResolver>
+<property name="prefix">
+<value>/WEB-INF/views/</value>
+</property>
+<property>
+<value>.jsp<value>
+</property>
+</bean>
+
+<mvc:resources mapping="/webjars/**" location="/webjars/" />
+
+Similarly, when we use Hibernate/JPA we need to configure dataSource, entityManager and transactionManager as beans.
+
+The above code repaeats over and over again through multiple applications, as it does the servlet dispatcher configuration:
+
+<servlet>
+<servlet-name>dispatcher</servlet-name>
+<servlet-class>
+org.springframework.web.servlet.DispatcherServlet
+</servlet-class>
+</servlet>
+
+Question that pops up automatically is: Can we bring more intelligence into this?; When a spring mvc jar is added into an application,
+can we auto configure some beans automatically?
+How about auto configuring datasource if Hibernate jar is on the classpath?
+How about auto configuring a Dispatcher Servlet if Spring MVC jar is on the classpath?
+
+Thats precissely what SpringBoot does. SpringBoot looks at a)frameworks available on the classpath (classpath=external libraries en intellij), b)existing configuration for the application.
+Based on these, Spring Boot provides basic configuration needed to configure the application whith these frameworks.
+This is called Autoconfiguration. 
+
+Examples of autoconfiguration on logs:
+Mapping servlet: 'dispatcherServlet' to [/]
+Mapped "{[/error]}" onto public org.springframework..
+Mapped URL path [/webjars/**] onto handler of type [class org.springframework...
+
+As soon as we added in Spring Boot Starter Web as a dependency in our project,
+SpringBoot Autoconfiguration sees that Spring MVC is on the classpath. It autoconfigures dispatcherServlet, a default error page and webjars.
+
+If you add Spring Boot JPA Starter you will see that Spring Boot Auto Connfiguration auto configures a dataSource and an Entity Manager.
+
+*Where is SpringBoot autoconfiguration?
+External libraries -->org.springframework.boot:spring-boot-autoconfigure.jar
+
+We will take a look at DataSourceAutoConfiguration
+
+Typically all Autoconfiguration classes look at other classes available in the classpath.
+If specifi classes are available in the classpath, then configuration for that functionality is enabled through autoconfiguration.
+Annotations such as @ConditionalOnClass, @ConditionalOnMissingBean help in providing these features.
+
+Example For DataSourceAutoConfiguration:
+
+@ConditionalOnClass({DataSource.class, EmbeddedDatabaseType.class }): This configuration is enabled only when these classes are available in the classpath.
+
+@Configuration 
+@ConditionalOnClass({DataSource.class, EmbeddedDatabaseType.class }): This configuration is enabled only when these classes are available in the classpath.
+@EnableConfigurationProperties(DataSourceProperties.class).
+
+Notar que cuando agregamos la libreria de jpa en el pom, EmbeddedDatabaseType.class está en External Libraries en org/springframework/jdbc/dataSource/embedded
+DataSource.class debiera poder verse en el classpath si es que agregamos en el pom la libreria de sql (o al menos eso creo yo)
+
+*Debugg
+If something goes wrong with autoconfiguration in spring-boot, we can debug it by adding this to application.properties::
+logging.level.org.springframework: DEBUG  
+....
+
+
