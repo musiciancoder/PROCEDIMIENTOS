@@ -47,43 +47,61 @@ long duration = endTime - startTime
 System.out.print(String.valueOf(duration));
 
 
-2.Thrughput
+2.Throughput
 Cuando corremos varias subtareas independientes que no apuntan a un resultado global entre todas ellas el parametro ideal para medir rendimiento es el thugput.
 Se define como el numero de tareas por segundo.
 Supongamos que tenemos varias peticiones http a un servidor. El thrugput es entonces en este caso (numero de peticiones)/segundo. 
+La principal técnica para aumentar el througput es crear un Thread Pool, que como su nombre lo dice contiene varios hilos por los que va pasando una fila de tareas, las que son tomadas por cada uno de estos hilos una a una. Los hilos no se destruyen en memoria, sino que se reutilizan, con el consiguiente aumento en rendimiento.
+Existen varios modos de implementar un Thread Pools que ya vienen en el JDK, siendo el mas comun el Fixed Thread Pool.
+Thread Pool Executor:
+int numberOfThreads = 4;
+Executor executor = Executors.newFixedThreadPool(numberOfThreads); 
 Con Jmeter se observa que El thrugput aumenta consistentemente en forma lineal a medida que aumentamos el numero de hilos hasta que sigue aumentando linealmente pero con menos pendiente. Ese es el punto en que se alcanza el numero de cores fisicos. 
 Pasado ese punto sigue aumentando con pendiente menor debido a los cores virtuales hasta alcanzar un maximo de Thhrugput y luego se mantiene constante.
 
 *Sincronizacion, atomicidad y volatilidad
 Un recurso (variable o método, por ejemplo) es atómico si y solo si puede ser ocupado por un hilo a la vez, ya sea porque por definición es atómico (definicion de primitivas, getters y setters) o bien porque nosotros se lo especificamos con las palabras reservadas syncronized o volatile.
-Por lo general lo que buscamos es que los recursos sean atómicos, aún cuando buscamos concurrencia.
+Por lo general lo que buscamos es que los recursos sean atómicos (atómico = en una sola operacion de hardware), aún cuando buscamos concurrencia, para aumentar performance. Double por ejemplo no es atomico porque en un cpu de 64 bits para guardarse necesita del upper 32 bits y del lower 32 bits.
 Para volver atómico un método que es compartido por varios hilos, debemos especificarlo con la palabra reservada Sincronized, de esta forma el método queda bloqueado para el resto de los hilos hasta que el hilo que lo esta ocupando llega al final del método.
-Ademas, con Syncronized podemos no solo volver atomico un metodo, sino que cualquier pedazo de codigo, con Object lock = new Object(); y syncronized(lock);
-Con la palabra reservada volatile en la definicion de una variable long o double, volvemos atomicas estas dos primitivas (que por definicion no lo son)
-Con volatile en la definicion de cualquier variable evitamos el data race, o sea cuando la CPU comienza a correr variables en orden aleatorio (esto a veces la CPU lo hace para optimizar rendimiento).
+Ademas, con Syncronized podemos no solo volver atomico un metodo, sino que cualquier pedazo de codigo, con Object lock = new Object(); y syncronized(lock); (para bloquear debemos usar solo el objeto lock y ningun otro. Ademas, la instanciacion de la clase q contiene los metodos a bloquear en el main debe hacerse para solo un objeto, sino el bloqueo no funcionará).
+Con la palabra reservada "volatile" en la definicion de una variable long o double, volvemos atomicas estas dos primitivas (que por definicion no lo son), con lo que evitamos Race Condition.
+Con "volatile" en la definicion de cualquier variable evitamos el data race, o sea cuando la CPU comienza a correr variables en orden aleatorio (esto a veces la CPU lo hace para optimizar rendimiento).
 
 *Locking.
 Ya está dicho que cuando un recurso (variable, metodo) es compartido por dos o mas hilos debemos intentar sincronizar. Sin embargo mientras mas codigo sincronizamos (usando sincronized en la declaracion del metodo por ejemplo), pagamos el precio en rendimiento y tiempo ya que mas cerca lo dejamos de una aplicacion no concurrente. Esto se conoce como Coarse Grinding
 Mientras menos código sincronizamos (usando sincronized dentro del metodo, por ejemplo), permitimos mas concurrencia (esto es conocido como fine-grinding), pero pagamos el precio en context switch y ademas corremos el riesgo de un Deadlock.
 Deadlock: Supongamos que el Hilo1 y el Hilo2 corren concurrentemente ocupando los recursos compartidos A y B que hemos protegido o sincronizado. 
 El Hilo1 ocupa el recurso A por lo que lo bloquea para el hilo2. El hilo2 corre a su vez ocupando y bloqueando el recurso B, hasta que llega al recurso A y no puede seguir hasta que el hilo1 lo libere.
-Sin embargo el hilo1 cuando llega a su vez al recurso B no puede seguir porque el hilo1 lo tiene bloqueado. Ambos hilos quedan detenidos. Esto se conoce como deadlock y naturalmente debe ser solventado.
-El tipo de deadlock descrito es el mas comun y se soluciona especificando que los recursos protegidos a ser usados deben seguir siempre el mismo orden en todos los hilos, es decir en nuestro caso el hilo2 no puede ocupar el recurso B antes del recurso A.
-
+Sin embargo el hilo1 cuando llega a su vez al recurso B no puede seguir porque el hilo2 lo tiene bloqueado. Ambos hilos quedan detenidos. Esto se conoce como deadlock y naturalmente debe ser solventado.
+El tipo de deadlock descrito es el mas comun y se soluciona especificando que los recursos protegidos a ser usados deben seguir siempre el mismo orden en todos los hilos, es decir en nuestro caso el hilo2 no puede ocupar el recurso B antes del recurso A (o sea evitando el "circular wait")
+Existen otras técnicas de bloqueo (thread interruption y trylock()), sin embargo estas técnicas no funcionan con la palabra reservada "syncronized".
 
 
 1.ReentrantLock
-Esta clase posee las mismas caracteristicas que Sincronized, pero ademas tiene:
+Esta clase posee las mismas caracteristicas que Syncronized, pero ademas tiene:
 -query methods para probar el estado interno del codigo/recurso protegido.
 getQueuedThreads()-devuelve lista de hilos esperando a usar el codigo/recurso protegido.
 getOwner()- devuelve el hilo que esta ocupando el codigo/recurso protegido en este momento.
 isHeldByCurrentThread()- nos dice si el codigo/recurso protegido esta siendo ocupado o no por ese hilo.
 isLocked()- nos dice el codigo/recurso protegido esta siendo ocupado por algun hilo.
 Y ademas cuenta con los siguuientes metodos:
-ReentrantLock(true): permite distribuir equitativamente entre hilos, sin preferencia. Esto podria reducir el throughput.
--Lock(): bloque código/recurso para dos o mas hilos. Cumple la misma funcion que sincronized(lock)
+ReentrantLock(true): permite distribuir equitativamente entre hilos, sin preferencia. Esto trae como desventaja que podria reducirse el throughput.
+-Lock(): cuando un hilo ocupa un bloque de código/recurso, este  bloque de código/recurso queda bloqueado para el resto de los hilos. Cumple la misma funcion que sincronized(lock)
+
+Lock lockObject = new ReentrantLock();
+
+public int use throws SomeException {
+ lockObject.lock();
+try{
+someOperations();
+return value;
+}finally{
+lockObject.unlock();
+}}
+
 -LockInterruptibility() para parar externamente un hilo que esta pasando por codigo protegido
--tryLock() para proteccion condicional de código. Retorna true y permite acceder a codigo/recurso si esta disponible.Retorna false y se no queda esperando si el codigo/recurso no esta disponible, sino que se mueve al else del if y podría volver al codigo/recurso despues una vez que este se libere. Esta es la gran diferencia comparado con el metodo lock() (que tambien pertenece a rla clase reentrantLock), que sí se queda esperando hasta que el codigo/recurso se libere.
+-tryLock() para proteccion condicional de código. Retorna true y permite acceder a codigo/recurso si esta disponible.Retorna false y se no queda esperando si el codigo/recurso no esta disponible, sino que se mueve al else del if y podría volver al codigo/recurso despues una vez que este se libere. Esta es la gran diferencia comparado con el metodo lock() (que tambien pertenece a la clase reentrantLock), que sí se queda esperando hasta que el codigo/recurso se libere, o sea puede bloquear, en cambio trLock() nunca bloquea.
+De esta manera, al usar el bloque trylock()
 
 2.ReentrantReadWriteLock
 Para operaciones de lectura deseamos por lo general que los procesos sean concurrentes, es decir que puedan haber varios clientes, servicios, etc. leyendo desde una bddd aunque los hilos compartan recursos entre ellos.

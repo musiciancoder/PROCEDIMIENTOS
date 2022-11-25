@@ -1,3 +1,82 @@
+*General differences:
+
+Spring Boot is an extension of Spring Framework. It is not a module.
+Spring and Spring Boot have exactly the same modules: MVC, Security, etc. Only diference is in it's simplicity, since Spring Boot has autoconfiguration for what used to be Spring boilerplate code.
+
+¿How do we know which tye of project?--->By looking at the pom. Spring:<groupId>org.springframework</groupId>; SpringBoot:	<groupId>org.springframework.boot</groupId>
+
+
+*Differences in bootstrap settings:
+
+How Spring Bootstraps?
+
+Spring supports both the legacy web.xml way of bootstrapping as well as the latest Servlet 3+ method.
+
+Let's see the web.xml approach in steps:
+Servlet container (the server) reads web.xml.
+The DispatcherServlet defined in the web.xml is instantiated by the container.
+DispatcherServlet creates WebApplicationContext by reading WEB-INF/{servletName}-servlet.xml.
+Finally, the DispatcherServlet registers the beans defined in the application context.
+
+Here's how Spring bootstraps using the Servlet 3+ approach:
+The container searches for classes implementing ServletContainerInitializer and executes.
+The SpringServletContainerInitializer finds all classes implementing WebApplicationInitializer.
+The WebApplicationInitializer creates the context with XML or @Configuration classes.
+The WebApplicationInitializer creates the DispatcherServlet with the previously created context.
+
+How Spring Boot Bootstraps?
+The entry point of a Spring Boot application is the class which is annotated with @SpringBootApplication:
+
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+
+By default, Spring Boot uses an embedded container to run the application. In this case, Spring Boot uses the public static void main entry point to launch an embedded web server.
+It also takes care of the binding of the Servlet, Filter, and ServletContextInitializer beans from the application context to the embedded servlet container.
+Another feature of Spring Boot is that it automatically scans all the classes in the same package or sub packages of the Main-class for components.
+Additionally, Spring Boot provides the option of deploying it as a web archive in an external container. In this case, we have to extend the SpringBootServletInitializer:
+
+@SpringBootApplication
+public class Application extends SpringBootServletInitializer {
+    // ...
+}
+Here the external servlet container looks for the Main-class defined in the META-INF file of the web archive, and the SpringBootServletInitializer will take care of binding the Servlet, Filter, and ServletContextInitializer.
+
+
+Differences for MVC:
+Nota: si necesitas un proyecto tipo para Spring MVC está cineAppConSeguridad (de itinajero); si necesitas un proyecto tipo para Spring MVC está empleos3 (tambien de itinajero)
+-On Spring we need to install server apaache tomcat in STS; On Spring Boot this is no longer necesary since tomcat is embedded.
+-On Spring we got JSP views; On Spring Boot we got HTML views instead (the thymeleaf dependency is still needed). Converting from html to jsp is done by adding spring.mvc.view.prefix=/WEB-INF/jsp/ and spring.mvc.view.suffix=.jsp
+-On Spring we got .xml files (which is a big part of the boilerplate code previously mentioned). On SpringBoot this is no longer needed.
+For MVC these .xml files used to comprise the ServletDispatcher.xml, which handles settings for all .jsp files, and the web.xml file which imports ServletDispatcher.xml and error pages and it used to have settings for other modules too, mainly spring security. Note that web.xml contains bootstrap settings for the entire application (as stated before), other modules aswell and not only MVC.
+As an alernative to the ServletDispatcher.xml file in spring we have the initializer java class (see baeldung blog for code), which of course is neither required in Spring Boot.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 2. What Is Spring?
 Simply put, the Spring framework provides comprehensive infrastructure support for developing Java applications.
 
@@ -263,3 +342,6 @@ In this article, we learned about the differences between Spring and Spring Boot
 In a few words, we can say that Spring Boot is simply an extension of Spring itself to make development, testing, and deployment more convenient.
 
 Get started with Spring 5 and Spring 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

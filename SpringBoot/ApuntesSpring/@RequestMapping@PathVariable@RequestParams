@@ -1,0 +1,3 @@
+Probar en postman un @PathVariable: localhost:8080/vacantes/view/3 (donde view/{id} en el @GetMapping)
+Probar en postman un @Request Param: localhost:8080/vacantes/delete?id=3 (donde delete es el @GetMapping). En postman se le debe pasar los valores en params, ya que ?id=3 en la url es consecuencia de esto.
+

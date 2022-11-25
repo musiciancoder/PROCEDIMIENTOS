@@ -29,7 +29,7 @@ ng g c clientes/form --flat: crear directorio clientes con componente form adent
 ng g c nombreComponenteOmodulo --flat: evita que se cree la carpeta nombreComponenteOmodulo, en otras palabras creará el archivo suelto al nivel de appComponent
 -is : para no crear archivos de estilos en component 
 ng g guard auth/guard/auth --skipTests: genera un guard dentro de la carpeta auth (que debe estar creada de antemano).
-ng g m reactive --routing: crear modulo de routing reactive-routing.module.ts que contiene rutas hijas (forChild) para ocupar mediante LazyLoad
+ng g m reactive --routing: crear carpeta reactive, que dentro tiene: :1) modulo de routing reactive-routing.module.ts que contiene rutas hijas (forChild) para ocupar mediante LazyLoadn; 2) reactive.module.ts
 
 
 REACT

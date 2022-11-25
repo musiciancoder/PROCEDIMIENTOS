@@ -1,0 +1,45 @@
+JDBC
+Java Data Base Connector is the common technology that our application code uses to communicate with the database. It comprises JDBC API and JDBC DRIVER API.
+In JDBC we need to provide all our connection settings as java code.
+We use SQL queries to manipulate databases.
+It belongs to JEE. 
+
+
+ORM
+Object Relational Model
+Is any kind of library (not only java) that binds an object to a database model.
+
+
+JPA
+Java Persistance API is java standard technology for manipulating databases by mapping databases with java classes through objects of these classes, therefore it is one kind of ORM (Object Relational Model)
+Was launched in 2006 as part of Java EE 5, and uses the novel java anotations concept as one of it's primary features. Therefore, just as JDBC, JPA belongs Java EE 
+which means JPA is one of Java EE many specifications, and as so it can also be used outside Java EE despite the fact that it belongs to it. 
+
+JPA vs JDBC
+JPA is an additional layer to JDBC (JPA abstracts JDBC), which means JPA is built upon JDBC.
+The key benefit to using JPA instead of JDBC is verbosity decrease since JPA does not need code for connecting to database nor does it use SQL queries as the api has its own methods to manipulate databases.
+JDBC is database-dependent, which means that different scripts must be written for different databases. On the other side, JPA is database-agnostic, meaning that the same code can be used in a variety of databases with few (or no) modifications.
+As a con we can mention the fact that JDBC almost always performs better than JPA, as JPA serves as a layer of abstraction for JDBC.
+Because JDBC throws checked exceptions, such as SQLException, we must write it in a try-catch block. On the other hand, the JPA framework uses only unchecked exceptions, like Hibernate. Hence, we don't need to catch or declare them at every place we're using them.
+In JDBC, transaction management is handled explicitly by using commit and rollback. On the other hand, transaction management is implicitly provided in JPA.
+
+
+HIBERNATE
+Previous to JPA there used to be many frameworks such as Hibernate and Toplink that used to work on their own, but with no standard regarding persistance.
+As JPA is standard Java specification for persistance, nowadays Hibernate (and all other frameworks) implements JPA (implements all of JPA interfaces) to satisfy
+the standard contract. JPA is the interface, hibernate is the class that implements the interface. JPA is the dance, Hibernate is the dancer.
+
+  
+HIBERNATE vs JPA
+There is no point to this comparison since hibernate implements JPA and therefore it does not have more features than JPA. JPA cannot do without an implementator.
+
+SPRING DATA JPA
+Is a Spring module that belongs to Spring Data which allows us to simplify data persistance by using the repository concept, which is basically very similar to DAO design pattern)
+It adds an abstraction layer to the JPA.
+
+SPRING DATA JPA vs HIBERNATE
+Hibernate implements JPA, which makes it a provider)
+Spring Data JPA  is not a provider, but a higher layer of abstracion to JPA.
+Spring Data JPA internaly uses a JPA provider (it can be hibernate, toplink, etc) to work with. This is evident on the pom file if we go to the implementation of spring-boot-starter-data-jpa dependency (right click and then "go to implementations". 
+Hibernate is default provider for Spring Boot. 
+

@@ -1,0 +1,8 @@
+@Component is equivalent to <bean></bean>
+@Service, @Controller, @Repository = {@Component + some more special functionality}
+
+@Controller: where your request mapping from presentation page done i.e. Presentation layer won't go to any other file it goes directly to @Controller class and checks for requested path in @RequestMapping annotation which written before method calls if necessary.
+
+@Service: All business logic is here i.e. Data related calculations and all.This annotation of business layer in which our user not directly call persistence method so it will call this method using this annotation. It will request @Repository as per user request
+
+@Repository: This is Persistence layer(Data Access Layer) of application which used to get data from the database. i.e. all the Database related operations are done by the repository.
