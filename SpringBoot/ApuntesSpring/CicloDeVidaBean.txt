@@ -1,10 +1,8 @@
-https://www.youtube.com/watch?v=J6Mae6LLpLI&list=PL
-Ciclo de vida de un bean
-1.Inicializacion del Contenedor de Spring
-2.Instanciación de Bean
-3.Inyeccion de dependencias
-4.Procesado del Bean
-5.Ejecucion del metodo Init (debe ser configurado en el contenedor de beans (xml o java)
-6.Bean listo para su uso
-7.Contenedor Spring apagado
-8.método destroy (debe ser configurado en el contenedor de beans (xml o java)
+1.Se crea el bean (los objetos)
+2.Se ejecutan los metodos init, es decir los que estan con anotacion @PostConstruct. 
+3.Se inicia la aplicacion con el metodo main
+4.Se inicializa el contenedor de Beans, lo que disponibiliza los beans.
+5.Hacer con el bean lo que deseemos
+6.Hacer algo y sacar el bean del contenedor de beans con @Predestroy
+7.Cerrar el contenedor de beans con close(). Esto destruye todos los beans de ese context.
+8.Contenedor Spring apagado

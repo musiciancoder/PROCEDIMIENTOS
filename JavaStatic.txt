@@ -1,6 +1,6 @@
-*Se cargan cuando se carga la clase, por lo que es mas rápido que los campos y métodos no estáticos que se cargan cuando se crea un objeto.
-*Los atributos static pertencen a la clase y no al objeto, es decir todas las instancias lo tienen, por lo que no se pasan como argumento en el constructor.
-*Se llaman con nombreClase.nombreCampo, nombreClase.nombreMetodo
-*NO se puede inicializar ni dar valores a un campo no estático desde un método estático con el uso de this.
+*Variables y métodos estáticos se cargan cuando se carga la clase, a diferencia de variables y métodos no estáticos que se cargan cuando se crea un objeto.
+*Se llaman con nombreClase.nombreVariable, nombreClase.nombreMetodo
+*Dentro de un método estático NO se puede inicializar ni dar valores a un campo no estático desde un método estático con el uso de this. Tampoco se puede llamar a otro método no estático con el uso de this.
 *¿Cuando preferir campos y métodos no estáticos? Cuando estamos seguros que el valor no va a cambiar en el tiempo, por ello normalmente para variables constantes se usa en combinacion con "final".
-*Todas las variables static se almacenan en memoria HEAP!
+*Todas las variables static se almacenan en memoria HEAP en la JVM !
+*En una clase estática todas sus variables y métodos son estáticos.

@@ -8,7 +8,8 @@ En el caso de hacer explicita la igualdad de objetos mediante mediante referenci
 
 2. Shallow copies
 Si queremos crear una copia con los mismos atributos que un objeto ya creado, pero con diferente referencia en memoria (es decir un shallow clone), lo hacemos con el metodo .clone() perteneciante a la clase Object.
-Luego este clon podrá ser manipulado sin modificar el objeto original. Para crear shallow copies debemos implementar Cloneable en la clase y sobreescribir el metodo clone haciendolo publico en vez de protected.
+Luego este clon podrá ser manipulado sin modificar el objeto original. Para crear shallow copies debemos implementar Cloneable en la clase y sobreescribir el metodo clone haciendolo publico en vez de protected, pero sobrescribiendolo nosotros mismos con los atributos
 
 3.Deep copies
 Si es que tenemos alguna propiedad que es una clase que hemos definido nosotros (direccion), si cambio esta propiedad en el clon, cambia tambien el objeto original. Naturalmente, ambos tienen diferente hashcode.
+Para crear shallow copies debemos implementar Cloneable en la clase y sobreescribir el metodo clone haciendolo publico en vez de protected, pero sobrescribiendolo nosotros mismos con los atributos

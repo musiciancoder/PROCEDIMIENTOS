@@ -1,1 +1,1 @@
-public String procesarFormulario(@ModelAttribute ("elAlumno") Alumno elAlumno) { //con @ModelAttribute se rescata un objeto que ya estaba en el modelo 
+public String procesarFormulario(@ModelAttribute ("elAlumno") Alumno elAlumno) { //con @ModelAttribute se rescata un objeto que ya estaba en el modelo, es para MVC

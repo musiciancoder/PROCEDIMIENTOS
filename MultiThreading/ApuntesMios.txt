@@ -63,7 +63,7 @@ Pasado ese punto sigue aumentando con pendiente menor debido a los cores virtual
 Un recurso (variable o método, por ejemplo) es atómico si y solo si puede ser ocupado por un hilo a la vez, ya sea porque por definición es atómico (definicion de primitivas, getters y setters) o bien porque nosotros se lo especificamos con las palabras reservadas syncronized o volatile.
 Por lo general lo que buscamos es que los recursos sean atómicos (atómico = en una sola operacion de hardware), aún cuando buscamos concurrencia, para aumentar performance. Double por ejemplo no es atomico porque en un cpu de 64 bits para guardarse necesita del upper 32 bits y del lower 32 bits.
 Para volver atómico un método que es compartido por varios hilos, debemos especificarlo con la palabra reservada Sincronized, de esta forma el método queda bloqueado para el resto de los hilos hasta que el hilo que lo esta ocupando llega al final del método.
-Ademas, con Syncronized podemos no solo volver atomico un metodo, sino que cualquier pedazo de codigo, con Object lock = new Object(); y syncronized(lock); (para bloquear debemos usar solo el objeto lock y ningun otro. Ademas, la instanciacion de la clase q contiene los metodos a bloquear en el main debe hacerse para solo un objeto, sino el bloqueo no funcionará).
+Ademas, con Syncronized podemos no solo volver atomico un metodo, sino que cualquier pedazo de codigo, con Object lock = new Object(); y syncronized(lock){}, siendo Object normalmente el recurso a compartir por los threads; (para bloquear debemos usar solo el objeto lock y ningun otro. Ademas, la instanciacion de la clase q contiene los metodos a bloquear en el main debe hacerse para solo un objeto, sino el bloqueo no funcionará).
 Con la palabra reservada "volatile" en la definicion de una variable long o double, volvemos atomicas estas dos primitivas (que por definicion no lo son), con lo que evitamos Race Condition.
 Con "volatile" en la definicion de cualquier variable evitamos el data race, o sea cuando la CPU comienza a correr variables en orden aleatorio (esto a veces la CPU lo hace para optimizar rendimiento).
 
@@ -113,12 +113,14 @@ Por otro lado al escribir o borrar de la bbdd generalmente deseamos bloquear el 
 Es otra tácnica de bloqueo y coneccion interthreads. A diferencia de los metodos locks que solo permiten un thread a la vez pasando por recurso/codigo protegido, con semaphore podemos setear un numero especifico de varios threads (number of permits) corriendo concurrentemente por ese codigo/recurso.
 int NUMBER_OF_PERMITS=1;
 Semaphore semaphore = new Semaphore(NULL);
-semaphore.aquire()//lock
+semaphore.acquire()//lock
 useResource(); //esto es el codigo protegido
 semaphore.release() //unlock
 Los semaphore no tienen la nocion de pertenencia que sí tienen los locks. 
 Además, cualquier thread puede liberar un semaphore que esta siendo ocupado por otro thread; esto podria crear un bug que con los locks no ocurre. 
 En un escenario de producer/consumer con recursos compartidos es mejor usar semaphore.
+Llamar al metodo acquire es chequear si el "numero de permisos>0". Si esto es falso, entonces el thread A se va a dormir hasta que otro thread cambie el estado del semaforo. Cuando 
+thread B libera el semaforo con el metodo release(), entonces el thread A despierta y vuelve a chequear que el "numero de permisos>0" y si es asi, continúa avanzando a la siguiente instruccion.
 
 
 4.Condition Variables.
@@ -134,7 +136,7 @@ String password=null;
 lock.lock();
 try{
 while(username==null||password==null){
-condition.await(); //espera a la señal
+condition.await(); //primero desbloquea y luego se queda esperando hasta la señal desde otro thread para reanudar
 }
 }
 finally{
@@ -153,3 +155,26 @@ condition.signal(); //manda la señal que ya hay credenciales para q el usuario 
 lock.unlock();
 }
 
+5.Objetos como contition Variable
+Los métodos wait(), notify() y notifyAll() pertenecen a la clase Object.
+wait(): pone el hilo a dormir hasta que otro hilo lo despierta con notify().
+notify(): despierta un hilo dormido
+notifyAll(): despierta todos los hilos dormidos
+Los tres metodos se usan en combinación con syncronized en ese objeto para bloquear recursos compartidos.
+Tambien es muy usado para el modelo Provider-Consumer
+
+public class MySharedClass {
+private boolean isComplete=false;
+public void waitUntilComplete(){ 
+syncronized(this){
+while(isComplete==false){
+this.wait();
+}
+}
+}
+public void complete(){
+syncronized(this){
+isComplete=true;
+this.notify();
+}
+}

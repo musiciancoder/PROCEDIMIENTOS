@@ -1,7 +1,7 @@
 *Definition
 Dependency Injection is a design pattern in which an object is provided to a class instead of being generated within the class 
 
-It is not exclusive from Java Spring (Angular, for instance has it to). 
+It is not exclusive from Java Spring (Angular, for instance has it too). 
 However it is Spring's main features, since it substitutes the "new" operator to generate an object from class A within class B by declaring class A as a bean.
 
 
@@ -13,7 +13,7 @@ Scenario 2) Lets say we have class A which is being instantiated (again with ope
 -We usually need a singleton application (one object per class). Since we need to create two objects for class A, this is no longer possible.
 
 
-This is where Dependency Injection comes in. Instead of create an object within a different class, we get them from the bean container and inject it into the class. 
+This is where Dependency Injection comes in. Instead of creating an object within a different class, we get them from the bean container and inject it into the class. 
 Therefore DI involves bean creation in it's first stage (creation of a bean), but not in it's second stage (injection of this bean) 
 
 To apply Dependency Injection in both Spring and SpringBoot we do this:
@@ -28,7 +28,7 @@ Method 2)We create an interface, then we generate a class that implements this i
 Next we create a getter for this class into the second class.
 Finally, we define ClassToBeInjected as a bean in our bean container. In Spring bean container is section <beans> </beans> of our applicationContext.xml file. In SpringBoot bean container is every @Bean annotation whithin the Configuration class (the one with @Configuration annotation).
 
-Method 3 --recommended--) We create an interface (called InterfaceToBeInjected), then we generate a class (called FirstClass) that implements this interface and we mark it with annotation @Component or @Service. By doing so we are generating the bean (generating the bean = generating the object for this class).
+Method 3 --recommended--) We create an interface (called InterfaceToBeInjected), then we generate a class (called FirstClass) that implements this interface and we mark it with annotation @Component (or @Service,@Controller,@Repository). By doing so we are generating the bean (generating the bean = generating the object for this class).
 Next, we do the dependency injection into the second class with annotation @Autowired InterfaceToBeInjected interfaceToBeinjected; being InterfaceToBeInjected the interface we created on the previous stage. Now we are looking for a bean (object) of a class that implements InterfaceToBeInjected. 
 Note that in this case we do not have to define manually a bean in our bean container, since @Component and @Service do this automatically for us.
 Lastly, we are able to use methods defined in FirstClass on our second class interfaceToBeinjected.methodName();

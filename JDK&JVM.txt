@@ -1,7 +1,8 @@
 https://www.youtube.com/watch?v=w2jlkcdvBSg
 
 La JVM esta dentro de JRE y este a su vez esta dentro de JDK.
-JRE permite ejecutar Java pero no programar, ya que no tiene un compilador.
+JRE permite ejecutar Java pero no programar, ya que no tiene un compilador. El JRE tiene la JVM + librerias que permiten ejecutar archivos en bytecode (.class), pero no archivos java (.java).
+La JVM lo que hace es pasar los archivos .class a código maquina para cada sistema operativo y de esta forma ejecutar el programa. Por esto se dice que Java es independiente de la plataforma que lo ejecuta.
 JDK si permite programar, ya que ademas del JRE para ejecutar contiene un compilador que permite compilar de codigo fuente (.java) a java.class
 
 Normalmente dentro del JDK hay una carpeta con nombre explicito JRE, pero no siempre es asi (en OpenJDK 14 por ejemplo no está). Independientemente de eso el JRE esta siempre embebido en el JDK

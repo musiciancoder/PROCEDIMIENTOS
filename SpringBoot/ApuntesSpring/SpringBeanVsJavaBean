@@ -1,6 +1,6 @@
 *JavaBeans:
 At a basic level, JavaBeans are simply Java classes which adhere to certain coding conventions. Specifically, classes that:
--have public default (no argument) constructors
+-have public default (no argument) constructors. If not explicitly present, remember empty constructors are there by default on java classes.
 -allow access to their properties using accessor (getter and setter) methods
 -implement java.io.Serializable
 
