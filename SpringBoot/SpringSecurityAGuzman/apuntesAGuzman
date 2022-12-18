@@ -1,0 +1,41 @@
+Con respecto al proyecto de springsecurity del español (crudBack), este proyecto ocupa OAUTH2, cosa que no hace el español. 
+
+Un JWT nuevo se crea cada vez que un usuario se loguea exitosamente, y estará vigente mientras dure la sesión se usuario. En cada petición http el usuario deberá pedir el recurso requerido junto con el JWT al servidor.
+El Header contiene el tipo de algoritmo, el payload contiene la data del usuario. sub=nombre de usuario en la aplicacion (musiciancoder), name=nombre real, iat=data adicional como por ejemplo fecha de registro, email, etc. Se puede naturalmente ir agregando mas campos en este json sin ningun problema; 
+La firma (verify signature) contiene el código secreto (your-256-bit-secret). La app no tiene acceso a esta clave secreta, solo se maneja a nivel de servidor.
+Los otros elementos (header y payload) se agregan al codigo secreto, se codifican en base 64 y esto es la firma. 
+En el sitio web de JWT, si intentamos modificar algo del JWT, nos aparecerá "invalid signature", pero naturalmente que sí se puede modificar el payload o el tipo de algoritmo sin problemas. Acá tambien podemos revisar el session storage y local storage.
+Cualquier JWT en el sitio web se puede decodificar en la consola (ver pantallazo), por lo que JWT es facilmente codificable y decodificable en ambos sentidos, por lo que es importante no guardar informacion sensible en el payload, ya que faclmente alguien lo puedría ver.
+Nota: Guzman ocupa dependencia maven spring-security-oauth2. A partir de java 9 javaxb-api y javaxb-runtime.
+
+1.Creó las entidades Usuario y Role (ver proyecto spring-boot-backend-apirest) para que al correr la app se crren estas tablas.
+2.Creó el patrón DAO con IusuarioDAO, pero sin clase implementadora, sino que la inyectó directamente en la clase de servicio UsuarioService.
+Esta clase implementa UserDetailsService, con su metodo obligatorio UserDetails devolviendo un tipo UserDetails, que contiene las autorizaciones del usuario (GrantedAuthorities).
+3.Creó la clase de configuracion de Spring Security SpringSecurityConfig que extiende WebSecurityConfigurerAdapter, donde inyectó nuestro servicio UserDetails. Creó los beans BCryptPasswordEncoder y AuthenticationManager. Esta clase la siguió escribiendo en videos posteriores. Esta clase la tiene el proyecto del español, aunque se llama MainSecurity y hace basicamente lo mismo.
+4.Creó la clase de configuracion del servidor AuthorizationServerConfig que extiende AuthorizationServerConfigurerAdapter. Esta clase se encarga de configurar las autorizaciones (de endpoints, por ejemplo). Acá inyectó BCryptPasswordEncoder y AuthenticationManager de la clase SpringSecurityConfig. Esta clase NO la tiene el proyecto del español
+5.Creó la clase de configuracion para el servidor de recursoResourceServerConfig que extiende ResourceServerConfigurerAdapter. Esta es básicamente la configuración de OAUTH2 para accesos a rutas protegidas. Esta clase NO existe en el proyecto del español, la configuracion de los antMatchers la hiso en la clase MainSecurity.
+6.Creó algunos usuarios con sus roles por medio de sql. Esto lo hizo al correr la aplicacion, con el script sql que está en el proyecto en resources-->import.sql
+7.Probó en postman. Partió probando con un GET localhost:8080/api/clientes y entró sin problemas ya que la configuración de la clase ResourceServerConfig se lo permitía. Luego volvió a probar con get para localhost:8080/api/clientes/1 y no pudo entrar porque necesitaba el token.  Los usuarios creados necesitan passwords encriptados para poder probar en postman. Esto lo obtuvo en SpringBootBackendApirestApplication implementando CommandLineRunner y escribiendo unas lineas de codigo adicionales. Al correr la app en el log obtuvo los passwords encriptados y los pegó para cada usuario en el import.sql
+Para generar un token de autenticacion en postman, lo hizo con la ruta localhost:8080/oauth/token, que es la ruta por defecto de OAUTH2. Luego en el body escribió el username (andres) el password sin encriptar (12345) y el grant_type (password).
+En Authorization en el postman seleccionamos basic auth y escribimos las credenciales del cliente, en nuestro caso Username=angularapp y Password=12345.
+Luego en el Authorization hacemos click en "Preview Request" y notaremos que en el Header ya tendremos escrito una clave (Authorization) valor encriptado (Basic HFYEhdt5h6DBBFB==).
+Damos click en send y obtenemos el access token. Volvemos a probar la ruta localhost:8080/api/clientes/1 con get, pero antes del send seleccionó Bearer Token en Authorization, hizo click en "Preview Request" y obtuvo la clave valor en el header. Hizoclick en send y ahi ya tuvo acceso a ver el id:1, "nombre":"Andres","apellido":"guzman", etc. Probó los otros verbos de REST y vió q funcionaban.
+Luego cortó el token y lo pegó en el sitio web de JWT, con lo que obtuvo header,payload y signature.
+8.Se creó el bean JwtAccessTokenConverter en la clase AuthorizationServerConfig. Esto es para que nosotros podamos escribir nuestra llave secreta (requerida en el signature del JWT) según el tipo de algoritmo (mac=tipo de algoritmo) que hemos seleccionado. 
+En nuestro caso el decidió que el mac va a ser tipo RSA, por lo que necesitó proveer con un string una llave secreta ("alguna.clave.secreta.12345678").
+Luego volvió a generar un token en postman segun el paso anterior.
+9.Para robustecer la seguridad cambió la llave secreta anterior ("alguna.clave.secreta.12345678") a dos llaves secretas, una publica y otra privada generadas por OpenSSL (existen mas medios de generar llaves secretas pero él ocupa esta).
+Generó un nuevo token segú los pasos anteriores y volvió a probar el acceso a localhost:8080/api/clientes/1.
+10.Luego quiso ver informacion adicional a la que se ve por defecto en el payload al pegar el token en el sitio web de JWT.
+Para ello creo la clase InfoAdicionalToken implementa TokenEnhancer (no esta en el proyecto del español) y escribió como clave valor la info adicional. Para ello necesitaba tener un usuario en esta clase, razón por la que creó la interfaz IUsuarioService y la implementó en UsuarioService (doble implementacion) y finalmente la inyectó en InfoAdicionalToken.
+A continuación registró el cambio para los endpoints en la clase AuthorizationServerConfig.
+Finalmente generó un nuevo token en postman y lo pegó en el sitio web de JWT.
+11.Creo info adicional para usuarios con nombre, apellido e email en entity (antes solo tenía id, username y password). Modificó InfoAdicionalToken para q mostrara en los loggers.
+12.Configuró los permisos según roles de usuario o administrador en la clase ResourceServerConfig (metodo configure, lo hizo con los antMatchers para cada verbo REST). Probó en Postman los accesos generando un token para administrador (con username=admin) y probando las rutas, luego se generó otro token para usuario (con username=andres) y comprobó que no tenía todos los accesos a rutas.
+13.Comentó los antMatchers en la clase SpringSecurityConfig porque explicó otra alternativa para dar accesos segun roles: escribir @EnableGlobalMethodSecurity(securedEnabled = true) en clase SpringSecurityConfig y @Secured("ROLE_ADMIN") en cada método a proteger en la clase ClienteRestController
+14.Probó desde Angular y vió que no tenía acceso debido a los CORS. Para solventarlo, en la clase ResourceServerConfig se creó un bean para la configuración de los CORS (el método guardado como bean es corsConfigurationSource), el cual fue pasado en en método configure de esta misma clase.
+Adicionalmente se creó un filtro (metodo corsFilter). Este filtro es ocupado tanto al generar el token con localhost:8080/oauth/token como en las peticiones al pedir recursos ya estando autenticados con nuestro token
+
+
+
+

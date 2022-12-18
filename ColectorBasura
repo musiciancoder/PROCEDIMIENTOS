@@ -1,0 +1,22 @@
+En otros lenguajes como C o C++ uno controla el uso de memoria, pero en Java la JVM esto se hace automaticamente a través del GC en la memoria Heap.
+Los objetos que ya no están referenciados (unreacheable objects) son colectados por el colector de basura (ver paquete colectorbasura en proyecto PruebasGeneralesJava).
+La JVM lleva a cabo el proceso de limpieza a través del GC por medio de tres etapas:
+1.Scanner: detecta los unreacheable objects
+2.Delete: borra los unreacheable objects
+3.Compacting: reordena la memoria Heap para que no hayan espacios de memoria vacios intermedios debido a los huecos que dejaron los objetos que fueron eliminados. Esta es por lejos la etapa mas lenta y la que mas puede perjudicar el performance.
+La memoria Heap está dividida en:
+-PermGen: aqui se guardan las variables static y la metadata.
+-Young Generation: Donde van los objetos "nuevos".
+-Old Generation:Donde van los objetos antiguos.
+La Young Generation se subdivide en "Eden" donde van los objetos que recien se crean y que no han sido sujetos a ningun GC aun y en "Survivor1" Y "Survivor2" que han sido sujetos a al menos un ciclo de GC.
+A medida que los objetos van sobreviviendo al GC van siendo pasados desde el eden a "Survivor1" Y "Survivor2" y entre "Survivor1" y "Survivor2" para reordenar los objetos sobreviviente de manera de disminuir la necesidad del compacting, ya que el reordenamiento consume menos recursos que realizar el compacting.
+A la Old Generation pasan los objetos que han sobrevivido numerosos ciclos GC. el numero de ciclos que debe sobrevivir un objeto en la Young Generation antes de pasar a la Old Generation se puede setear con un comand -XX algo.
+Existen los ciclos cortos y muy seguidos, estos son los que borran objetos de la Young Generation pero no los de Old Generation. Para borrar un objeto de la Old Generation estos deben ser colectados por ciclos largos y menos frecuentes del GC.
+Hay varios tipos de colector de basura que pueden ser seleccionados con -XX algo.
+-Serial GC: solo un hilo que detiene todo en la etapa de escaneo; no corre con la aplicacion.
+-Parallel GC: varios hilos concurrentemente que detienen todo en la etapa de escaneo; no corre con la aplicacion.
+-Concurrent GC: No necesita parar la aplicacion para su ejecución ya que corre concurrentemente con esta.
+-G1 GC:La memoria se subdivide en varias zonas mas pequeñas, con el GC siendo una mezcla de las tres anteriores y dando prioridad para borra las zonas pequeñas de mayor basura. Este es el GC por defecto.
+Se puede llamar al colector de basura sobrescribiendo el método finalize (ver paquete colectorbasura en proyecto PruebasGeneralesJava), sin embargo esto está desaconsejado desde la version 7.
+
+

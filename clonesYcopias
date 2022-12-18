@@ -12,4 +12,4 @@ Luego este clon podrá ser manipulado sin modificar el objeto original. Para cre
 
 3.Deep copies
 Si es que tenemos alguna propiedad que es una clase que hemos definido nosotros (direccion), si cambio esta propiedad en el clon, cambia tambien el objeto original. Naturalmente, ambos tienen diferente hashcode.
-Para crear shallow copies debemos implementar Cloneable en la clase y sobreescribir el metodo clone haciendolo publico en vez de protected, pero sobrescribiendolo nosotros mismos con los atributos
+

@@ -1,0 +1,2 @@
+Esto es de Spring Security
+13.Comentó los antMatchers en la clase SpringSecurityConfig porque explicó otra alternativa para dar accesos segun roles: escribir @EnableGlobalMethodSecurity(securedEnabled = true) en clase SpringSecurityConfig y @Secured("ROLE_ADMIN") en cada método a proteger en la clase ClienteRestController

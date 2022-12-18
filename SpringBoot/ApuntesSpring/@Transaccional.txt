@@ -3,6 +3,7 @@ Una transacción de base de datos es un conjunto de instrucciones que se ejecuta
 
 Este proceso de “tirar atrás” las instrucciones realizadas se le dice hacer un rollback, mientras que el proceso de confirmar todas las instrucciones en bloque una vez hemos visto que no se ha producido ningún error se le llama hacer un commit.
 
+Ojo, que al implementar CrudRespository, el @Transactional(readOnly = true) no es necesario segun A. Guzman, pero igual lo dejó en el proyecto
 
 https://www.baeldung.com/spring-transactional-propagation-isolation
 

@@ -1,0 +1,14 @@
+nota: shift es la fleacha hacia arriba.
+
+WINDOWS
+alt + tab: cambiar a ventanas recientes.
+
+INTELLIJ
+ctrl + h : ver herencia
+ctrl + d: repetir linea
+shift + f6: renombrar (refractor)
+ctrl + shift + f10: correr programa actual.
+ctrl + /: comentario una linea
+ctrl + shift + / : comentario bloque
+
+

@@ -1,0 +1,26 @@
+1.Inicia el proyecto con la dependencia de <groupId>io.jsonwebtoken</groupId> <artifactId>jjwt</artifactId>, a diferencia del proyecto de A.Guzman, que no tiene esta dependencia, sino la de OAUTH2. Esto indica que en el proyecto solo se ocupa jwt (español) y no jwt+oauth (A.Guzman).
+2.Crea las clases entity (Usuario y Rol). Usuario basicamente con los mismos campos que Guzman y con la tabla intermedia por medio de @JoinColumn al igual que Guzman. Sin embargo escribe un constructor vacío y otro constructor para todos los campos de clase.
+Rol tambien similar a Guzman, pero con los constructores. nombreRol español = nombre Guzman.
+3.Crea la clase UsuarioPrincipal implements UserDetails que es la que se encarga de las autorizaciones para cada usuario dependiendo de los roles que tenga.
+Al implementar UserDetails debe sobrescribir varios métodos (isAccountNonExpired, isAccountNonLocked, etc.), pero esto se consigue facilmente y es muy poco código en cada método. 
+Sin embargo, de su propia iniciativa creó el método estático build() que es en realidad el que hace todo el trabajo ya que convierte a un usuario en un Usuario principal segun el o los roles que tenga, es decir, se agregan las autorizaciones para cada usuario dependiendo de su rol.
+Notar que las autorizaciones son del tipo List<GrantedAuthority>authorities. Estas autorizaciones en el proyecto de Guzman estan en la clase de servicio UsuarioService implements UserDetailsService, en el método sobrescrito loadUserByUsername. 
+Más adelante (en el punto 5) el español crea la clase  UserDetailsServiceImpl implements UserDetailsService pasándole al interior de método loadUserByUsername el método build() , por lo que conceptualmente ambos proyectos son iguales con respecto a las autorizaciones.
+4.Creó las interfaces UsuarioRepository extends JpaRepository y RolRepository extends JpaRepository para buscar por nombre de usuario o por nombre de rol.
+Para lograr lo anterior inyecta por dependencia UsuarioRepository y RolRepository en sus respectivos servicios UsuarioService y RolService (que estaban creadas pero vacias anteriormente).
+5.Necesita cargar usuario por nombre de usuario; para ello creó la clase UserDetailsServiceImpl implements UserDetailsService y sobrescribió el metodo loadUserByUsername pasándole el método estático build() para que devolviera un "cargar usuario por nombre de usuario". El usuario dentro de loadUserByUsername lo obtiene mediante el servicio del punto 4, similar a como Guzman obtuvo el usuario que escribió dentro de su respectivo loadUserByUsername, excepto que el español inyectó un servicio en vez de un DAO como lo hace Guzman.
+6.Creó las clases JwtEntryPoint, JwtProvider y JwtTokenFilter. Esta es la mayor diferencia con respecto a Guzman, porque en el proyecto del chileno con OAUTH2 no existen estas clases y por ello es menos verboso.
+7.El JwtEntryPoint devuelve respuestas del tipo 401 no autorizado, etc.
+8.En JwtProvider creó método para generar el token (generateToken), un método para validar el token que será mandado en las sucesivas peticiones http (validateToken) y un método para obtener nombre de usuario a partir del token en las peticiones http.
+9. En JwtTokenFilter sobrescribió el metodo doFilterInternal, donde ocupa los dos últimos métodos mencionados en el punto anterior para que spring filtre internamente a ver si el token que se esta mandando en las sucesivas peticiones http es o no válido Ojo, que esta clase a diferencia de las dos anteriores no es un componente (o sea no genera bean).
+10.Creó la clase MainSecurity donde hizo la configuración de Spring security, incluídos los permisos permisos para los endpoints. Con respecto al proyecto de Guzman en cuanto a métodos, esta clase tiene metodos q corresponden a las clases SpringSecurityConfig y ResourceServerConfig.
+11.Comenzó a codificar lo correspondiente a login (de usuario registrado) y registro (de nuevo usuario).
+Para ello creó las tres clases del paquete DTO para interactuar con la data que llega del front para login y registro.
+Luego en el controlador AuthController  creó los metodos de login y registro según los endpoints respectivos. Notar que para metodo de registro no ocupó nada de token, lo que tiene sentido, ya que es primera vez que la persoa entra. En el método de login en cambio, devuelve al front un response entity con el token en su interior.
+12.Probó en postman.
+Probó primero auth/token para registrar un usuario con los datos del body (roles de usuario y administrador) y vió q lo guardó en la bbdd.
+Luego con el usuario anterior se autenticó con localhost:8080/auth/login y vió que obtuvo un token.
+Luego probó obtener una lista de productos con el token obtenido. En postman en Authorization seleccionó Bearer token y luego escribió Bearer jdjj654553hhdhhdhd (o sea el token).
+Finalmente puso protecciones por rol a los métodos create, delete y update en ProductoController y probó uevamente.
+
+ 

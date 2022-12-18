@@ -11,7 +11,7 @@ public class MsvcUsuariosApplication {
     private Long id;
     private String nombre;
 
-    @Column(unique = true) //funciona solo para el caso que nosotros creamos la tabla al correr la aplicacion, pero no cuando esta creada de antemano en la bbdd
+    @Column(unique = true, length = 20) //funciona solo para el caso que nosotros creamos la tabla al correr la aplicacion, pero no cuando esta creada de antemano en la bbdd
     private String email;
 
     private String password;
