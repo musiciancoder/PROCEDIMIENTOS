@@ -1,0 +1,16 @@
+apiVersion:v1
+kind:Service
+metadata:
+#este es el hostname
+  name:msvc-cursos
+spec:
+  type: LoadBalancer
+  ports:
+    -port:8002
+	protocol:TCP
+	#el targetPort es el valor del container que se está anclando a esta red (recordar que los pods por si solos no tienen puertos, sino q ocupan los del container), o sea el mismo de containerPort en archivo deplyment-cursos.yaml
+	targetPort:8002
+   selector:
+   #el mismo de deplyment-cursos.yaml
+    app:msvc-cursos
+

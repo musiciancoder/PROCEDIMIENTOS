@@ -1,0 +1,308 @@
+ En ambos computadores, lo unico q tiene puerta de enlace predeterminada es Adaptador de LAN inalámbrica Wi-Fi
+ Que es un adaptador de ethernet?
+ Por qué me sale en antiguo un Adaptador de Ethernet 3 y en nuevo no ? Q significa esto?
+ Q ES UN Adaptador de LAN inalámbrica Conexión de área local* 1 y 2 q sale en el antiguo y por qué no me aparece esto en el nuevo?
+ Cual es el enrutador q esta actuando como gateway?
+
+ NUEVO
+
+ Adaptador de LAN inalámbrica Wi-Fi:
+ 
+ Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : Killer(R) Wi-Fi 6E AX1675s 160MHz Wireless Network Adapter (211D2W)
+   Dirección física. . . . . . . . . . . . . : 58-CE-2A-B5-C5-B1
+   DHCP habilitado . . . . . . . . . . . . . : sí
+   Configuración automática habilitada . . . : sí
+   Vínculo: dirección IPv6 local. . . : fe80::38e0:8c32:d81c:e717%10(Preferido)
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.1.81(Preferido)
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Concesión obtenida. . . . . . . . . . . . : sábado, 31 de diciembre de 2022 11:14:32
+   La concesión expira . . . . . . . . . . . : domingo, 1 de enero de 2023 19:55:31
+   Puerta de enlace predeterminada . . . . . : 192.168.1.1
+   Servidor DHCP . . . . . . . . . . . . . . : 192.168.1.1
+   IAID DHCPv6 . . . . . . . . . . . . . . . : 106483242
+   DUID de cliente DHCPv6. . . . . . . . . . : 00-01-00-01-2A-A7-E3-75-CC-96-E5-55-9C-01
+   Servidores DNS. . . . . . . . . . . . . . : 200.28.4.129
+                                       200.28.4.130
+   NetBIOS sobre TCP/IP. . . . . . . . . . . : habilitado
+   
+   ANTIGUO
+   
+   Adaptador de LAN inalámbrica Wi-Fi:
+
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : Realtek RTL8723DE 802.11b/g/n PCIe Adapter  DIFERENTE
+   Dirección física. . . . . . . . . . . . . : DC-F5-05-42-CB-4B  DIFERENTE
+   DHCP habilitado . . . . . . . . . . . . . : sí IGUAL
+   Configuración automática habilitada . . . : sí IGUAL
+   Vínculo: dirección IPv6 local. . . : fe80::d53b:a5ff:2960:c92d%20(Preferido) DIFERENTE
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.1.86(Preferido) DIFERENTE
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0  IGUAL
+   Concesión obtenida. . . . . . . . . . . . : domingo, 1 de enero de 2023 12:22:34  DIFERENTE
+   La concesión expira . . . . . . . . . . . : domingo, 1 de enero de 2023 20:22:33  DIFERENTE
+   Puerta de enlace predeterminada . . . . . : 192.168.1.1  IGUAL 
+   Servidor DHCP . . . . . . . . . . . . . . : 192.168.1.1  IGUAL
+   IAID DHCPv6 . . . . . . . . . . . . . . . : 299693317 DIFERENTE
+   DUID de cliente DHCPv6. . . . . . . . . . : 00-01-00-01-23-FE-9C-19-B0-0C-D1-EA-2D-EB  DIFERENTE
+   Servidores DNS. . . . . . . . . . . . . . : 200.28.4.129   IGUAL
+                                       200.28.4.130
+   NetBIOS sobre TCP/IP. . . . . . . . . . . : habilitado IGUAL
+   
+   NUEVO (ETHERNET 1)
+   
+   Adaptador de Ethernet Ethernet:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : Killer E3100G 2.5 Gigabit Ethernet Controller
+   Dirección física. . . . . . . . . . . . . : CC-96-E5-55-9C-01
+   DHCP habilitado . . . . . . . . . . . . . : sí
+   Configuración automática habilitada . . . : sí
+   
+   ANTIGUO (ETHERNET 1)
+   
+   Adaptador de Ethernet Ethernet:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : Realtek PCIe GbE Family Controller
+   Dirección física. . . . . . . . . . . . . : B0-0C-D1-EA-2D-EB
+   DHCP habilitado . . . . . . . . . . . . . : sí
+   Configuración automática habilitada . . . : sí
+   
+   NUEVO (ETHERNET 2)
+   
+   Adaptador de Ethernet Ethernet 2:
+
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : VirtualBox Host-Only Ethernet Adapter
+   Dirección física. . . . . . . . . . . . . : 0A-00-27-00-00-12
+   DHCP habilitado . . . . . . . . . . . . . : no
+   Configuración automática habilitada . . . : sí
+   Vínculo: dirección IPv6 local. . . : fe80::a345:225d:7f3:2e80%18(Preferido)
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.56.1(Preferido)
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada . . . . . :
+   IAID DHCPv6 . . . . . . . . . . . . . . . : 789184551
+   DUID de cliente DHCPv6. . . . . . . . . . : 00-01-00-01-2A-A7-E3-75-CC-96-E5-55-9C-01
+   NetBIOS sobre TCP/IP. . . . . . . . . . . : habilitado
+   
+   ANTIGUO (ETHERNET 2)
+   
+   Adaptador de Ethernet Ethernet 2:
+
+   Sufijo DNS específico para la conexión. . : 
+   Descripción . . . . . . . . . . . . . . . : VirtualBox Host-Only Ethernet Adapter  IGUAL
+   Dirección física. . . . . . . . . . . . . : 0A-00-27-00-00-0D   VARIA LOS DOS ULTIMOS
+   DHCP habilitado . . . . . . . . . . . . . : no IGUAL
+   Configuración automática habilitada . . . : sí IGUAL
+   Vínculo: dirección IPv6 local. . . : fe80::872f:f9e2:ee59:74e1%13(Preferido)   DIFERENTE
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.56.1(Preferido)   IGUAL
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0   IGUAL
+   Puerta de enlace predeterminada . . . . . :
+   IAID DHCPv6 . . . . . . . . . . . . . . . : 369754151  IGUAL
+   DUID de cliente DHCPv6. . . . . . . . . . : 00-01-00-01-23-FE-9C-19-B0-0C-D1-EA-2D-EB  DIFERENTE
+   Servidores DNS. . . . . . . . . . . . . . : fec0:0:0:ffff::1%1  NO SALE
+                                       fec0:0:0:ffff::2%1
+                                       fec0:0:0:ffff::3%1
+   NetBIOS sobre TCP/IP. . . . . . . . . . . : habilitado  IGUAL
+   
+   
+   
+   ANTIGUO2
+   
+   Microsoft Windows [Versión 10.0.19044.2364]
+(c) Microsoft Corporation. Todos los derechos reservados.
+
+C:\Users\Andres>ipconfig
+
+Configuración IP de Windows
+
+
+Adaptador de Ethernet Ethernet:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+
+Adaptador de Ethernet Ethernet 2:
+
+   Sufijo DNS específico para la conexión. . :
+   Vínculo: dirección IPv6 local. . . : fe80::872f:f9e2:ee59:74e1%13
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.56.1
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada . . . . . :
+
+Adaptador de Ethernet Ethernet 3:
+
+   Sufijo DNS específico para la conexión. . :
+   Vínculo: dirección IPv6 local. . . : fe80::ffdb:c4fb:7e89:dde2%18
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.59.1
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada . . . . . :
+
+Adaptador de LAN inalámbrica Conexión de área local* 1:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+
+Adaptador de LAN inalámbrica Conexión de área local* 2:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+
+Adaptador de LAN inalámbrica Wi-Fi:
+
+   Sufijo DNS específico para la conexión. . :
+   Vínculo: dirección IPv6 local. . . : fe80::d53b:a5ff:2960:c92d%20
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.1.86
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada . . . . . : 192.168.1.1
+
+Adaptador de Ethernet Conexión de red Bluetooth:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+
+C:\Users\Andres>ipconfig /all
+
+Configuración IP de Windows
+
+   Nombre de host. . . . . . . . . : LAPTOP-0JOL34HF
+   Sufijo DNS principal  . . . . . :
+   Tipo de nodo. . . . . . . . . . : híbrido
+   Enrutamiento IP habilitado. . . : no
+   Proxy WINS habilitado . . . . . : no
+
+Adaptador de Ethernet Ethernet:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : Realtek PCIe GbE Family Controller
+   Dirección física. . . . . . . . . . . . . : B0-0C-D1-EA-2D-EB
+   DHCP habilitado . . . . . . . . . . . . . : sí
+   Configuración automática habilitada . . . : sí
+
+Adaptador de Ethernet Ethernet 2:
+
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : VirtualBox Host-Only Ethernet Adapter
+   Dirección física. . . . . . . . . . . . . : 0A-00-27-00-00-0D
+   DHCP habilitado . . . . . . . . . . . . . : no
+   Configuración automática habilitada . . . : sí
+   Vínculo: dirección IPv6 local. . . : fe80::872f:f9e2:ee59:74e1%13(Preferido)
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.56.1(Preferido)
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada . . . . . :
+   IAID DHCPv6 . . . . . . . . . . . . . . . : 369754151
+   DUID de cliente DHCPv6. . . . . . . . . . : 00-01-00-01-23-FE-9C-19-B0-0C-D1-EA-2D-EB
+   Servidores DNS. . . . . . . . . . . . . . : fec0:0:0:ffff::1%1
+                                       fec0:0:0:ffff::2%1
+                                       fec0:0:0:ffff::3%1
+   NetBIOS sobre TCP/IP. . . . . . . . . . . : habilitado
+
+Adaptador de Ethernet Ethernet 3:
+
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : VirtualBox Host-Only Ethernet Adapter #2
+   Dirección física. . . . . . . . . . . . . : 0A-00-27-00-00-12
+   DHCP habilitado . . . . . . . . . . . . . : no
+   Configuración automática habilitada . . . : sí
+   Vínculo: dirección IPv6 local. . . : fe80::ffdb:c4fb:7e89:dde2%18(Preferido)
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.59.1(Preferido)
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada . . . . . :
+   IAID DHCPv6 . . . . . . . . . . . . . . . : 856293415
+   DUID de cliente DHCPv6. . . . . . . . . . : 00-01-00-01-23-FE-9C-19-B0-0C-D1-EA-2D-EB
+   Servidores DNS. . . . . . . . . . . . . . : fec0:0:0:ffff::1%1
+                                       fec0:0:0:ffff::2%1
+                                       fec0:0:0:ffff::3%1
+   NetBIOS sobre TCP/IP. . . . . . . . . . . : habilitado
+
+Adaptador de LAN inalámbrica Conexión de área local* 1:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : Microsoft Wi-Fi Direct Virtual Adapter
+   Dirección física. . . . . . . . . . . . . : DE-F5-05-42-CB-4B
+   DHCP habilitado . . . . . . . . . . . . . : sí
+   Configuración automática habilitada . . . : sí
+
+Adaptador de LAN inalámbrica Conexión de área local* 2:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : Microsoft Wi-Fi Direct Virtual Adapter #2
+   Dirección física. . . . . . . . . . . . . : DC-F5-05-42-CB-4B
+   DHCP habilitado . . . . . . . . . . . . . : sí
+   Configuración automática habilitada . . . : sí
+
+Adaptador de LAN inalámbrica Wi-Fi:
+
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : Realtek RTL8723DE 802.11b/g/n PCIe Adapter
+   Dirección física. . . . . . . . . . . . . : DC-F5-05-42-CB-4B
+   DHCP habilitado . . . . . . . . . . . . . : sí
+   Configuración automática habilitada . . . : sí
+   Vínculo: dirección IPv6 local. . . : fe80::d53b:a5ff:2960:c92d%20(Preferido)
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.1.86(Preferido)
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Concesión obtenida. . . . . . . . . . . . : domingo, 1 de enero de 2023 12:22:34
+   La concesión expira . . . . . . . . . . . : domingo, 1 de enero de 2023 20:22:33
+   Puerta de enlace predeterminada . . . . . : 192.168.1.1
+   Servidor DHCP . . . . . . . . . . . . . . : 192.168.1.1
+   IAID DHCPv6 . . . . . . . . . . . . . . . : 299693317
+   DUID de cliente DHCPv6. . . . . . . . . . : 00-01-00-01-23-FE-9C-19-B0-0C-D1-EA-2D-EB
+   Servidores DNS. . . . . . . . . . . . . . : 200.28.4.129
+                                       200.28.4.130
+   NetBIOS sobre TCP/IP. . . . . . . . . . . : habilitado
+
+Adaptador de Ethernet Conexión de red Bluetooth:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+   Sufijo DNS específico para la conexión. . :
+   Descripción . . . . . . . . . . . . . . . : Bluetooth Device (Personal Area Network)
+   Dirección física. . . . . . . . . . . . . : DC-F5-05-42-CB-4A
+   DHCP habilitado . . . . . . . . . . . . . : sí
+   Configuración automática habilitada . . . : sí
+
+C:\Users\Andres>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

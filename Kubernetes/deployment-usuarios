@@ -1,0 +1,19 @@
+#este es del deployment
+name:msvc-usuarios
+spec:
+replicas:1
+selector:
+matchLabels:
+app:msvc-usuarios
+templete:
+metadata:
+labels:
+app:msvc-usuarios //notar q tiene la misma etiqueta!!
+spec:
+containers:
+image:aguzf/usuarios:latest
+name:usuarios
+ports:
+containerPort:8001
+#acá podrían ir las variables de ambiente, pero lo dejó así para comprobar que toma los valores por defecto del application.properties. En deployment-cursos.yaml (ver archivo) sí los tiene a modo de ejemplo
+

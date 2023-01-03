@@ -1,0 +1,30 @@
+PATRONES ESTRUCTURALES
+Muchas veces cuando recien comenzamos a desarrollar un proyecto, no se tiene claridad acerca de propiedades y atributos finales que irán en una clase en particular. 
+Por ello en el medio del desarrollo, cuando ya existe cierta claridad sobre ello se le pide al desarrollador ir agregando estas propiedades, lo que obliga a modificar clases; el código del comienzo al agregarsele estos atributos la mayoria de las veces viola principios SOLID.
+Si trabajamos en cambio con patrones estructurales desde el comienzo, una petición de modificación de ciertas variables o atributos no nos va a afectar ya que estamos cumpliendo principios SOLID desde el principio. 
+  
+
+ADAPTER
+Consiste en que una clase implemente los métodos de una interfaz, pero no directamente, sino a traves de una clase adaptadora, que en su interior convierte los métodos de la clase a adaptar a los métodos de la interfaz
+¿Cuando usar? Cuando deseamos que una clase cualquiera ya hecha implemente una interfaz pero sin tener que modificar la clase ni la interfaz, dejándolas completamente independientes la una de la otra
+
+BRIDGE
+Consiste en crear una clase que sirva como puente entre dos interfaces (ejemplo del catalan) o entre una interfaz y una clase abstracta (ejemplo del gringo en https://www.youtube.com/watch?v=9jIgSsIfh_8&t=182s ), 
+ya sea  que estos tengan métodos en común o no para que la abstraccion y la implementacion puedan variar de forma independiente.
+¿Cuando usar? Cuando una interfaz (VendedorOnline) ya desarrollada nos percatamos posteriormente que debe ser subdividida (VendedorOnLineEmpresas) y no deseamos mofificar la interfaz original 
+Ver ejemplo del catalán, queda mas claro.
+
+COMPOSITE
+Consiste en crear una estructura de arbol de estructuras, para que cada una de estas estructuras funcione de forma independiente. 
+El árbol de estructuras se crea en una clase de tipo Composite (CompositeBox en el ejemplo que esta en el IDE) y cada una de las estructuras individuales se denominan Leaf (videogame, books en el ejemplo que esta en el IDE). 
+Cada una de estos Leaf son factibles de modificación en forma separada, lo que constituye una gran ventaja, ya que no tocamos el resto del código. Ver ejemplo del gringo https://www.youtube.com/watch?v=oo9AsGqnisk
+
+DECORATOR
+Consiste en emplear el concepto de wrappers (wrappers = decorators) que consiste en q un objeto envuelve a un segundo objeto y el segundo envuelve al tercero y asi sucesivamente; de esta forma agregamos funcionalidad en forma sucesiva a cada objeto sin tener que recurrir a herencia convencional, sino que ocupamos la composicion.
+La clase del ultimo objeto a envolver (o sea el q no envuelve a nadie) es llamada wrapped (Notifier) y en ella van los atributos y metodos mas generales. Los decorators o wrappers envuelven a este wrapped y se envuelven entre si sucesivamente añadiendo funcionalidad.
+Si se requiere una funcionalidad nueva no presupuestada inicialmente simplemente se crea un decorador nuevo, cumpliendo con el concepto de open-closed.
+
+
+
+
+

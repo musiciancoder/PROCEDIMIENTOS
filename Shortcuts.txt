@@ -1,7 +1,17 @@
 nota: shift es la fleacha hacia arriba.
 
+DEV TOOLS
+ctrl + shift + i : ver devtools
+ctrl + shift + supr : borrar historial navegacion
+
+
 WINDOWS
+alt + esc: ver ventana anterior
 alt + tab: cambiar a ventanas recientes.
+win + d: desktop
+win + e: ver carpetas en local
+win + i: ver configuracion sistema
+win + shift + s : captura pantalla con recorte
 
 INTELLIJ
 ctrl + h : ver herencia

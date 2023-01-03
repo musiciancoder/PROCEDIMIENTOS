@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+	name: msvc-cursos
+#estas son las especificaciones de el o los pods
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: msvc-cursos
+  template:
+    metadata:
+	  labels:
+	    app:msvc-cursos
+	# estas son las especificaciones del o los containes
+	spec:
+	  containers:
+	    -name: cursos
+		 image: aguzf/cursos:latest
+		 ports:
+		   - containerPort:8002
+	#variables de entorno obtenidas desde docker compose. Si no se ponen, kubernetes toma por defecto las variables q estan en el application.properties.
+		 env:
+		  - name: PORT
+          #la primera vez q ejecutó este archivo iba todo sin comillas en las variables y no le funcionó. Agregó las comillas y ahi ya le funcionó
+		    value: "8002"
+		  - name: DB_HOST
+		    value: "postgres14:5432"
+		  - name: DB_DATABASE
+		    value: msvc-cursos
+		   - name: DB_USERNAME
+		    value: postgres
+		   - name: DB_PASSWORD
+		    value: sasa
+			- name: USUARIOS_URL
+		    value: "msvc-usuarios:8001"
+			
+		
+		 

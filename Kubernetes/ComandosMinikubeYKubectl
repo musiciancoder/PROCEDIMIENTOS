@@ -1,0 +1,51 @@
+minikube es una herramienta que permite virtualizar kubernetes, pero solo para trabajar en nuestro local.
+kubectl es una herramienta que permite simular un cliente que está ejecutando kubernetes (en local kubectl se comunica con minukube)
+
+
+Nota: todos estos comandos se ejecutan en el proyecto a nivel de src en la linea de comandos de intellij e intellij debe ser abierto como administrador.
+minikube stop : detener cluster
+minikube start --driver=hyperv: iniciar minikube para windows 10 version NO home. 
+minikube start --driver=virtualbox: iniciar minikube para windows 10 y 11 version home
+minikube status: al ejecutar esto despues de el comando anterior, debiera aparecer host, kubelet y apiserver, todos ellos como "running", lo que significa que el cluster esta corriendo, por lo que al inicializar minikube con el comando anterior al mismo tiempo estamos levantando un Cluster.
+kubectl create -h : ver comandos kubectl 
+kubectl create deployment mysql --image=mysql8 --port=3306: crear deployment de nombre mysql8 (suponiendo q ya tenemos mysql8 en el docker hub, ya que minikube NO tiene acceso a nuestro docker en local );(ojo, que se necesita variable de ambiente, que no se la podemos dar en forma de comando, por lo que va a fallar segun Guzman)
+kubectl get deployments: mostrar los deployments
+kubectl get pods: mostrar pods
+kubectl describe pods (escribir aca el codigo del pod obtenido con el comando anterior): mas info acerca del pod
+kubectl logs (escribir aca el codigo del pod) : obtener logs para saber si falló algo o si todo esta ok o no
+kubectl get deploy : lo mismo q kubectl get deployments
+kubectl delete (acá va nombre del deployment, en nuestro caso iría mysql8): borrar ese deployment
+kubectl create deployment mysql --image=mysql8 --port=3306 --dry-run=client -o yaml>deployment-mysql.yaml: con esto no nos creamos un deployment imperativamente en el cluster, sino que generamos un archivo de deployment llamado  deployment-mysql.yaml, que podemos modificar para agregarle la variable ambiente que faltaba anteriormente. deployment-mysql es el nombre del archivo, pero puede tener otro nombre tambien.
+kubectl apply -f .\deployment-mysql.yaml: crear deployment declarativamente con el archivo yaml
+kubectl expose deployment mysql8 --port=3306 --type=ClusterIP : crear un servicio para comunicacion interna con hostname=mysql8 y puerto=3306 para q msvc-usuarios se pueda conectar en forma interna al pod de mysql8 (este fue el comando q ejecutó, los otros dos de mas abajo solo los mencionó). Distribuye la carga en forma interna entre las replicas (las replicas era una de las variables dentro del archivo yaml, en nuestro caso es 1, por lo que para nuestro caso específico no se hizo balanceo de carga, pero igual es factible de hacerse)
+kubectl expose deployment mysql8 --port=3306 --type=NodePort : crear un servicio en uno de los Worker Node para que externamente se conecten directo a ese Worker Node en especifico
+kubectl expose deployment mysql8 --port=3306 --type=LoadBalancer : crear un servicio en el que la carga esté distribuida entre todos los pods de diferentes maquinas (maquinas=worker node) .(en produccion requiere de AWS o Azure). Distribuye la carga en forma externa.
+kubectl get services: ver services
+kubectl describe service mysql8: ver detalle del servicio.
+kubectl get all: mostrar todo (pods, servicios, etc.)
+kubectl create deployment msvc-usuarios --image=aguzf/usuarios:latest --port=8001 : crear deployment msvc-usuarios desde docker hub. Notar que el puerto 8001 lo podemos ver en nuestro application.properties del proyecto, sin embargo el pull de kubernetes para generar el deployment es siempre desde docker hub, no de nuestro local. Además el puerto pertenece siempre al container, no al pod, esto lo podemos ver con el comando de kubectl describe pod codigodelpod, ahí aparecen los containers.
+kubectl expose deployment msvc-usuarios --port=8001 --type=LoadBalancer: generar servicio msvc-usuarios para comunicacion externa
+kubectl get services: ver services. Notar q acá aparecen la IP para comunicacion interna (CLUSTER-IP) y externa (EXTERNAL-IP). Para el servicio generado anteriormente en forma interna
+(o sea el de mysql8) existe un CLUSTER-IP para comunicacion interna dentro del cluster, pero en EXTERNAL-IP dice <none>. Para el servicio de comunicacion externa en cambio (o sea msvc-usuarios) de todas maneras genera un CLUSTER-IP para comunicacion interna pese a que no le pusimps --type=ClusterIP; además en EXTERNAL-IP dice <pending>, lo que es normal en minicube, sin embargo cuando trabajamos con un proveedor como AWS
+va a salir algo como lb-usuarios-80478836646.us-east-1.elb.amazonaws.com:8001.
+Además aparecen los puertos de los servicios en PORT(s), con el puerto interno primero (3306 y 8001) y el puerto externo TCP para mysql8 (no tiene, porque lo generamos con --type=ClusterIP) y 30507 (generado automaticamente con --type=LoadBalancer) para msvc-usuarios 
+minikube service msvc-usuarios --url: obtener la ip publica para acceso externo hacia minicube. Minikube tiene por defecto un load balancer, por lo que si tenemos varios pods de msvc-usuarios va a balancear la carga. Esta ip o url es la q se ocupa para probar en postman
+kubectl set image deployment msvc-usuarios usuarios=aguzf/usuarios:v2  : actualiza la imagen en pod desde latest a v2. Para ello previamente debimos etiquetar en docker hub la imagen y subirla  como v2 con comandos docker tag usuarios aguzf/usuarios:v2   y docker push aguzf/usuarios:v2
+kubectl scale deployment msvc-usuarios --replicas=3: escalar el deployment msvc-usuarios. Luego al darle un kubectl get pods van a aparecer 3 instancias (o tres pods) con STATUS de Runnning
+kubectl get service mysql8: ver servicio mysql8 generado imperativamente
+kubectl get service mysql8 -o yaml: ver servicio mysql8 generado declarativamente (muestra el yaml en la linea de comandos)
+kubectl get service mysql8 -o yaml>svc-mysql.yaml: guarda el yaml del servicio en un archivo externo de nombre svc-mysql.yaml. Es decir igual podemos generar un yaml en forma imperativa.
+kubectl delete -f .\deployment-usuarios.yaml: borrar deployment (si es que hay un yaml asociado a este deployment no borra el yaml)
+kubectl apply -f .\deployment-usuarios.yaml: crear deployment a partir del yaml (si queremos modificar algo, luego de editar en el yaml sencillamente ejecutamos este comando de nuevo).
+minikube dashboard: activar interfaz grafica de minikube.
+kubectl get sc: obtener storage class para persistent volume
+kubectl apply -f .\mysql-pv.yaml : ejecutar persistent volume
+kubectl apply -f .\mysql-pvc.yaml : ejecutar persistent volume claim
+kubectl get pv: ver persistent volume
+kubectl get pvc: ver persistent volume claim
+kubectl apply -f .\configmap.yaml : ejecutar deployments del configmap
+kubectl get secret: ver archivo secret
+kubectl create clusterrolebinding admin --clusterrole=cluster-admin --serviceaccount=default:default : para crear privilegio de administrador de cluster a este rol
+
+
+

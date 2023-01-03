@@ -1,0 +1,17 @@
+//este es del servicio
+apiVersion:v1
+kind:Service
+metadata:
+name:msvc-usuarios
+  
+ spec:
+ #tanto port como targetPort son para comunicacion interna en el cluster, ya que el status loadBalancer genera automaticamente un puerto externo 30507
+  ports:
+  port:8001 
+  protocol:TCP
+  targetPort:8001
+  selector:
+  app:msvc-usuarios //para poder seleccionar un conjunto de pods q contengan esta etiqueta
+  type:LoadBalancer
+  status:
+  loadBalancer:{}

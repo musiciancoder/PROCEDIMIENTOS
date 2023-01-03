@@ -1,0 +1,17 @@
+#este es un claim para tener acceso a persistan volume
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+ #debe ser el mismo del pv
+  volumeName: mysql-pv
+  accessModes:
+  #debe ser el mismo del pv
+    - ReadWriteOnce
+     #debe ser la misma del pv
+  storageClassName: standard
+  resources:
+    requests:
+    #debe ser la misma del pv, o sea en este caso 2Gigas
+      storage: 2Gi

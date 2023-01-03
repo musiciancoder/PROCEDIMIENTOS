@@ -1,0 +1,37 @@
+#(apps porque es deployment, segun Guzman esta es la nomenclatura). v1 es la version
+apiVersion: apps/v1
+#objetivo del yaml, en este caso es generar un deployment
+kind: Deployment 
+metadata:
+#nombre del deployment
+ name:postgres14
+#configuracion
+spec:
+ #numero de pods
+ replicas:1
+ selector:
+  matchLabels:
+   #esta es la etiqueta del deployment. Debe coincidir en clave valor con la de los pods 
+   role: postgres 
+  template:
+   metadata:
+    labels:
+	#esta es la etiqueta de los pods. 
+	 role:postgres 
+	specs:
+	 #de aca en adelante es lo que está en el docker compose
+	 containers:
+	   -name: nombre container
+	   image: la imagen descargada de docker hub
+	   ports:  
+	   #Acá se aprecia que los pods no generan ellos un puerto, sino que trabajan con los puertos de los containers, a diferencia de los servicios, que si son del tipo LoadBalancer sí generan puertos externos. Acá le dimos el puerto por defecto de postgres
+	     -containerPort: 5432
+		env: 
+		 -name: POSTGRES_PASSWORD
+		  value: sasa
+		 -name:POSTGRES_DB
+		  msvc_cursos
+		
+	    
+ 
+ 

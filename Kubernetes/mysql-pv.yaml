@@ -1,0 +1,24 @@
+#este es un persistant volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+#este es el name que llaman los pods a traves de los claims
+ name: mysql-pv
+#acá va la configuracion del volumen
+spec:
+ capacity:
+  storage: 261
+ volumeMode: Filesystem
+ #kubectl get sc es el storageclass, lo podemos averiguar con comando kubectl get sc
+ storageClassName: standard
+ #accesos requeridos para los nodos 
+ accessModes:
+ - ReadWriteOnce
+ #driver del pod
+ hostPath:
+  path: /var/lib/mysql
+  type: DirectoryOrCreate
+
+  
+
+ 

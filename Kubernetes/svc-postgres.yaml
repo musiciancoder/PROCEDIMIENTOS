@@ -1,0 +1,19 @@
+#va solo la version para servicios
+apiVersion:v1
+kind:Service
+metadata:
+#el nombre tiene que coincidir con el nombre que le dimos al deployment en el archivo yaml del deployment, en nuestro caso este archivo es deployment-postgres.yaml
+ name:postgres14
+spec:
+ ports:
+ #este es el puerto del servicio para los pods
+ #al ejecutar un get services aparece en PORT(S) 5432/TCP, por lo que q 5432 es el puerto interno del servicio y no tiene puerto externo, ya que aparece solo el protocolo despues de 5432. Esto es debido a q mas abajo en type seleccionamos que el servicio fuera interno con ClusterIP 
+
+ - port: 5432
+   protocol: TCP
+   targetPort: 5432
+  selector:
+   #va la misma clave valor q le pusimos en deployment-postgres.yaml
+    role:postgres
+	#servicio para comunicacion interna
+   type:ClusterIP
