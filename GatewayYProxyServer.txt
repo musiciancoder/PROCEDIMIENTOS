@@ -1,0 +1,7 @@
+Una puerta de enlace o gateway es un servidor centralizado centralizado (puede ser un computador, pero normalmente es un router) que actúa como intermediario o puente una red (por ejemplo nestra red local) y otra red (por ejemplo internet), permitiendo que el protocolo de una red pueda comunicarse con el protocolo de otra red al traducir la informacion de estos protocolos para que pueda ser leida.
+En la puerta de enlace pueden agregar funcionalidad especifica para manejo de seguridad, filtros o cacheo, de forma de manejar todo esto en forma centralizada en nuestra red.
+
+Strictly speaking, proxies connect two or more applications that speak the same protocol, while gateways hook up two or more parties that speak different protocols. A gateway acts as a “protocol converter,” allowing a client to complete a transaction with a server, even when the client and server speak different protocols.
+Figure 6-2 illustrates the difference between proxies and gateways:
+The intermediary device in Figure 6-2a is an HTTP proxy, because the proxy speaks HTTP to both the client and server.
+The intermediary device in Figure 6-2b is an HTTP/POP gateway, because it ties an HTTP frontend to a POP email backend. The gateway converts web transactions into the appropriate POP transactions, to allow the user to read email through HTTP. Web-based email programs such as Yahoo! Mail and MSN Hotmail are HTTP email gateways.

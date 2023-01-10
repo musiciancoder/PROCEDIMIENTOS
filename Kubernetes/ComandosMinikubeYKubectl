@@ -46,6 +46,6 @@ kubectl get pvc: ver persistent volume claim
 kubectl apply -f .\configmap.yaml : ejecutar deployments del configmap
 kubectl get secret: ver archivo secret
 kubectl create clusterrolebinding admin --clusterrole=cluster-admin --serviceaccount=default:default : para crear privilegio de administrador de cluster a este rol
-
+kubectl create clusterrolebinding admin --clusterrole=cluster-admin --serviceaccount=default:default  : crear un role binding para comunicar spring cloud con el cluster de kubernetes
 
 

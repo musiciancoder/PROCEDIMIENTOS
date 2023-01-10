@@ -10,14 +10,24 @@ spec:
   storage: 261
  volumeMode: Filesystem
  #kubectl get sc es el storageclass, lo podemos averiguar con comando kubectl get sc
- storageClassName: standard
+ #lo comentó en la seccion de volumenes de aws
+ #storageClassName: standard
+  storageClassName: ""
  #accesos requeridos para los nodos 
  accessModes:
- - ReadWriteOnce
+ #para usar un nodo
+ # - ReadWriteOnce
+ #para usar varios nodos en aws
+   - ReadWriteMany
  #driver del pod
- hostPath:
-  path: /var/lib/mysql
-  type: DirectoryOrCreate
+ #lo comentó en la seccion de volumenes de aws, porque agregó csi en vez de hostPath
+ #hostPath:
+ # path: /var/lib/mysql
+ # type: DirectoryOrCreate
+ csi:
+  driver:efs.csi.aws
+  #ver pantallazo para volumeHandle
+  volumeHandle:fs-05777hdhhde
 
   
 

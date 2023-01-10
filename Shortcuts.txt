@@ -11,6 +11,7 @@ alt + tab: cambiar a ventanas recientes.
 win + d: desktop
 win + e: ver carpetas en local
 win + i: ver configuracion sistema
+win + fn + inicio : captura pantalla normal. Lo manda a C:\Users\andre\OneDrive\Imágenes\Capturas de pantalla
 win + shift + s : captura pantalla con recorte
 
 INTELLIJ

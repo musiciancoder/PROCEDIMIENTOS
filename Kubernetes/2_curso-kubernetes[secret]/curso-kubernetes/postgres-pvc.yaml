@@ -4,9 +4,12 @@ metadata:
   name: postgres-pvc
 spec:
   volumeName: postgres-pv
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: standard
+  # accessModes:
+    # - ReadWriteOnce
+  # storageClassName: standard
+     accessModes:
+     - ReadWriteMany
+   storageClassName: ""
   resources:
     requests:
       storage: 2Gi

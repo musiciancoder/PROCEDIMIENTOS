@@ -24,7 +24,18 @@ Consiste en emplear el concepto de wrappers (wrappers = decorators) que consiste
 La clase del ultimo objeto a envolver (o sea el q no envuelve a nadie) es llamada wrapped (Notifier) y en ella van los atributos y metodos mas generales. Los decorators o wrappers envuelven a este wrapped y se envuelven entre si sucesivamente añadiendo funcionalidad.
 Si se requiere una funcionalidad nueva no presupuestada inicialmente simplemente se crea un decorador nuevo, cumpliendo con el concepto de open-closed.
 
+FACADE
+Se usa para evitar que un cliente llame directamente a una clase de servicio, ya que entonces estariamos rompiendo con el principio de open-close
+En general no se recomienda llamar directamente a otro paquete de servicio (third party) desde el cliente (método main), por lo que debemos crear una fachada que llame al servicio y nosotros llamar a esa fachada desde el cliente.
 
-
+PROXY
+El patron proxy permite tener mayor control sobre el objeto de una clase, al realizar alguna accion antes o despues que la petición alcance ese objeto, de la misma forma que un dispositivo como gateway o un proxy server actuarían para realizar alguna accion antes o despues de que una peticion (http normalmente) llegue a nuestra maquina
+Además maneja el ciclo de vida del servicio, y el proxy funcionará incluso si el objeto del servicio no se encuentra disponible
+La clase Proxy debe implementar alguna interfaz que tambien sea implementada por la clase de servicio original
+Se pueden introducir nuevos proxies segun requerimientos de funcionalidad (filtros, seguridad o caché por ejemplo) sin necesidad de modificar el servicio o el cliente, por lo q se cumple el principio Open-Closed.
+ 
+FLYWEIGHT
+Consiste en que cuando dos objetos o mas tienen muchos atributos en comun entre ellos, podemos separar las clases en clases que contengan los atributos en comun y otras que contengan los atributos exclusivos. Esto permite que quepan mas objetos en la memoria RAM, por lo que estaremos optimizando recursos.
+¿Cuando usar? Cuando debemos accesar o renderizar desde una fuente externa (bbdd, servicio, etc.) demasiados objetos, cada uno de ellos conteniendo demasiados atributos, por lo que es factible que una maquina con pocos recursos se quede sin memoria.
 
 

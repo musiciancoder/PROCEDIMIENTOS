@@ -1,7 +1,8 @@
 KUBERNETES
 
-Importante: cosas como comentarios y explicaciones de archivos yaml estan en esta ruta: C:\Users\andre\PROCEDIMIENTOS\Kubernetes
-Sin embargo, el proyecto como tal (codigo) se sigue modificando de lo q venia en Docker, o sea aca: C:\Users\andre\Desarrollo\Curso_Microservicios_Docker_Kubernates_AWS
+Importante: cosas como comentarios y explicaciones de archivos yaml estan en esta ruta: C:\Users\andre\PROCEDIMIENTOS\Kubernetes o C:\Users\andre\PROCEDIMIENTOS\Kubernetes\2_curso-kubernetes[secret]\curso-kubernetes
+Sin embargo, el proyecto como tal (codigo) se sigue modificando de lo q venia en Docker, o sea aca: C:\Users\andre\Desarrollo\Curso_Microservicios_Docker_Kubernates_AWS. 
+En estas rutas estan los archivos con comentarios, sin embargo, si queremos copiar para pegar en otro proyecto, mejor descargar de los archivos del curso. 
 
 Podemos darle instrucciones a nuestro Cluster por medio de un cliente externo que se está comunicando
 El cliente envía instrucciones al cluster de kubernetes, el que por medio de la apiserver que se encuentra dentro del masternode se encarga de ejecutar adecuademente estas instrucciones, ya sea crear un pod, crear un deployment, etc.
@@ -129,3 +130,101 @@ Las configuraciones del application properties en kubernetes de arriba pueden se
 2. Escribir la configuracion en el configMap para dev y/o prod. No hizo nada en UsuarioController porque ya estaba agregado del exto anterior el put para que tomara cualquier texto q le pongamos en configMap.
 3. Subir la imagen de nuevo a dockerhub. Borrar el deployment-usuarios y levantarlo de nuevo. Levantar tambien el configMap (comando apply)
 4. Probar en postman con GET http://172.18.2013.250:32701
+
+Existen dos tipos de pruebas en Kubernetes para analizar la salud de nuestros pods y contenedores.
+-Liveness: que se encarga de ver cada cierto lapso de tiempo que la aplicacion no se haya caido (q no dé un estatus 500). Si se ha caído sencillamente reinicia el contenedor en el pod (no el pod, que se mantiene tal cual).
+-Readiness: que se encarga de verificar si los servicios de nuestros pods estan en condiciones de recibir peticiones http adecuademente. Informa si un pod/servicio está muy sobresaturado y ya no es capaz de recibir peticiones http por lo que está derivando las peticiones a otras instancias (pods) hasta que baje el trafico y vuelva a estar operativo. 
+El kublet (perteneciente a cada worker node, ver diapos) hace esto en forma automatica por defecto en kubernetes, pero la idea de esta seccion es configurar ciertos parametros para tener un control personalizado de liveness y readiness.  
+Por ejemplo si existe un pod que no esta funcionando bien, las peticiones se derivarán a otros pods. Solo para msvc-usuarios realizó lo siguiente:
+1. Agregar en pom dependencia de spring boot actuator, que permite ademas chequear otras cosas interesantes ademas de readiness y liveness como metricas, chequeos de url, etc.
+2. En application properties escribir la configuracion para readiness y liveness. En archivo deployment (en este caso deployment-usuarios-seccion-spring) escribir variables de ambiente para readiness y liveness.
+3. Subir la imagen de nuevo a dockerhub. Ejecutar el archivo de deployment (deployment-usuarios-seccion-spring en nuestro caso).
+4. Probar en postman. Primero igual que en los casos anteriores (para confirmar q funciona). Luego con un GET probar para msvc-usuarios con GET http://172.18.2013.250:31320/actuator luego http://172.18.2013.250:31320/actuator/info y luego http://172.18.2013.250:31320/actuator/health y luego http://172.18.2013.250:31320/actuator/env y luego con http://172.18.2013.250:31320/actuator/health/readiness y luego http://172.18.2013.250:31320/actuator/health/liveness
+
+Kubernetes permite personalizar la asignacion de recursos a nuestros containers (si no pernosalizamos igual esto se realiza por defecto), como memoria ram y/o cpu. Esto al igual q los 2 temas anteriores tambien se setea en las variables de entorno del archivo deployment (en nuestro caso deployment-usuarios-seccion-spring). Naturalmente los limits van a depender de la disponibilidad de recursos q tengamos en nuestro worker node o machine en el proveedor (aws, por ejemplo).
+ Solo para msvc-usuarios realizó lo siguiente:
+1. Agregó requests y limits en deployment-usuarios-seccion-spring
+2. Borró y ejecutó (comandos apply y delete) deployment-usuarios-seccion-spring. Se demora al levantar!!
+
+GATEWAY
+
+Gateway es un servidor de enrutamiento dinamico compuesto por filtros de funcionalidad especifica autorizacion, seguridad, analisis estadisticos, cors etc, de forma de manejar todo esto en forma centralizada en todo el ecosistema y no individualmente para cada microservicio. Ya vienen filtros por defecto para enrutar, pero podemos tb personalizadar estos filtros para implementar multilenguajes, manejos de error, modificar cabeceras o parametros del request, manejar respuesttas estaticas para ciertas rutas, interceptar rutas a un servicio en particular y modificar su enrutamiento a otro servicio, etc,
+Existen dos implementaciones: Zuul de Netflix y Spring Cloud Gateway (con comunicacion asincrona).
+El gateway es el punto de entrada al ecosistema de microservicios desde el exterior (internet) y sera el encargado de enrutar cada uno de estos servicios con url individuales a una url base. 
+
+1. Creó el proyecto msvc-gateaway como modulo hijo de curso-kubernetes. Luego agregó dos de las dependencias de Kubernetes.
+2. Creó el archivo application.yaml en resources del proyecto msvc-gateaway, para enrutar msvc-cursos y msvc-usuarios individualmente a esta configuracion centralizada que es el gateway; ademas en este archivo hay que indicar que vamos a proveer loadbalancer (de spring cloud en nuestro caso). La configuraciones de este archivo application.yaml tambien se podrian haber hecho en el application.properties nornal con la configuracion que sale en el curso
+3. Se creó un dockerfile para msvc-gateaway, construyó la imagen, le puso un tag (siempre le puso un tag en todos los casos anteriores, por si acaso) y la subió a  dockerhub. 
+4. Creó el archivo gateway.yaml, donde colocó juntos el deployment (con la imagen del dockerfile q creó en el paso anterior) y el servicio del gateway. No lo tengo como archivo, porque me dio lata ya q es repetir lo hecho para msvc-cursos o msvc-usuarios, pero se puede descargar de los archivos del curso.
+5. Verificó el deployment (con kubectl get pods) y el servicio (con kubectl get services). En el servicio cachó que tiene asignado el puerto 8090:30074/TCP para gateway (el 30074 asignado automaticamente por minikube).
+6. Con comando minikube service msvc-gateaway --url cachó la ruta http://172.29.201.32:30074 para probar en postman
+7. En postman probó con GET http://172.29.201.32:30074/api/usuarios (recordar q /api/usuarios fue la ruta q se le dió a msvc-usuarios en archivo application.yaml). Notar que es el loadbalancer de spring cloud el q esta en uso, no el de kubernetes, ya que aunque tiene el connection en los headers, le funciona impeca.
+
+
+EKS de AWS
+
+AWS EKS= Elastic Kubernetes Service administrado por Amazon. Es para trabajar en el mundo real con varios nodos (nodos=maquinas), en vez de un solo nodo q es lo q hemos venido haciendo con minikube en local. Este mismo servicio lo tiene GCP, Digital Ocean y Azure y otros proveedores.
+Anteriormente se vio ECS para trabajar con contenedores en AWS, en esta sección en cambio de trabajará con nodos en AWS.
+Tambien podriamos contratar un VPS en cualquier proveedor de VPS (incluso en amazon) e ir instalando uno a uno los diferentes software/componentes de kubernetes como kubelet, kube proxy, etc. pero es mucho mas lento y complejo. Con EKS es mar rapido y automatico.
+
+1. Ir a la pagina de EKS en AWS. https://us-east-1.console.aws.amazon.com/eks/home?region=us-east-1#  (ojo q no es gratuito esto!)
+2. Crear Cluster en aws.
+Hacer click en "crear cluster". Entonces va a aparecer la pantalla de "configurar cluster" (ver pantallazos). Dar nombre, version y seleccionar rol.
+Si no se tiene un rol creado previamente, hacer click en "Guia usuario de Amazon".
+Despues va a pedir "especificar redes", pero nosotros estamos creando una red para comunicacion interna entre los pods y externa desde internet, por lo que debemos crear una pila, que es lo que nos proveerá de un conjunto de recursos de red para la VPC, como la red, subredes o subnet, internet gateway, natgateway, grupos de seguridad, etc.
+Para ello escribir cloudformation en el buscador de aws y llegar con los pantallazos hasta "crear pila". En la pantalla de crrear pila va a pedir la URL de amazon s3, que la obtenemos de la documentacion (pantallazos).
+Luego en pantalla de especificar detalles de la pila damos un nombre y dejamos todo lo demas por defecto y creamos la pila.
+Nos vamos a CloudFormation-->Pilas y revisamos q la pila se haya terminado de crear (tarda un poco). Esto nos proveerá de un VPC (virtual private cloud) que es una red virtual aislada, con subnet privada para comunicacion interna entre nuestros pods y publica para comunicación con internet.
+Luego vuelve a "especificar redes" y selecciona la pila recien creada. Cons la sola excepcion de donde dice "acceso al punto de enlace del cluster" que se debe dejar en publico y privado, todo lo demas es por defecto y creamos el cluster (se demora un buen rato).
+3. Configurar kubectl para que desde nuestro equipo (alienware) nos podamos comunicar con el cluster de kubernetes en aws.
+Verificar que exista el archivo config en C:\Users\andre\.kube ; en este momento esta configurado para minikube, por lo que respaldamos antes de proseguir. Cuando ta esté lista la configuracion de kubectl para amazon este archivo va a cambiar automaticamente con los settings de minikube a aws.
+Descargar la interfaz de comandos de aws para windows 64 (ver pantallazos). Instalar con archivo. exe. Verificar una vez q haya terminado en powershell como administrador con comando aws
+A continuación debemos crear una clave de acceso (ver pantallazos) en nuestro perfil de usuarios en aws, que queda grabada en nuestro aws. Descargar este archivo, abrirlo y verificar que esten el AWSaccessKeyId y AWSsecretkeyId . 
+Volver al powershell y escribir aws configure. Entonces pedirá el AWSaccessKeyId, por lo que se lo pasamos, el AWSsecretkeyId y la zona horaria us-east-1.
+Luego, sobreescribir archivo config con comando aws eks --region us-east-1 update-kubeconfig --name k8s-curso, colver al archivo y verificar.
+Verificar pods con comando kubectl get pods. Va a aparecer "No resources found in default namespace", lo q significa q estamos conectados ok, solo q aun no hay pods.
+Con comando kubectl get services obtenemos el servicio por defecto de aws.
+4. Crear los nodos en EC2 de AWS. En el paso 1 va a pedir Rol de IAM de nodo, y en este momento no tenemos ninguno, por lo q hay que crearlo.
+Para ello hacer nos vamos a donde estan los roles y creamos un nuevo rol. En la siguiente pantalla seleccionamos EC2 y en la siguiente pantalla en "politicas de permiso" seleccionar eksworker y en la pantalla siguiente marcamos el ticket de AmazonEKSWorkerNodePolicy (no apretar "siguiente" en este caso).Luego en el buscador de "Politicas de permisos" buscamos cni y lo marcamos.
+La última "Politica de permisos" a  marcar es ec2containerreg y luego marcamos AmazonEC2ContainerRegistryReadOnly.
+Ahora si le damos click en siguiente, en pantalla siguiente le damos un nombre al rol y click en Crear Rol. Volveos a la pantalla de roles y vemos si esta el nuestro.
+Volvemos a la pantalla de creacion de nodos, seleccionamos el rol q acabamos de crear y dejamos todo el resto de esta pantalla (pantalla ) por defecto.
+Luego en el paso 2 ("Establecer la configuracion de informatica y de escalado", donde debemos especificar las propiedades de la maquina), seleccionar las propiedades adecuadas (ver pantallazos).
+En paso 3 debemos especificar las redes. Por defecto ya dieran mostrarse seleccionadas las subnets que se generaron en el cluster. Lo dejamos tal cual.
+En paso 4 revisamos y damos click en "crear". Entonces en la pantalla de "Grupos de nodos" va a aparecer "creando". Hay que estar actualizando hasta q ya haya sido creada y en la pantalla del cluster aparezcan los nodos (se demora!).Cuando ya este listo en el panel de EC2 van a aparecer dos instancias en ejecucion (creamos 2), pero si bien estan creadas hay q seguir esperando hasta q se inicializen (hay q ir actualizando la pagina).
+5. Crear un sistema de almacenamiento con EFS (elastic file sistem) para guardar nuestas bbdd de postgress y mysql. Usaremos persistent volumes mediante el driver csi o Container Storage Interface ( a diferencia del local donde ocupamos hostPath). 
+CSI es una interfaz q provee kubernetes para q los proveedores (en este caso aws) lo puedan implementar, en donde el sistema de almacenamiento esta 100% fuera de cualquier worker node. La implementacion de csi para el caso particular de aws es EFS, que por debajo es un NFS (net file system, o sea en la red). Para ello:
+En buscador de aws escribimos efs y click en "crear sistema de archivos". Damos un nombre (para mysql en este caso), cambiamos el VPC al que creamos en pasos anteriores y click en "Personalizar".
+El paso 1 lo dejamos tal cual. En paso 2 ("acceso a la red") Nos va a pedir grupos de seguridad, por lo q nos vamos a grupos de seguridad y creamos uno nuevo.
+Para ello le damos un nombre al grupo, descripcion, seleccionamos el vpc de nuestro cluster. En "reglas de entrada" seleccionamos NFS en "tipo" y en origen debemos pegar el IPv4 de nuestro VPC. Luego click en "crear grupos de seguridad".
+Volvemos al paso 2 y seleccionamos el grupo q acabamos de crear. El paso 3 lo dejamos tal cual y el 4 tambien. Hacemos click en "crear". Luego repitió lo mismo para postgres.
+6. Configurar el driver CSI en el EFS. Para ello:
+Copiar comando desde github (esta en los archivos adjuntos del curso, ver pantallazo). Pegar en el powershell abierto como administrador (le salió a el un error porwue no tenia git instalado, pero a mi no me debiera salir. Por lo mismo instaló git).
+7. En nuestro proyecto modificar archivos persistent volume (ver archivo mysql-pv y mysql-pvc en ruta C:\Users\andre\PROCEDIMIENTOS\Kubernetes o C:\Users\andre\PROCEDIMIENTOS\Kubernetes\2_curso-kubernetes[secret]\curso-kubernetes). Hacemos lo mismo para ep pv y pvc de postgress. Ademas el deployment usuarios lo dejó con una réplica en vez de tres (o sea un pod en vez de tres). En este punto entonces tendrá dos nodos (creados en aws) con un pod (una replica )cada uno .
+8. Desde la consola de nuestro proyecto modular en intellij, crear un role binding (ver comandos) para comunicar spring cloud con el cluster de kubernetes para q asi pueda extraer los pods y servicios (lo que interesa son las ips y los puertos de ellos) para q se puedan registrar en el servidor de nombre que se maneja por debajo en springcloud.
+9. Desde la consola de nuestro proyecto modular en intellij, ejecutar cada uno de los yaml (excepto gateway) con comando apply.
+10. svc-cursos.yaml y svc-usuarios.yaml se despliegan al final, y luego cuando le demos un comando kubectl get svc podremos ver que ya esta asociado a aws en forma automatica, ya q en EXTERNAL-IP muestra el load balancer de aws. Nos vamos al panel de EC2 en aws y van a aparecer todos los recursos q creamos (balanceadores de carga es lo mas importante y tienen el mismo nombre (que debiera ser igual a Nombre de DNS, ver pantallazo) q noa aparece en EXTERNAL-IP en nuestra consola local de intellij)
+11. Probar en postman con dns:puerto (tuvo q crear usuarios y cursos en postman ya q obviamente por ser la primera vez la bbdd esta vacia en amazon).
+
+SPRING SECURIRITY
+Creó el proyecto msvc-auth en spring inizialzr con las dependencias spring security, spring web y spring reactive web, esta ultima dijo q era una alternativa a feignclient q es lo q se ocupa en los otros proyectos. En el pom del proyecto recien creado sin embargo, no le aparece una dependencia spring reactive web propiamente tal, sino spring-boot-starter-webflux
+Agregó ademas las dependencias de kubernetes, agregó la version de spring cloud en el pom y lo dejó como modulo del proyecto parent curso-kubernetes. En la clase principal agregó @EnableDiscoveryClient.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
