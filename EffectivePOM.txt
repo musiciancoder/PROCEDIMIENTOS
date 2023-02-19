@@ -1,0 +1,4 @@
+En el Effective POM estan las librerías que yo tengo descargadas en mi .m2/repositories de proyectos anteriores, NO las librerías disponibles en internet.
+El Effective POM se puede ver solo en eclipse  (aparece una viñeta abriendo el POM), NO en IntelliJ.
+El Effective POM siempre es el parent y el POM es el hijo, por ello es que los pluggins de maven que corren en todas las fases se pueden ver acá y no en el POM normal (a menos que lo sobrescribamos). Para las dependencias, sin embargo solo hay que considerar las que estan en el POM normal.
+En Eclipse es mas facil ver las dependencias en Dependency Hierarchy (aparece una viñeta abriendo el POM). En Resolved Dependencies se muestran de distinto color segun el scope (test, compile)

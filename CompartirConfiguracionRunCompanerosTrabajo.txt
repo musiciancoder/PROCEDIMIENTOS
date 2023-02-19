@@ -1,0 +1,3 @@
+1.En el proyecto donante se recomienda crear primero una copia de la configuracion a compartir, pero sin el metodo main (a menos que sea el mismo proyecto), solo con variables de entorno y argumentos. 
+2.Luego ir a Run-->Edit Configurations y seleccionar la configuracion q deseamos compartir.  Se va a abrir la pantalla del run en donde marcamos "store as project file" y la guardamos en rutadelproyecto\.idea\runConfigurations.
+3.Vamos al directorio y veremos el archivo xml de la configuracion. Se lo pasamos al compañero de pega para que él lo copie en rutadelproyecto\.idea\runConfigurations. Ahi ya debiera poder agarrarlo desde Edit Configurations luego de  actualizar en el ide.

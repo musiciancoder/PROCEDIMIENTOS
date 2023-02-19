@@ -1,0 +1,1 @@
+Las anotaciones de Spring @Scheduled(fixedDelay = 1000, initialDelay = 500) y @EnableScheduling  en combinacion permiten ejecutar codigo cada cierto tiempo. Ver ejemplo en proyecto curso_kafka_spring

@@ -8,6 +8,13 @@ IMPORTANTE: en el curso el español le llama "router" a un equipo tipo modem/rou
 modem/router, incluyendo el de mi casa (es el q esta donde mi mamá, ya que los chicos son los decos q sirven solo para las teles).
 
 
+SABER MIS DATOS DE CONECCION.
+Se desaconseja el uso de ipconfig, porque muestra datos por defecto que han sido cambiados y ya no estan en uso, ademas muestra las conexiones de ethernet que confunden.
+
+En vez de ello:
+ ir a web miip.cl. Esto va a mostrar mi ip publica (recordar que yo tengo cgnat).
+ luego ir en barra de direcciones a a miippublica.baf.movistar.cl. Ahi estan todos los datos.
+
 IP PUBLICA:
 IP (Internet Protocol) es la dirección de nuestra red en internet para poder recibir y enviar paquetes de informacion (remitente/destinatario. Es única e irrepetible en todo el mundo (al menos durante el tiempo que estemos conectados). La da el proveedor de internet mediante el router.
 
@@ -83,6 +90,13 @@ Este ejemplo es extensible en la siguiente premisa: "NO PODEMOS ABRIR EL MISMO P
 
 
 
+
+
+
+
+Hola master, ya estoy finalizando este curso, pero he vuelto a este video porque me asalta una duda un tanto básica. He leído en numerosos foros que el acrónimo DNS se refiere a Domain Name System (o sea se refiere a la guía de telefonos en términos como lo has explicado tú) y no a Domain Name Server  (o sea al servidor de nombres de dominio) como has mencionado tu. Corrígeme si estoy equivocado, pero esto cobra sentido cuando todo el mundo habla de DNS server
+
+
 ORIGEN:
 En términos simples es la url del cliente.
 Para desarrollos en local, la definicion de origen es protocolo+ip+puerto, con ip pudiendo ser localhost (q es lo mismo q escribir la ip de nuestro computador, o sea 172.algo...) o una ip de otra máquina en la que esté corriendo una api, por ejemplo.
@@ -115,7 +129,7 @@ En este caso no importa que tengamos un CG-NAT o que no tengamos puerto, la cone
 UPnP consiste en configurar en nuestro computador conectado a una red local para abrir un puerto en el router de forma de poder conectarnos desde fuera mediante socket. No funciona con CG-NAT, ya que no tenemos control sobre el router.  
 
 
-Ejemplos prácrivos
+Ejemplos prácticos
 con ping+host (por ejemplo ping dominio) podemos saber la ippublica de un dominio (de google en este caso). En el navegador escribimos entonces el socket ippublica:80 y nos llevará a ese dominio.
 Yo tengo conexion CG-NAT en mi casa en Madrid, y mi IPPublica la puedo ver en: https://www.cualesmiip.com/ , por lo que para abrir un puerto en este momento debo hacerlo por conexion inversa.
 
@@ -123,4 +137,18 @@ Localhost
 La dirección loopback tiene una IP por defecto (127.0.0.1) útil para probar programas en tu ordenador, sin enviar información a través de Internet. Esto ayuda cuando estás probando aplicaciones que no están listas para que el mundo las vea.
 Cuando llamas a una dirección IP desde tu ordenador, normalmente intentas contactar con otro ordenador a través de Internet. Sin embargo, con la dirección loopback, estás llamando al localhost, es decir, a tu ordenador sin ingresar siquiera a la red local, por lo que se utiliza la loopback IP en vez de la IP privada.
 Por ello escribir en angular 127.0.0.1:4200/ es lo mismo que localhost:4200
+
+
+MODELOS DE REDES
+Para entender las partes de una red es importante entender modelo de capas OSI y TCP/IP. 
+Cada una de estas capas funcionan en forma absolutamente aisladas las unas de las otras (como el envío de un libro de ua libreria de españa a mi casa en Chile)
+Ver pantallazos.
+
+La capa de enlace, que puede estar en un punto acceso wifi, en un switch o en el mismo router, se encarga de verificar que los datos que enviamos de un lugar a otro llegan bien.
+La capa física es la señal wifi o un cable (de fibra óptica, por ejemplo). No el computador o un celular!
+Cada capa cuenta con varios protocolos, que son reglas que deben seguirse para que la conexión sea exitosa. No todos los protocolos de una capa deben estar funcionando al mismo tiempo en una conexión, generalmente se trabaja con un protocolo por capa, co o el modelo TCP/IP que utiliza solo estos protocolos correspondientes a las capas transporte y red respectivamente.
+En el emisor capa agrega un cierto numero de bits adicionales (overhead) con una cabecera para que pueda ser identificado por la misma capa en el receptor. Una vez que llega al receptor, la capa de enlace saca todo lo que hay dentro de la matriuska para verificar q esté todo bien (por ello hay un coste de performance/tiempo) y si todo esta bien retira la cabecera de la capa de enlace y el overhead de enlace, pasandolo a la capa siguiente que es la capa de red, que a su vez elimina cabecera y overhead y lo traspasa a la siguiente cabecera hasta llegar al computador del receptor.
+En general hay un coste de performance/tiempo (overhead) cada vez que pasamos de un enlace a otro .
+La capa 2 (enlace o data link en inglés) consta de dos conceptos: switch y mac address. La mac address es un codigo (numero de serie) de tarjeta de red que es único e irrepetible. 
+En la capa de la matrioska que corresponde a la capa de enlace se agrega una cabecera con la mac address. La explicación del switch va orientada a una red donde varios computadores de la misma red se comunican al switch, pero no de redes distintas, como se explicó en videos anteriores.
 

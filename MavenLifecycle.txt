@@ -3,10 +3,9 @@ La librerías externas nunca están en el proyecto, sino en .m2/repository y el 
 Cuando uno agrega manualmente una libreria en el pom y actualiza el proyecto, esta libreria se decarga en primera instancia desde el repositorio local, y si no esta ahi desde un repositorio remoto (para el caso de equifax este repo remoto esta en Nexus, porque asi se configuró en el settings.xml) y se instala en external libraries junto con las otras librerias que ya estaban. Esto es independiente del ciclo de vida de maven, no confundir!
 clean: elimina el target (si hay)
 validate: que lo que hay escrito en pom esté bien escrito.
-compile:compila a codigo bytes .class y genera un target
-
- sin .jar dentro de él
-test: para pruebas unitarias
+compile:compila a codigo bytes .class y genera un target, pero sin .jar dentro de él
+test-compile: compilar pruebas unitarias
+test: correr pruebas unitarias
 package: genera el jar en el target
 verify: para pruebas integrales de QA
 install: guarda el proyecto en el repositorio local (este repositorio esta en la misma ruta del settings.xml (dentro de .m2 en el caso particular de equifax)); esto permite que el proyecto pueda ser llamado desde otros proyectos a traves de su groupId, artifact y version en el pom del otro proyecto

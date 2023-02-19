@@ -3,6 +3,7 @@ kubectl es una herramienta que permite simular un cliente que está ejecutando k
 
 
 Nota: todos estos comandos se ejecutan en el proyecto a nivel de src en la linea de comandos de intellij e intellij debe ser abierto como administrador.
+clear: limpiar terminal. Los comandos recientes igual se pueden acceder con las flechas arriba y abajo.
 minikube stop : detener cluster
 minikube start --driver=hyperv: iniciar minikube para windows 10 version NO home. 
 minikube start --driver=virtualbox: iniciar minikube para windows 10 y 11 version home
@@ -47,5 +48,5 @@ kubectl apply -f .\configmap.yaml : ejecutar deployments del configmap
 kubectl get secret: ver archivo secret
 kubectl create clusterrolebinding admin --clusterrole=cluster-admin --serviceaccount=default:default : para crear privilegio de administrador de cluster a este rol
 kubectl create clusterrolebinding admin --clusterrole=cluster-admin --serviceaccount=default:default  : crear un role binding para comunicar spring cloud con el cluster de kubernetes
-
+kubectl apply -f .\deployment-mysql.yaml (con replicas:0): borrar los pods
 

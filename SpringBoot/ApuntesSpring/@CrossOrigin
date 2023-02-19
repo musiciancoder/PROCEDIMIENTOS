@@ -1,2 +1,19 @@
-@CrossOrigin //para que las politicas de CORS no bloqueen las peticiones desde el front.
-Se usa en el controller a nivel de clase
+CORS: Cross Origins Register Server. Permite o impide el tráfico al servidor desde ciertas urls de clientes.
+
+
+En Spring Boot:
+@CrossOrigin(origins= "http://localhost:3000" //para que las politicas de CORS no bloqueen las peticiones que llegan desde angular en este caso
+Se usa a nivel de clase en el controlador para permitir el paso a cualquier metodo del controlador.
+Se usa a nivel de método(s) para permitir el paso a una(s) url(s) en particular.
+
+Tambien podemos permitir el paso a cualquier url en nuestra aplicacion, agregando lo siguiente en la clase SpringBootApplication, después del método main (no dentro de este):
+@Bean
+public WebMvcConfigurer corsConfigurer(){
+ return new WebMvcConfigurer(){
+ @Override
+ public void addCorsMappings(CorsRegistry registry){
+ registry.addMapping("/**").allowedOrigins("http://localhost:3000");
+ }
+ };
+ }
+ }

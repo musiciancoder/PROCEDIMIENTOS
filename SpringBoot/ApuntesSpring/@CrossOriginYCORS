@@ -1,0 +1,31 @@
+
+
+CORS: Cross Origins Register Server. Impide el tráfico al servidor desde origenes distintos al del servidor. Como el origen localhost:4200 (angular) es distinto al origen localhost:8080 (spring), entonces falla.
+
+
+En Spring Boot:
+@CrossOrigin(origins= "http://localhost:4200" //para que las politicas de CORS no bloqueen las peticiones que llegan desde angular en este caso
+Se usa a nivel de clase en el controlador para permitir el paso a cualquier metodo del controlador.
+Se usa a nivel de método(s) para permitir el paso a una(s) url(s) en particular.
+Esta anotacion no perteneces a spring security, por lo q se puede usar independientemente de spring security
+
+Tambien podemos permitir el paso a cualquier url en nuestra aplicacion, agregando lo siguiente en la clase SpringBootApplication, después del método main (no dentro de este), tambien sin Spring Security:
+@Bean
+public WebMvcConfigurer corsConfigurer(){
+ return new WebMvcConfigurer(){
+ @Override
+ public void addCorsMappings(CorsRegistry registry){
+ registry.addMapping("/**").allowedOrigins("http://localhost:4200");
+ }
+ };
+ }
+ }
+
+
+
+
+Ademas de esto, en este video se explica como trabajar con CORS Con Sprong Security: https://www.youtube.com/watch?v=gGSDcr6v8po
+
+ 
+ Otra alternativa: en el front, en el navegador podemos instalar la extension:
+ https://chrome.google.com/webstore/detail/moesif-origin-cors-change/digfbfaphojjndkpccljibejjbppifbc

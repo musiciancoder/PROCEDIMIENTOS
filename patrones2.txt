@@ -1,4 +1,65 @@
-PATRONES ESTRUCTURALES
+SOLID
+
+SINGLE RESPONSABILITY
+"A Class should only have one reason to change"
+
+OPEN CLOSED PRINCIPLE
+"A class should be open for extension, but closed for modification"
+
+LISKOV
+"Subtypes should be replaced by their base types with no errors"
+
+INTERFACES SEGREGATION
+"Many specific interfaces are better than one general interface"
+
+DEPENDENCY INVERSION PRINCIPLE
+"We must depend on abstractions (interfaces!) and not concrete classes. High level modules (superclases) should not depend on low level modules (subclases). Both should depend on abstractions (interfaces)"
+
+
+*PATRONES DE CREACION
+Son patrones de diseño para generar objetos.
+
+1.SINGLETON
+Crea una instancia u objeto por clase.
+La forma mas sencilla de crear singleton es a través de Enum (ver código de ejemplo en PruebasGeneralesJava).
+
+
+2.PROTOTYPE
+Consiste en crear objetos de una clase a partir de un objeto modelo de esta clase previamente existente.
+Para crear objetos por prototype ocupamos el método .clone(). Si deseamos generar objetos por prototype de una clase q hayamos creado nosotros no debemos sobrescribir hashcode ni equals, sin embargo debemos implementar la interfaz cloneable en nuastra clase, sobrescribiendo el método clone, haciendolo public en vez de privado.
+Naturalmente los objetos generados por prototype tendrán distinto hashcode.
+
+
+3.FACTORY
+Simple factory Idiom: Consiste en liberar a una clase X del código de creación de objetos según parametros, y para eso nos creamos un FACTORY.
+Actual factory: Consiste en liberar al factory de la creación de objetos según parametros. Para ello nos creamos unca clase abstracta en la clase X (Restaurant), cuyo método abstracto debe ser sobrescrito en las clases que hereden de esta (BeefBurgerRestaurant por ejemplo).
+¿Cuando usar este patrón? Cuando en un principio no estamos seguros de los tipos exactos a usar.
+
+
+4.ABSTRACT FACTORY
+Consiste en generar una fabrica de fabricas, por lo que está un nivel por arriba del patron FACTORY.
+- Creamos interfaces para los tipos de productos (GPU y Monitor).
+- Creamos clases (AsusGpu, AsusMonitor, MsiGpu, MsiMonitor) que implementen cada una de las interfaces anteriores. Los métodos implementados serán usados mas adelante
+- Creamos una clase abstracta (Company) cuyos métodos abstractos devuelvan los tipos del primer paso (GPU y Monitor). Esta es la fábrica de fabricas
+- Creamos las fabricas individuales (ASUSManufacturer y MSIManufacturer) sobrescribiendo los métodos abstractos del paso anterior. En el interior de estos métodos van los métodos mencionados dos pasos atrás.
+-En método main instanciamos poliformicamente las fabricas y estamos dados.
+¿Cuando usar este patrón? 
+Cuando se necesita trabajar con varias familias de productos relacionados, pero sin depender de estas clases (notar que tampoco tenemos ningun equals o equalsIgnoreCase, por eso funcionamos en forma independiente)
+Generalmente se parte de un FACTORY ya q si mas adelante se agregan mas productos se puede evolucionar a un ABSTRACT FACTORY.  
+
+
+5.BUILDER
+Consiste en separar la construccion de un objeto de su representación en la clase, o sea la finalidad es la misma que en factory, pero por medios diferentes.
+Se debe crear una clase builder que contiene los mismos campos de clase que el objeto que queremos generar. En ella se agregan varios métodos setters individuales y se llama al método builder().
+Opcionalmente se puede contar o no con una clase director para agrupar atributos similares.
+¿Cuando usar este patron?
+Cuando tenemos demasiados atributos y deseamos evitar demasiada sobrecarga de constructores y a la vez separar la construccion de un objeto de su representación en la clase.
+
+
+
+
+*PATRONES ESTRUCTURALES
+Consiste en generar clases complejas y/o objetos complejos pertenecientes a estas clases a partir de módulos mas simples mediante herencia, con el objetivo de cumplir con principios SOLID. 
 Muchas veces cuando recien comenzamos a desarrollar un proyecto, no se tiene claridad acerca de propiedades y atributos finales que irán en una clase en particular. 
 Por ello en el medio del desarrollo, cuando ya existe cierta claridad sobre ello se le pide al desarrollador ir agregando estas propiedades, lo que obliga a modificar clases; el código del comienzo al agregarsele estos atributos la mayoria de las veces viola principios SOLID.
 Si trabajamos en cambio con patrones estructurales desde el comienzo, una petición de modificación de ciertas variables o atributos no nos va a afectar ya que estamos cumpliendo principios SOLID desde el principio. 
@@ -38,4 +99,39 @@ FLYWEIGHT
 Consiste en que cuando dos objetos o mas tienen muchos atributos en comun entre ellos, podemos separar las clases en clases que contengan los atributos en comun y otras que contengan los atributos exclusivos. Esto permite que quepan mas objetos en la memoria RAM, por lo que estaremos optimizando recursos.
 ¿Cuando usar? Cuando debemos accesar o renderizar desde una fuente externa (bbdd, servicio, etc.) demasiados objetos, cada uno de ellos conteniendo demasiados atributos, por lo que es factible que una maquina con pocos recursos se quede sin memoria.
 
+DAO (patron estructural, pero de arquitectura, no de diseño)
+DAO data access object
+Video de mitocode para patrones de diseño DAO
+Es un patrón de diseño para accesar bases de datos. Generalmente se prueba primero su funciomamiento con datos "enduro" en la misma clase.
+1.Construir una clase bean (Persona) con sus seters y getters
+2.Construir una interfaz (PersonaDAO) con metodos correspondiente a todas las acciones que Persona puede realizar.
+3.Crear una clase que implemente la interfaz anterior (PersonaDAOImpl) y sobreescriba sus metodos. Dentro de cada uno de estos metods ir llamando a los setters de Persona para ir poblando la BD "enduro"
+4.Crear una clase principal, instanciar PersonaDAOImpl y probar.
 
+
+*PATRONES CONDUCTUALES
+
+CHAIN OF RESPONSABILITY
+Consiste en dividir comportamientos o funcionalidades de un todo, asignando cada una de estos comportamientos a objetos individuales llamados Handlers. 
+Al recibir un request, cada uno de estos handlers puede decidir si procesar el request o pasarlo al siguiente handler de acuerdo a un orden prestablecido por el cliente.
+Al separar funcionalidad en los handlers cumplimos a cabalidad con single responsability.
+
+COMMAND
+Consiste en separar todo tipo de acciones a ejecutar (switchedLights()) tanto de clases padres como hijas. 
+¿Cuando usar? Cuando deseamos que el cliente tenga el control directo sobre las acciones a ejecutar.
+
+ITERATOR.
+Es el clasico Iterator explicado por Juan Pildoras que sirve para iterar una colección.
+¿Cuando usar? Cuando no queremos exponer toda una coleccion al cliente (en una pantalla por ejemplo), solo queremos pasarle uno por uno cuando haga click en siguiente o anterior.
+
+MEDIATOR
+Actúa a modo de intermediario entre varias clases concretas (componentes de swing, por ejemplo) para que la lógica de unas no vaya en los métodos de las otras, haciendo que estas clases puedan ser ocupadas nuevamente en otras partes de la aplicacion.
+¿Cuando usar? Siempre que tengamos lógica perteneciente a una clase concreta (como getters o setters) en métodos de otra clase concreta (esto se debe evitar).
+
+MEMENTO
+Obtenemos fotos instantáneas del estado de un objeto y las vamos almacenando, de manera de poder volver atrás si un estado es requerido. En el IDE ver el ejemplo de tutorialpoint, queda mejor explicado.
+¿Cuando usar? Typically, the Memento Design Pattern will be used in situations where some actions are undoable, therefore requiring to rollback to a previous state. However, if the state of the Originator is heavy, using the Memento Design Pattern can lead to an expensive creation process and increased use of memory. 
+
+STATE
+Permite cambiar el comportamiento de un objeto según el estado interno en el que se se encuentre en ese momento.
+¿Cuando usar? Cuando tenemos un número finito y pequeño de cambios de comportamiento en un objeto, de esta forma evitamos bloques if() o switch() en el objeto mismo.  

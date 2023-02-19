@@ -2,5 +2,14 @@
 *Se llaman con nombreClase.nombreVariable, nombreClase.nombreMetodo
 *Dentro de un método estático NO se puede inicializar ni dar valores a un campo no estático desde un método estático con el uso de this. Tampoco se puede llamar a otro método no estático con el uso de this.
 *¿Cuando preferir campos y métodos no estáticos? Cuando estamos seguros que el valor no va a cambiar en el tiempo, por ello normalmente para variables constantes se usa en combinacion con "final".
+One rule-of-thumb: ask yourself "Does it make sense to call this method, even if no object has been constructed yet?" If so, it should definitely be static.
+Define static methods in the following scenarios only:
+
+If you are writing utility classes and they are not supposed to be changed.
+If the method is not using any instance variable.
+If any operation is not dependent on instance creation.
+If there is some code that can easily be shared by all the instance methods, extract that code into a static method.
+If you are sure that the definition of the method will never be changed or overridden. As static methods can not be overridden.
+
 *Todas las variables static se almacenan en memoria HEAP en la JVM !
 *En una clase estática todas sus variables y métodos son estáticos.

@@ -96,17 +96,78 @@ ARCHIVO POM
 </project>
 
 PLUGGIN
-Un pluggin es un grupo de goals o tareas a ser realizadas.
+Un pluggin es un grupo de goals o tareas a ser realizadas, solo que en el caso de los pluggins estos goals pueden pertenecer a dos o mas fases; en cambio los goals asociados a una fase por definicion son siempre los mismos goals. 
 Maven está compuesto de varios pluggin. 
-La nomenclatura para ejecutar un goal es plugginID:goalID (esto raramente se ocupa, como se explica mas abajo en el ciclo de vida). Por ejemplo, para generar un proyecto, cuando escribimos archetype:generate archetype es el pluggin
-y generate es el goal. Sin embargo usualmente un plugin no se compone de un solo goal sino de varios.
+La nomenclatura para ejecutar un goal es mvn plugginID:goalID (esto raramente se ocupa, como se explica mas abajo en el ciclo de vida).  Sin embargo usualmente un plugin, ya esta dicho no se compone de un solo goal sino de varios. Un ejemplo de esto es el comando mvn compiler:compile donde compiler es el plugin y compile es el goal. Otro ejemplo es archetype:generate
+
+En lineas generales ejecutamos un goal independientemente de cualquier fase con:
+mvn <PLUGIN>:<GOAL>  (notar que aunque va el nombre del pluggin ("compiler", por ejemplo) el que se ejecuta es el goal, no el pugin
+Ejecutamos una fase entera con:
+mvn compile (notar que en este caso la fase es "compile" y se llama igual que en el goal de dos lineas mas arriba, pero esto es solo coincidencia)
+
+A Maven plugin is a group of goals; however, these goals aren't necessarily all bound to the same phase.
+
+For example, here's a simple configuration of the Maven Failsafe plugin, which is responsible for running integration tests:
+
+<build>
+    <plugins>
+        <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>${maven.failsafe.version}</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>integration-test</goal>
+                        <goal>verify</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+Copy
+As we can see, the Failsafe plugin has two main goals configured here:
+
+integration-test: run integration tests
+verify: verify all integration tests passed
+We can use the following command to list all goals in a specific plugin:
+
+mvn <PLUGIN>:help
+Copy
+For example, to list all goals in the Failsafe plugin, we can run:
+
+mvn failsafe:help
+Copy
+And the output will be:
+
+This plugin has 3 goals:
+
+failsafe:help
+  Display help information on maven-failsafe-plugin.
+  Call mvn failsafe:help -Ddetail=true -Dgoal=<goal-name> to display parameter
+  details.
+
+failsafe:integration-test
+  Run integration tests using Surefire.
+
+failsafe:verify
+  Verify integration tests ran using Surefire.
+Copy
+To run a specific goal without executing its entire phase (and the preceding phases), we can use the command:
+
+mvn <PLUGIN>:<GOAL>
+Copy
+For example, to run the integration-test goal from the Failsafe plugin, we need to run:
+
+mvn failsafe:integration-test
 
 CICLO DE VIDA
 Existen tres tipos de ciclos de vida: Build (este es por defecto), Clean y Site. Cuando se habla de ciclo de vida a secas (y de ahora en mas en nuestro caso) se refiere al Build
 Cada fase del ciclo de vida de maven está asociado a uno o mas pluggins (aunque generalmente esta relacion es 1:1) y a su vez los pluggins pueden tener uno o mas goals.
 Cuando definimos un packaging en el pom con  <packaging>jar</packaging> (puede ser un war tb) estamos asociando implicitamente las fases del ciclo de vida
-a pluggin y goals, por lo que para ejecutar una fase simplemente se hace con el comando mvn nombreDeFase, es decir no se llaman pluggins ni goals en la linea de comandos 
-Fases del ciclo de vida         Pluggin:Goal
+a goals, por lo que para ejecutar una fase simplemente se hace con el comando mvn nombreDeFase, es decir no se llaman pluggins ni goals en la linea de comandos y cuando se hace esto todos los goals de las fases anteriores se ejecutan tambien.
+
+Fases del ciclo de vida         Pluggin:Goal (notar que al llevar packing asociamos fases con goals, no fases con pluggin. El pluggin que aparece en la siguiente lista es simplemente el pluggin al que pertenece el goal)
 process-resources     resources:resources
 compile		      compiler:compiler
 test		      surefire:test
@@ -127,7 +188,7 @@ CAMBIAR CONFIGURACION DE UN PLUGIN
 La configuracion de los plugins por defecto no aparece en el pom.xml, sino en el Effective POM.
 Si queremos cambiar la configuracion de un plugin debemos agregarlo expresamente en el POM. 
 Por ejemplo para cambiar la configuracion del compilador java a 1.8, debemos agregar:
-  <build>
+  <build> (esto es porque estamos en el ciclo de viva Build, no Clean ni Site)
    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -144,7 +205,7 @@ Luego de agregarlo debemos actualizar maven
 Las opciones de configuration (<source> y <target> en nuestro ejemplo) se pueden obtener en la documentacion al hacer click en el goal de cada pluggin (ver https://www.youtube.com/watch?v=6ySq0a6YFjA minuto 7:55)
 
 SCOPES
-Los scopes de cada dependencia externa se usan para definir en quégoal se ejecuta la dependencia.
+Los scopes de cada dependencia externa se usan para definir en qué goal se ejecuta la dependencia.
 Por ejemplo:
 <scope>test</scope> para que se ejecute solo en pruebas (normalmente esto va normalemnte en la dependencia de Junit
 <scope>provide</scope> scope can be used to tell maven that we do not need a dependency to be packaged in to a war that will be deployed to a container which will already have that jar/dependecy

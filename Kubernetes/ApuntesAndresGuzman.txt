@@ -206,16 +206,102 @@ Copiar comando desde github (esta en los archivos adjuntos del curso, ver pantal
 10. svc-cursos.yaml y svc-usuarios.yaml se despliegan al final, y luego cuando le demos un comando kubectl get svc podremos ver que ya esta asociado a aws en forma automatica, ya q en EXTERNAL-IP muestra el load balancer de aws. Nos vamos al panel de EC2 en aws y van a aparecer todos los recursos q creamos (balanceadores de carga es lo mas importante y tienen el mismo nombre (que debiera ser igual a Nombre de DNS, ver pantallazo) q noa aparece en EXTERNAL-IP en nuestra consola local de intellij)
 11. Probar en postman con dns:puerto (tuvo q crear usuarios y cursos en postman ya q obviamente por ser la primera vez la bbdd esta vacia en amazon).
 
-SPRING SECURIRITY
-Creó el proyecto msvc-auth en spring inizialzr con las dependencias spring security, spring web y spring reactive web, esta ultima dijo q era una alternativa a feignclient q es lo q se ocupa en los otros proyectos. En el pom del proyecto recien creado sin embargo, no le aparece una dependencia spring reactive web propiamente tal, sino spring-boot-starter-webflux
+
+SPRING SECURITY
+
+1. Creó el proyecto msvc-auth en spring inizialzr con las dependencias spring security, spring web y spring reactive web, esta ultima dijo q era una alternativa a feignclient q es lo q se ocupa en los otros proyectos. En el pom del proyecto recien creado sin embargo, no le aparece una dependencia spring reactive web propiamente tal, sino spring-boot-starter-webflux
 Agregó ademas las dependencias de kubernetes, agregó la version de spring cloud en el pom y lo dejó como modulo del proyecto parent curso-kubernetes. En la clase principal agregó @EnableDiscoveryClient.
 
 
+2. Habilitó el proyecto msvc-auth como servidor de autorizacion.
+Spring Authorization Server (documentacion) "SAS is a framework that provides implementation of the OAuth 2.1 and OpenIDConnect 1.0 specifications and other related specifications. It is built on top of
+Spring Security to provide a secure, light-weight and customizable foundation for building OpenID Connect 1.0 Identity Providers and OAuth2 Authorization Server products. SAS can be used anywhere you already use Spring Security (o sea en el proyecto que acabamos de crear)" Es relativamente nuevo.
+2.1.Agregó librería de oauth en el pom de msvc-auth, para q msvc-auth se convierta en un servidor de autorizacion para login
+2.2.Copió y pegó directamente de la documentacion la clase SecurityConfig, q es la clase de configuracion de spring security (tuve algunos problemillas con letras rojas, por lo que mejor llegué y copié del codigo fuente del curso).
+
+3. Habilitó nuestro servicio msvc-usuarios como cliente para el servidor de autorizacion msvc-auth, para poder hacer login (lo configuró para local/minikube primero, despues lo cambiará para kubernetes/aws). Para ello:
+ 3.1. Agregó la libreria de oauth2-client en el pom de msvc-usuarios.
+ 3.2. Creó un application.yml en msvc-usuarios y dentro configuró el cliente con la ruta de autorizacion
+ 3.3. En UsuarioController creó el metodo authorized para manejar la ruta dada en el paso 2, lo q devolverá clave-valor de codigo de autorizacion.
+ 3.4. Creó SecurityConfig en msvc-usuarios, que es la clase de configuracion de Spring Security para el cliente. En este caso msvc-usuarios es un cliente en el ambito de spring security
 
 
+4. Configuró el servidor de recursos en msvc-usuarios, que es para proteger nuestras rutas. Para ello:
+ 1. Agregó libreria en el pom de msvc-usuarios
+ 2. Agregó configuracion en el application.yml
+ 3. En clase SecurityConfig de msvc-usuarios agregó antmatchers para dar permisos a las rutas
+ 
+5.Configuró varibles de entorno en msvc-usuarios, para poder acceder desde el cliente (o sea msvc-usuarios) a los recursos del servidor de recuros en minikube. Para ello:
+  5.1. Agregó variables de ambiente en application.yml ( ${LB_AUTH_ISSUER_URI:http://127.0.0.1:9000}). Ojo, que Andrés Guzman le llama loadBalancer a la IP.
+  5.2. Agregó variables de ambiente Configmap
+  5.3. Agregó variables de ambiente en deployment-usuarios
+  5.4. Ya q anteriormente habia agregado librerias, volvio a construir la imagen para msvc-usuarios, darle un tag y subirla a dockerhub.
+  
+6.Configuro varibles de entorno en msvc-auth, para ello:
+  6.1. Agregó las variables de entorno en metodo registeredClientRepository de SecurityConfig en msvc-auth.
+  6.2. Copio y pego el dockerfile desde msvc-usuarios. Construyó la imagen, dio un tag y subió a dockerhub.
+  
+7. Escribio Deployment y Service de Auth
+   7.1.Copió, pegó y modificó desde archivo gateway.yml el archivo auth.yml que va a servir a la vez a modo de deployment y servicio para msvc-auth. 
+   7.2.Agregó variables de ambiente en auth.yml
+   
+8. Ejecutó las configuraciones de los pasos anteriores:
+   8.1. Dió un comando apply a configmap.yml y a auth.yml para desplegar pods y generar servicios.
+   8.2. Con comando minikube service msvc-usuarios --url obtuvo la ip y puerto de minikube (http://172.30.148.152:31492). Esta es la ruta del servidor de autorizacion.
+   8.3.  Con comando minikube service msvc-auth --url obtuvo la ip y puerto de minikube (http://172.30.148.152:31326). Esta es la ruta para los clientes, que está protegida con el servidor de recursos y OAuthClient, que genera el token y autentica.
+   8.4. En configmap pegó estas rutas en las variables de ambiente
+   8.5. Pegó ambas rutas en el configmap y volvió a ejecutar el configmap.
+   8.6. Borró el despliegue de msvc-usuarios.yaml y lo volvió a ejecutar (importante siempre levantar primero el servidor de autorizacion y luego los clientes, aunq en este caso por los pasos anteriores el servidor de autenticacion ya estaba levantado. Ademas siempre confirmar con los logs q despliegues esten bien).
+   8.7. Probó en postman con las rutas de 8.2 y 8.3. Probó un litstar con un get y comprobó que ahora no lo puede ver debido a que en metodo securityFilterChain de SecurityConfig en msvc-usuarios se especifica q necesitamos autenticacion y la autorizacion "SCOPE_read","SCOPE_write"
+   
+9. Probó login mediante oauth2
+   9.1.En barra de navegador escribió http://172.30.148.152:31326/oauth2/authorization/msvc-usuarios-client  , o sea ipminikube (obtenida en punto 8):puerto (tambien obtenido en punto 8)/oauth2/authorization/nombre del cliente escrito en configmap (msvc-usuarios-client). Entonces se le abre una pagina que dice Please Sign In.
+   9.2. Escribió "admin" en user y 12345 en password, ya que eso esta en el SecurityConfig de msvc-auth. Se abre otra pagina, marcamos el ticket de consentimiento y enviamos.
+   9.3. Entonces nos redirige al endpoint /authorized (q fue lo q seteamos en application.yml), con un codigo de autorizacion para iniciar sesion (que fue lo q seteamos en metodo authorized de UsuarioController). Copió el código para a continuacion probar en postman.
+   9.4. Con la ruta del servidor de autorizacion de 8.2 probó en postman (ver los dos pantallazos q dice PruebaPostmanLoginOauth21). Enviamos y obtenemos el token en el body, q tiene una duracion de 5 minutos (se puede configurar en el servidor de autorizacion).
+   9.5. Nota: ver pantallazos.Sin token primero, volver a probar el punto 8.7, va a fracasar. Luego, setear "bearer token" en postman, pegar token y volver a probar, entonces sí funciona el GET! 
+   9.6. Probar post y put. veremos q aunque le pasomos el token igual no nos da acceso debido a los antmatchers del metodo securityFilterChain en SecuityConfig, ya que no tienen el "write" en este metodo.
+   
 
+10. Encriptó en usuarios controller, creó la imagen y subió. Luego hizo lo mismo del punto 9, para POST (ver pantallazo) para obtener el token y lo pegó para obtener la lista en el GET (igual q en punto 9).
+Al igual q antes no le funciona el put (y esta bien). Para solucionar esto, en el applicationyml se podría agregar write en el scope. Sin embargo optó por probar en el navegador con la ruta especificada en pantallazo (ver pantallazo q dice urlParaWrite). 
+Hizo lo mismo de antes y entonces sí pudo modificar con el put, obteniendo en el postman la contraseña encriptada (pantallazo PruebaPostmanConPasswordencriptadoEnPut)
 
+        
+11. Configuró BCrypt Password Encoder en el servidor de autorización
+     11.1. Comentó las credenciales hardcodeadas en SecuityConfig del auth en el metodo UserDetailsService, reemplazandolo por el metodo configure. En este punto aun le queda implementar el UserDetailsService que escribió en este método
+	 11.2. Comentó en metodo RegisteredClientRepository las lineas correspondiente a codigo hardcodeado, cambiandolas por las de código encriptado.
 
+12. Configuró autenticacion por login por email.
+     12.1. Escribió método handler login (UsuarioController).
+	 12.2. En SecurityConfig de msvc-usuarios agregó "/login" en los antmatchers
+	 12.3. En msvc-auth creó la clase WebClientConfig y escribió el método WebClient, que es la configuracion para poder usar webclient como balanceador de carga entre msvc-auth y msvc-usuarios (similar a feign).
+	 12.4. Creó la clase UsuarioService en msvc-auth para hacer el login, con el metodo obligatorio loadUserByUserName en esta clase dando los authorities, igual que en el proyecto del mismo A.Guzman spring-boot-backend-apirest, excepto que en aquel proyecto el usuario que hay que procesar le llega desde el frontend y lo compara directamente con la bbdd.
+	 En cambio en este proyecto en cambio le llega el usuario desde el cliente que es otro microservicio y mencionó (en realidad no mencionó, sino que puso un texto en el video, porque parece q se le olvidó) q por debajo spring security compara credenciales de forma automática.
+	 12.5. Actualizó las imagenes tanto para usuarios como para auth, etiquetó y subió a dockerhub.
+	 12.6. Setó replicas=0 (o sea eliminó los pods) en los deployment.yaml tanto para usuarios como para auth y las ejecutó con comando apply. Luego las cambió a replicas=1 y ejecutó auth y usuario (siempre el servidor de autorizacion primero).
+	 12.7. Probó con la ruta de login (lo mismo que en el el punto 10, pero esta vez con login, ver pantallazos desde donde dice "captura de pantallas 139 en adelante" para esta parte (no confundir con las capturas de pantalla para el punto 10) para obtener permiso de lectura solamente (de hecho en la pantalla siguiente hay que marcar el checkbox de read). Obtuvo el code y con él generó el token. Pegó el token y con get vió que tenia acceso al listado pero no a ditar con put, asi que ejecutó la url con read y write (al igual q lo hizo en el punto 10), obtuvo código, token, pegó token en el put, ejecutó el put y vió que entonces sí podía  
+	 12.8. Eliminó el puerto 8001 en metodo loadUserByUsername de UserService. Modificó clase WebClientConfig y volvió a probar todo de nuevo en postman para demostrar que el puerto no es necesario con esta modificación.
+	 
+13. Propagó el token de msvc-usuarios a msvc-cursos.
+      13.1. Probó en postman un get con ipmsvc-curoso:puerto/4 (esto lo obtuvo con comando minikube service msvc-cursos --url). Vió q le falló porq no tiene el token.
+ 	  13.2. Modificó obtenerAlumnosPorCurso() de clase UsuarioClientRest en msvc-cursos para pasarle el token como Autorizacion en los headers en postman.
+	  13.3. Modificó interfaz CursoService agregando el token en los argumentos que corresponden
+	  13.4. Modificó CursoServiceImpl que implementa la clase CursoService para concordar con cambios en 13.3
+	  13.5. Modificó detalle() en CursoController, para q pida el token como en 13.2.
+	  13.6. Construyó imagenes, hizo tag y subió a dockerhub. Borró deployments y los ejecutó nuevamente.
+	  13.7. Generó el token, lo pegó en Autorization bearer token de ipmsvc-curoso:puerto/4 y probó de nuevo. Esta vez sí le da un 200
+	  
+14. Login OAuth2 Cliente Http Postman. 
+    Sucede que hasta el momento habia probado obtener el código de validacion previo al token mediante un formulario en el navegador. La idea es generarlo en postman para simular que este formulario esté en un cliente http como angular, react, etc.
+	14.1. En  registeredClientRepository() de SecurityConfig de msvc-auth seteó en false el consentimiento y en defaultSecurityFilterChain() tambien de SecurityConfig msvc-auth deshabilitó csrf.
+	14.2. Borró las imagenes, las etiquetó y las subió a dockerhub
+	14.3. Borró los pods (comando apply deployment con replicas=0) y desplegó nuevamente para msvc-auth
+	14.4. Se fue a Postman y con GET ipusuario:puertousuario/oauth2/authorization/msvc-usuarios-client (ver pantallazo "Captura de pantalla 156") obtuvo el formulario en el postman.
+	14.5. (seguir viendo los pantallazos) De este punto en adelante es todo igual a antes en postman.
+	
+	
+	 
 
 
 

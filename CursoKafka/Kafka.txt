@@ -1,0 +1,178 @@
+Conceptos básicos
+1. Instaló Kafka según este enlace para windows: https://www.geeksforgeeks.org/how-to-install-and-run-apache-kafka-on-windows/
+
+NOTA: los siguientes comandos los hace correr desde C:\kafka\
+
+NOTA: SE recomienda borrar todos los logs de C:\kafka\zookeeper-data\version-2 y de C:\kafka\logs antes de levantar zookeeper y el broker de Kafka o si hay algun problema. Ademas, cuando se vaya a parar por mas de una hora se recomienda bajar todo (broker, zookeeper
+
+2.Inició Zookeeper con este comando: .\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties ;  Inició el broker de Kafka con este comando: .\bin\windows\kafka-server-start.bat .\config\server.properties
+NOTA: En general los .sh del curso se reemplazan con .bat en los comandos
+
+3.Creó un topic (stream de datos) con cinco particiones. Recomendó un comando desactualizado. El que se usa ahora, que lo inverstigué de este blog (https://blog.loginradius.com/engineering/quick-kafka-installation/) es este:
+kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic devs4j-topic --partitions 5 
+La segunda vez que creé un topic el comando de arriba no funcionó (que loco!). En vez de eso sí funcionó el comando del profe, o sea: kafka-topics.bat --bootstrap-server localhost:9092 --create --topic devs4j-topic --partitions 5 --replication-factor 1
+
+NOTA:todos los comandos de aqui en adelante los hace correr desde C:\kafka\bin\windows. 
+
+4.Explicó conceptos de réplicas por tópic, con lead y follower. Para tener dos réplicas hay que tener dos brokers (hasta este momento solo tiene un broker creado)
+
+5. Explicó como listar y describir los topics con:
+C:\kafka\bin\windows>kafka-topics.bat --list --bootstrap-server localhost:9092
+test-topic
+
+C:\kafka\bin\windows>kafka-topics.bat --describe test-topic --bootstrap-server localhost:9092
+Topic: test-topic       TopicId: 7EchnunVT_S6lLyOQCp8Zw PartitionCount: 5       ReplicationFactor: 1 Configs: 
+
+6.Explicó qué es un consumer y qué es un provider en un topic.
+.Creó un consumer y un provider respectivamente con:
+kafka-console-consumer.bat --topic test-topic --bootstrap-server localhost:9092
+kafka-console-producer.bat --topic test-topic --bootstrap-server localhost:9092
+NOTA: Para el proyecto en el IDE creo otro topic llamado devs4J, por lo que para el proyecto del IDE, consumer y provider se levantan con:
+kafka-console-producer.bat --topic devs4j-topic --bootstrap-server localhost:9092
+kafka-console-consumer.bat --topic devs4j-topic --bootstrap-server localhost:9092 --property print.key=true
+Probó mandando un mensaje del provider al consumer en tiempo real. Mencionó que esto es muy útil porque en una aplicacion si un usuario hace algun cambio en la bbdd los otros usuarios no necesitan estar
+chequeando cada cinco minutos, sino que llegan notificaciones en tiempo real si es que hay un cambio
+NOTA: Se detienen con ctrl +c en linea de comandos
+
+7.Agregó dos configuraciones al consumer:
+kafka-console-consumer.bat --topic test-topic --from-beginning --bootstrap-server localhost:9092 --property print.key=true --property key.separator="-"
+con --from-beginning muestra los mensajes desde que el provider se inicializó, independientemente que el consumer se haya inicializado o no.
+con --property print.key=true muestra clave valor de los mensajes, no solo el valor de ellos.
+
+8.Modificó un tópic subiendo el numero de particiones (no se puede bajar el numero de particiones en kafka) con comando: kafka-topics.bat  --bootstrap-server localhost:9092 --alter --topic test-topic --partitions 40
+
+9. Borró el topic con comando kafka-topics.bat  --bootstrap-server localhost:9092 --delete --topic test-topic
+
+10. Introdujo el concepto de Consumer Groups. Una vez que una partición ha sido tomada por un consumer de un grupo, otro consumer de ese grupo ya no la puede tomar. Un consumer puede leer multiples particiones, pero la particion que se le asigne a un consumer solo puede ser consumida por ese consumer.
+
+11.Explicó como borrar los logs que se van guardando en c:/kafka/kafka-logs (ver torpedo que él pasó).
+
+12. Creó un nuevo topic e inició producer y consumer en linea de comando
+
+13.Creó un proyecto de kafka en Java. Importó librerías de kafka, configuró el producer con método main, corrió el proyecto (inicia y acaba, no como proyecto tipico de servicios que se queda escuchando) y lo corrió. 
+El consumer recibió el mensaje hardcodeado en el código exitosamente, por lo que el consumer en este punto recibe info desde dos producers, el de la consoloa y el del proyecto.
+
+14. Introdujo los conceptos de Batch y Linger. Sucede que al mandar un mensaje por el tópic, cada mensaje es una operación independiente, pero al agregar un batch (se agrega con la linea: props.put("linger.ms","10");) se meten varios mensajes en una sola operacion, mejorando rendimiento, el que fue medido con tiempo que tarda la ejecucion (con las lineas correspondientes a CurrentMillis).
+
+15. Creó un Consumer en el IDE y lo probó mandando un mensaje con la linea de comandos.
+
+16. Creó múltimples consumers dentro de un mismo consumer group, corriendo el código del consumer en el IDE dos veces. Esto a mi no me resultó, porque el Intellij (el usa eclipse) me pide parar y reiniciar. Despues sí logré correrlo, ya que con el consumer corriendo se debe correr el producer (no se debe parar el consumer). Esto se logra corriendolos desde el runner con boton secundario, no desde el metodo main o desde la clase. Va a estar ok cuando veamos una consola para el consumer y otra para el runner.
+
+17. Escribió las clases Devs4fThreadConsumer y Devs4jMultiThreadConsumer para no tener que estar haciendo siempre lo del punto 16. Esto tampoco me resultó, ya que todos los mensajes caen en la particion 0.
+Ojo, que en esta seccion dejaron esta pregunta: "hola Profesor, una consulta... es posible hacer que el producer indicar a que partición deberá ir el mensaje?" y él respondió con un código.
+
+18. Explicó q los logs relentizan kafka, por lo que editó el uso de logs en clase Devs4fThreadConsumer. Al correr a él le salen los valores de Offset, Partition, Key y Value. Como esta guardado en la version de git no me corre, pero en versiones posteriores de git me di cuenta q faltaban las llaves del bucle for y ahi si corre bien.
+
+19. Escribió una clase TransactionalProducer y una TransactionalConsumer que son transaccionales. Para probar estas clases escribió una excepcion forzada en el TransactionalProducer y corrió TransactionalProducer. En linea de comandso del consumer no transaccional
+vió que se le caía por esta excepción, pero aún asi escribía todos los registros hasta antes de la excepción. En la consola del IDE en cambio no se tienen estos registros, ya que el código es transaccional. Me corrió bien
+
+20. Con la clase Devs4jCallbackProducer escribió un ejemplo de callback con clase anonima, para realizar tareas luego de que el hilo ya ha terminado (con método onCompletion()). Me corrió bien
+
+21. En vez de callback con clase anonima se puede escribir con lambdas. El profe escribió esto en la misma clase Devs4jCallbackProducer, pero yo creé una aprte llamada Devs4jCallbackProducerUsingLambdas. Explicó tambien que existe otra forma de hacerlo implementando la interfaz Callback (esto quedó comentado en Devs4jCallbackProducerUsingLambdas)
+
+22. En el producer normal cambio una linea para establecer q las todas las keys 3.1 van a particion 1 y todas las keys 2.1 van a particion 2.  Esto es muy util porque las keys podrian representar un usuario, por ejemplo, entonces todos los usuarios irian a la misma particion. 
+
+23. Planteó la tarea.
+
+24. Para la tarea (no la desarrolló) mencionó q seteando max.in.flight.requests.per.connection = 1. nos aseguramos de mantener todos los mensajes en orden, pero a costo de bajar el rendimiento, porque solo estamos ocupando 1 hilo (en vez de los 5 q veniamos ocupando).
+
+25. Explicó q i se desea asegurar que no se generan mensajes duplicados en kafka se debe colocar la propiedad enable.idempotence =true (ver torpedo)
+
+26. Explicó como no hacer un commit cada vez que nos llegan datos que ya hemos recibido anteriormente, por lo que no van a salir los offset en el log la segunda vez q corramos el producer. Para  ello modificó el consumer, pero paraque quedara mas ordenado yo me cree otro consumer Devs4jConsumerTwo
+
+
+KAFKA SPRING 
+
+A continuacion inició un proyecto de spring para poder recibir y enviar en los logs mensajes de un topic enviados desde un provider externo o desde un provider en el mismo proyecto de spring. Para ello:
+1. Creó el proyecto curso_kafka_spring, con las dependencias de kafka.
+2. Configuró un consumer en clase KafkaConfiguration, con métodos consumerProperties() y beans consumerFactory() y listenerContainerFactory().
+3. En la clase principal configuró un listener con el q podemos recibir mensajes enviados desde consola comandos del producer.
+4. Levantó zookeeper, broker, producer y consumer y probó enviando un mensaje desde linea de comando del producer hacia los logs de spring.
+5. Configuró un producer en clase KafkaConfiguration, Inyectó esta dependencia en la clase principal, implementó en esta clase CommandLineRunner con su método run para poder ver el mensaje q esta enviando, corrió la app y verificó que el mensaje estaba llegando a la linea de comandos del consumer.
+6. Escribió y probó código asincromo en el run de la clase principal. Comprobó que "Message sent" que fue el log q escribió en OnSuccess estuviera en los logs de spring.
+7.Borró codigo asincrono del punto anterior y escribió codigo sincrono. Volvio a probar y vio q estaba todo ok.
+8.Configuró código para batch. Para ello agregó la linea         listenerContainerFactory.setBatchListener(true);  en método ConcurrentKafkaListenerContainerFactory() de clase configuracion. En clase principal modificó el método run e hizo cambios tambien en @KafkaListener y en listen
+9.  En el listener al principio recibia una lista de string como argumento...pero en seccion Accediendo a la información completa del mensaje (para mostrar particion, offset, key y value) lo cambio a ConsumerRecord. Modificó tambien el log para mostrar estos valores y agregó el argumento String.valueOf(i) en kafkaTemplate.send(); Probó y vio q funcionaba bn. 
+10. Modificó el metodo ConcurrentKafkaListenerContainerFactory() para crear tres hilos (o sea tres consumers). Se esta manera el envío es con batch y el consumo es concurrente.
+11. Modificó el clase CursoKafkaSpringApplication para iniciar y detener el consumer automaticasmente luego de 5 segundos.
+12. En clase de configuracion agregó el bean meterRegistry y lo agregó en el bean kafkaTemplate. Esto es para generar métricas de la app. No lo probó, dijo "lo iremos viendo mas adelante."
+13. Agregó las anotaciones de Spring 	@Scheduled(fixedDelay = 1000, initialDelay = 500) y @EnableScheduling que en combinacion permiten ejecutar codigo cada cierto tiempo.
+14. Siguió agregando configuracion para métricas en class CursoKafkaSpringApplication, agregando el método sendKafkaMessages() para ver cuenta de mensajes. Ademas en esta clase comentó un monton de cosas de pasos anteriores, principalmente logs. Ahora sí lo probó, obteniendo la cuenta total de mensajes enviados, de esta forma en los logs podemos ver la cuenta total de mensajes sin necesariamente conocer si estan siendo enviados en forma concurrente o no.
+15. En metodo printMetrics() agregó codigo para ver todas las metricas disponibles.
+		
+		
+AWS
+
+NOTA: En esta seccion seccion solo tomé nota, pero no ejecuté nada en AWS
+
+En AWS ocupamos el servicio MKS (Managed Streaming for Kafka) que permite crear en la nube un cluster de Kafka con varios nodos y varias réplicas.
+1. Creó un grupo de seguridad en EC2 para el cluster de kafka. Un grupo de seguridad es un firewall virtual (firewall es un sistema diseñado para proteger las redes privadas del acceso no autorizado y no verificado en una conexión a Internet) para que la instancia (maquina virtual) controle el trafico de entrada y salida.
+Al crear el grupo, por defecto las reglas de entrada (configuración de Tipo, Protocolo, Puertos y Origen hacia nuestra instancia en Amazon) estan cerradas y las salidas (configuración de Tipo,Protocolo, Puertos y Origen desde nuestra app en Amazon) abiertas. El creó regla de entrada de tipo TCP personalizado,con intervalo de puertos 9092 (q es el puesto de kafka), lo demas lo dejó por defecto y creó el grupo de seguridad.
+2. Creó un grupo de seguridad en EC2 para un cliente, con regla de entrada tipo SSH,con int. de puertos 22 y origen cualquier lugar.
+3. Creó un cluster (red) de Kafka en MKS. Para ello en AWS definió Networking (VPC, Availability zones (2) y subredes), Brokers (=instancias o VM) definiendo tamaño de estos (grande en este caso) y numero de brokers por Availability zone (en nuestro caso 2 por zona, o sea cuatro en total), Etiquetas, Almacenamiento, Encriptacion (trafico encriptado o no), Autenticacion, Monitoreo (metricas de nuestro cluster). En configuracion avanzada seleccionó el grupo de seguridad previamente creado. 
+4. Luego de crear el Cluster de kafka se puede revisar en el buscador inmediatamente. En Best Practices de AWS podemos ver el tamaño vs numero de particiones que se pueden enviar.
+5. Creó una máquina en ec2 para conectarnos a Kafka como cliente. Para ello al crear el ec2 en AWS seleccionó Linux en AMI (Amazon Machine Image) y el security group del cliente creado previamente (paso 6 en pantallas de aws). 
+Lo demas lo dejó por defecto. Al lanzar la instancia va a pedir que le demos un nombre a la llave (esto segun yo porque seleccionamos ssh en security del cliente previamente). Lo hacemos y descargamos la llave PEM en local.
+Recordar que en el archivo van una llave privada y otra publica. La pública se instala y va a dar permiso para conectarme con mi llave privada. En local con comando chmod 400 chmod nombreArchivoDescargado (El tiene mac, averiguar si para windows funciona igual este comando) habilita todos los permisos para poder conectarse desde local a la VM cliente de ec2.  
+6. Se conectó finalmente a la VM cliente de ec2 mediante el pem (ver comienzo video "Conectándonos al cluster y creando topics"). 
+Una vez conectado le dió un comando yum update para actualizar.
+Luego instaló java con comando sudo yum install java-1.8.0
+Comprobó con java -version.
+Descargó kafka con comando: wget https://downloads.apache.org/kafka/2.6.0/kafka_2.12-2.6.0.tgz (ojo con las versiones!!)
+Descomprimió con tar -xvf kafka_2.12-2.6.0.tgz e ingresa a carpeta con cd kafka_2.12-2.6.0
+Listó los tópics con comando bin/kafka-topics.sh --list --bootstrap-server (pegar aqui client integration information obtenido del cluster). En este momento no va a mostrar nada porq aun no creamos un topic.
+A continuacion creó un topic llamado devs4j-topic (ver video minuto 4:25 ). Lo creó con 5 particiones  con factor de repeticion 1 y cuatro réplicas por partición (se repiten los numeros de réplicas 1,2,3,4 en todas las particiones pero con diferente orden en c/u) . Ver el video pq los comandos son eternos.
+Luego creó un consumer (mismo comando en local, pero con el del Plaintext que sale en "view client information" del cluster de AWS) y un provider (en un segundo cmd mismo comando en local, pero con el  pero con el Plaintext que sale en "view client information" del cluster de AWS). Ambos consumer y provider se ejecutan en el cliente ec2.
+
+EJEMPLO PRACTICO
+
+El ejemplo practico va orientado a poder persistir y manipular (con postman) registros con atributos pertenecientes a una clase modelo de nuestro proyecto spring (clase Devs4jTransaction, como se verá. Notar que en el proyecto anterior no habia ninguna clase modelo, simplemente habia consumer y producer que era lo que necesitabamos). Para ello deberemos desplegar el proyecto en EC2, luego crear un dominio en Elastic Search de AWS y probar con postman..
+1. Creó el proyecto llamado devs4j-transactionscon librerias spring-kafka y javafaker.
+2. Configuró kafka en clase de configuracion KafkaConfiguration (igual q en el proyecto con spring curso_kafka_spring).
+3. Seteó el cluster de AWS en el metodo consumerProps() del consumer. Esto significa que el proyecto NO podremos correrlo, porque en la sección de AWS solo fui un espectado pasivo. De todas maneras el proyecto se fue guardando paso a paso en github.
+4. Creó el listener de la misma forma q en el proyecto anterior en en IDE y cambió todos los tipos Integer del proyecto a String.
+5. Desplegó el proyecto en EC2. Pare ello:
+5.1. Led ió un mvn clean install para construir el proyecto en local
+5.2. Ingresó por consola al EC2, se fue al directorio kafka_2.12-2.6.0/ y con el siguiente comando creó un topic: bin/kafka-topics.sh --bootstrap-server (pegar aqui client integration information obtenido del cluster) --create --topic devs4jtransactions --partitions 50 --replication-factor 4
+5.3. Listamos nuestros topics con comando bin/kafka-topics.sh --list --bootstrap-server (pegar aqui client integration information obtenido del cluster), donde debieramos ver el q acabamos de crear.
+5.4. Salimos de EC2 con comando exit. Subimos el jar a ec2 desde nuestro directorio local con comando scp -i nombreLlavePem rutaDondeEstaElJar/nombreDelJar.jar miUsuarioDeEC2@pegarDNSDesdeAWS:nombreDirectorioEnAWS/nombreArchivoEnAWS (el lo dejó en la raiz con nombreArchivoEnAWS = devs4jtransactions.jar 
+5.5. Volvimos a entrar a EC2, nos vamos al directorio al directorio kafka_2.12-2.6.0/ , listamos con ls y ya debieramos ver el jar subido. Ejecutamos el jar con comando java -jar devs4jtransactions.jar. En los logs debieran verse todos los mensajes que estan siendo enviados al broker.
+5.6. En AWS en nuestro cluster en MSK ya debieramos ver trafico hacia nuestro cluster. Hasta este punto nuestra app funciona tanto como provider como consumer y el cluster es solo la red que  contiene el broker (servidor) para q esto pueda funcionar. 
+6.   Generó transacciones de ejemplo usando registros simulados por Java Faker.
+Para ello:
+6.1. Agregó dependencia jackson-databind
+6.2. Creó la clase Devs4jTransaction (POJO)
+6.3. En método sendMessages de la clase principal pasó los faker a una instancia de Devs4jTransaction. Con esto conseguiremos simular registros para Devs4jTransaction como si de una base de datos se tratase.
+6.4. Modificó el método listen para ver particion, offset, key y value en los logs 
+6.5. Creó Bean de ObserverMapper y lo inyectó, pero por ahora lo dejó comentado
+6.6. Luego borró la versión anterior en EC2 con comando rm nombreDelJar.jar y subió la nueva version como se detalla en el punto anterior.
+6.7.Corrió el nuevo jar y revisó que tenía Particion, Offset, Key y Mensaje para cada registro simulado por faker.  Lo de faker es provisorio para probar, ya q la idea es ir enviando  
+
+7. Creó un cluster (en ES de AWS se le llama dominio al cluster) en el servicio Elastic Search (en adelante ES) de AWS. Para ello:
+Buscó ES con la lupa y le dio click a "crear dominio"
+Elegir tipo implementacion-->desarrollo y pruebas
+Configurar dominio-->numero nodos:1
+Configurar acceso y seguridad-->Acceso publico (solo para el curso, normalmente seria privado)
+                             -->Crear usuario maestro (dar usuario maestro y contraseña maestra)
+							 -->Politica de acceso (acceso libre)
+Revisar-->confirmar
+Entonces en seccion "Mis dominios" ya debiera aparecer el nombre del dominio creado. Fijarse que en pantalla de "Informacion General" aparezca tanto el link para Punto de enlace(para postman) como el de Kibana.
+8.Se fue a postman y con un GET de la url Punto de enlace y credenciales maestras en viñeta de autorizacion ya obtuvo un json del dominio de ES.
+Agregó el endpoint /_cat/health?v en postman y ya se puede ver la salud del dominio; con _cat/nodes se ven informacion de los nodos.
+Podemos entrar a kibana con las credenciales maestras q dimos cuando creamos el dominio (lo explicará despues).
+9.Creó un indice de ES. Para ello en postman dio un PUT con Punto de enlace/nombreProyecto(en este casodevs4jTransactions). Despues dio un GET  a esta misma URL y va a obtener el indice ya creado.
+En este punto ya podemos enviar registros con POST Punto de enlace/nombreProyecto/1 (partio con identificador igual a 1). En el cuerpo envió un json con nombre, apelliso, username y monto (monto es double), que son los atributos de clase Devs4jTransaction en nuestro proyecto. Con el GET vemos que quede guardado.
+10. Creó un cliente Elastic search en el proyecto, para conectarnos hacia nuestro dominio
+10.1. En el proyecto en local agregó dependencia elasticsearch-rest-high-level-client.
+10.2. Creó la clase de configuracion ElasticSearchConfig.
+10.2. Modificó la clase Devs4jTransactionsApplication, pero en realidad yo me creé por cuenta propia una clase Devs4jTransactionsApplication2 para que quedara mas entendible. La idea es en esta clase pasarle un dato en duro al dominio en ES para probar esta configuracion de cliente q estamos haciendo.
+11. Probó el cliente ES. Corrió en local el proyecto (o sea el cliente) y chequeó el dominio de ES en postman mediante GET Punto de enlace/nombreProyecto(en este casodevs4jTransactions)/_search En el json de la respuesta hay un "_type". Lo copió (el valor solamente, no la llave) y luego lo reutilizó con GET Punto de enlace/nombreProyecto(en este casodevs4jTransactions)/valorDelType/identificadorQueLeDimosEnClase Devs4jTransactionApplication2 y ya podremos ver el regitro.
+12. Integró el cliente de Elasticsearch al consumer de la aplicacion de Kafka. Para ello mofificó el método listen de la clase Devs4jTransactionsApplication.
+13. Probó la Integración del cliente ElasticSearch  al consumer de la aplicacion de Kafka. Para ello:
+13.1. Corrigió algunos detalles muy menores en clase Devs4jTransactionsApplication y construyó el proyecto con mvn clean install.
+13.2. Subió el jar por EC2 igual q antes.
+13.3. En el postman borró el dato que habia indexado en el paso 11 con DELETE Punto de enlace/nombreProyecto/ y revisó que no tenia ningun registro con un GET.
+13.4. Ejecutó el JAR, vió que en los logs estaban correctamente los mensajes y en el postman con GET Punto de enlace/nombreProyecto(en este casodevs4jTransactions)/_search tambien apareceieron todos estos registros. 
+Notar que en la prueba del punto 11 él mismo tuvo q enviar un registro mediante postman ya que no habia cliente. Acá sin embargo el cliente esta integrado en el proyecto de kafka, por lo q no necesita mandar registros por postman, ya q toma los registros del cliente en el proyecto.
+14. Mostró como setear un dashboard en Kibana. Esto es para ver métricas y valores de nuestra app desplegada en ES de Amazon.
+15.Igual puse la clase ElasticSearchConfigLocal q es para el ejemplo del apendice para crear un Cluster de ElasticSearch en local si no tenemos cuenta en AWS. Se puede tb instalar el local Kibana para q cuando ejecutemos un ejemplo ES en local podamos visualizarlo con Kibana en la web (yo no lo hice, pero esta en los videos del apendice) 

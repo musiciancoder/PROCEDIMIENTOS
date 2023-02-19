@@ -1,0 +1,17 @@
+@Primary cumple la misma funcion que @Qualifier, es decir elegir un bean sobre otro del mismo tipo.
+La diferencia es que @Primary se usa con @Bean, es decir en la creacion del objeto a ser inyectado, en cambio @Qualifier se usa con @Autowired, es decir en la inyeccion de dependencias misma.
+
+@Configuration
+public class Config {
+
+    @Bean
+    public Employee JohnEmployee() {
+        return new Employee("John");
+    }
+
+    @Bean
+    @Primary
+    public Employee TonyEmployee() {
+        return new Employee("Tony");
+    }
+}
