@@ -36,9 +36,19 @@ Luego ejecutamos docker run -p 8001:8001 --rm -it idImagen /bin/sh. Entonces se 
 Podemos copiar un archivo desde nuestro directorio del proyecto a un contenedor en ejecucion en modo interactivo (en otro terminal) con: docker cp .\NombreArchivo.java idContainer:/a
 pp/Login.java. 
 
+*Docker-Compose
+Debemos instalarlo, no basta con tener docker.
+
 *COMUNICACION ENTRE COMPONENTES
 En el application.properties debemos escribir: spring.datasource.url=jdbc:postgresql://localhost:host.docker.internal/nombreMicroservicio ; Ademas en el cliente rest debemos escribir el nombre del otro microservicio (con el que nos queremos comunicar, por ejemplo @FeignClient(name="msvc-cursos", url="msvc-cursos:8002") 
-                                                                                                                            
-
+                                                                
+Con cliente HTTP (Librerías Feign o RestTemplate) podemos conectarnos entre microservicios y bases de datos:
+1. En local sin docker: seteando nombre de aplicacion y url propio en el application.properties y del microservicio que queremos comunicarnos en la clase del cliente http; para bbdd basta con setearlo en el application.properties, como siempre. (Se usa sencillamente localhost)
+2. En local con docker: hay que crear un network en local y luego dockerizar cada microservicio y hacerlos correr en una red de docker previamente creada. Editar tanto  application.properties como clase cliente Http en cada microservicio poniendo el nombre del otro microservicio que deseamos llamar. Ojo que el name del otro microservicio va solo una vez o en la clase cliente http o en el application properties y lo mandamos llamar en la clase cliente rest.
+Las bases de datos se pueden dejar fuera de la red docker o dockerizarlas y hacerlas parte de la red tambien, en cuyo caso habría que cambiar el application.properties en la linea del spring.datasource.url. dejándolo con el nombre del contenedor de la base de datos, por ejemplo: #spring.datasource.url=jdbc:postgresql://postgres14/msvc_cursos (en vez de #spring.datasource.url=jdbc:postgresql://host.docker.internal:5432/msvc_cursos que sería con la bbdd fuera de la red). En contenedores el local podemos ademas comunicar con internet, aplicaciones de la WWW mediante url de la api.
+Además podemos setear las variables del application.properties de cada microservicio (como nombre de aplicacion y bases de datos, por ejemplo) como variables de entorno en el docker-compose y levantar todos los microservicios con el docker-compose.												
+3. Entre instancias creadas manualmente en AWS (sin ECS): En el docker-compose de cada microservicio debemos especificar en nombre del container y la imagen del microservicio y en las variables de entorno (en el mismo docker-compose) especificamos la url del microservicio al q nos queremos conectar.
+Cada docker compose (o sea cada container y por ende cada microservicio) lo ejecutamos en una instancia (maquina) diferente. Se puede usar un network en el docker compose, pero sino se crea uno por defecto. Naturalmente igual necesitamos un cliente HTTP en el proyecto.
+4. Entre tareas creadas automaticamente en AWS (con ECS): Se comunican mediante DNS o IP publica fija obtenidas al setear un Load Balancer en los servicios que ejecutan las tareas. Estos DNS van en las variables de entorno que seteamos en la interfaz gráfica de EC2 cuando creamos (o editamos) los containers. Naturalmente igual necesitamos un cliente HTTP en el proyecto.
 
 

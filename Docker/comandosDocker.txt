@@ -18,6 +18,7 @@ docker start idContainer : reiniciar container en estado exited (lo muestra en e
 docker start -a idContainer : reiniciar container en estado exited (lo muestra en estado atached con el terminal, por lo que este quedará tomado)
 docker logs idContainer: ver logs de un container que esta en estado dettached
 docker logs -f idContainer: ver logs de un container que esta en estado dettached y dejarlo atachado de ahora en adelante
+docker mv nombreNuevo nombre antiguo: cambiar nombre archivos como docker-compose u otros.
 
 
 docker ps -a : para ver todos los containers que han sido creados en ese directorio y el status de cada uno
@@ -94,6 +95,7 @@ docker run --name containerName --net nombreNetwork --ip 172.19.0.2 -h web.bhara
 docker network disconnect nombreNetwork nombreContainer: desconectar
 docker inspect nombreContainer: para verificar que no hay networks asociadas
 docker network connect nombreNetwork nombreContainer: volver a conectar
+docker run -p 8001:8001 -d -rm --name msvc-usuarios --network nombreNetwork nombreImagen: correr una imagen en una red previamente creada.
 
 Docker File
 Sirve para crear nuestras propias imagenes y correrlas en uno o varios contenedores

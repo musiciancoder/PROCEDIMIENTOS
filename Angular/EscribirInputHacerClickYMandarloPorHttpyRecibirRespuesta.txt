@@ -1,0 +1,19 @@
+import { fromEvent } from "rxjs";
+import { ajax } from "rxjs/ajax";
+import { concatMap, map } from "rxjs/operators";
+
+const endpointInput: HTMLInputElement = document.querySelector('input#endpoint');
+const fetchButton = document.querySelector('button#fetch');
+
+//El concepto acá es que hay dos subsripciones: una para cuando escribe algo y otra cuando hace click en el boton
+
+fromEvent(fetchButton, 'click')//hasta acá es un fromEvent Normal
+.pipe( //para poder ocupar Map y ConcatMap
+  map(() => endpointInput.value), //con esto pasamos el valor del texto escrito
+  concatMap(value => //notar que el value acá no es fetchButton, 'click' , sino 
+  //endpointInput.value (o sea lo q escribimos en el texto), ya que con el map transformamos fetchButton, 'click' a  endpointInput.value aunque  fetchButton, 'click' y endpointInput.value no estan relacionados entre si a diferencia de lo q ocurre en archivo mymap.ts donde ajaxResponse.response.capital es un atributo de ajaxResponse.Es por eso que en este caso estamos autoejecutando con funcion flecha en el map, a diferencia de mymap.ts. Con esto demostramos q un Map puede manejar cualquier cosa.
+    ajax(`https://random-data-api.com/api/${value}/random_${value}`)//Acá nos estamos subscribiendo a un cambio en el cuadro de texto (primera subscripcion)
+  )
+).subscribe( //Acá nos estamos subscribiendo al fromEvent, o sea cuando hace click en el boton (segunda subscripcion). 
+  value => console.log(value) //El value acá es la respuesta del ajax
+);

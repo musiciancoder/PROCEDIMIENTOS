@@ -1,0 +1,30 @@
+1.INTRODUCTION
+
+*Clean (from now on CA) & Hexagonal Architecture (from now on HA): Isolated domain logic/layer from outside dependencies and runtime tools.
+*HA is also known as "Ports and adapters"
+*CA (Robert Martion 2012) involves HA + Onion Architecture + detailed definition on the domain layer. Despite of this differenciation, sometimes CA is referred to as HA and viceversa.  
+
+We will create a food app with 4 microservices which are going to comunicate between them using message pass which will be kafka (Ver figura section-1).
+1.Estos microservicios en conjunto estaran diseñados siguiendo HA (de nuevo, ver figura), es decir la capa de dominio estará aislada de infraestructuras y dependencias externas. Esto se logra separando el microservicio en unidades desplegables por separado (Business logic, API, Messagging, Data Access  q en el caso de Order Service componen en conjunto la capa/logica de dominio, por ejemplo), por lo que se tendrán módulos (del curso o de código??) separados para cada uno de estos componentes.
+El siguiente paso será definir puertos de entrada y salida para cada microservicio mediante adaptadores.
+El primer adaptador (primer adapter) es siempre la entrada y en el caso de Order Srvice es el que permitirá al httpClient ingresar al Business logic y los secondary adapters son para los puertos de salida q permiten q el messaging como data access salgan a la bbdd y a kafka respectivamente. Este concepto de primary y secondary adapters se repite en todos los servicios.
+2.A continuacion aplicará DDD al domain logic (aggregates, entities, Value Objects, etc)
+3 y 4.Cada evento va a ser guardado en las bases de datos en tablas Outbox usando acid, siguiendo una combinacion de patrónes SAGA (para manejo de transacciones) y Outbox. 
+Luego enviará los diferentes eventos a Kafka usando un Scheduler
+5.CQRS
+6.Kubernetes y GKE
+
+2.CLEAN AND HEXAGONAL ARCHITECTURE
+TODO: Ver el powerpoint. La idea es q al terminar esta seccion cada uno de los puntos queden claros.
+El principal concepto es que para aislar la capa de dominio con la finalidad q sea apropiadamente testeada, debemos dividir el software en interiores y exteriores. En el interior debe quedar la lógica de negocios y en los exteriores componentes como UI, consola, bbdd, colas de mensajes e incluso frameworks como Spring. Los adaptadores, q pasan informacion al core logic (parte ploma del dibujo) mediante dependency injection, son interfaces q comunican interiores con exteriores.
+Las ventajas de tener y probar la logica de negocios por separado es que podemos cambiar facilmente por ejemplo de mysql a postgress o incluso mongodb sin cambiar la logica de negocios. Podemos cambiar interface, UI, o el exterior que queramos, no solo bbdd.
+Es una mejora con respecto a la tradicional 3 capas (o Layered Architecture !) q consiste en capa de datos (repository), logica de negocios (service) y capa de presentacion (controller) ya que para las 3 capas cada capa depende de las otras.
+Al estar aislada la lógica de negocio es mucho mas facil de mockear para las pruebas unitarias.
+La desventaja es que el código es mucho mas verboso.
+
+
+ 
+
+
+
+

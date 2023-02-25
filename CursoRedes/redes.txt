@@ -152,3 +152,5 @@ En general hay un coste de performance/tiempo (overhead) cada vez que pasamos de
 La capa 2 (enlace o data link en inglés) consta de dos conceptos: switch y mac address. La mac address es un codigo (numero de serie) de tarjeta de red que es único e irrepetible. 
 En la capa de la matrioska que corresponde a la capa de enlace se agrega una cabecera con la mac address. La explicación del switch va orientada a una red donde varios computadores de la misma red se comunican al switch, pero no de redes distintas, como se explicó en videos anteriores.
 
+VPS
+Es una máquina virtual privada que funciona como servidor virtual y q contratamos en un servicio de hosting como AWS. 

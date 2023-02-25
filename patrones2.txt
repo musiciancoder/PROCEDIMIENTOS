@@ -59,6 +59,7 @@ Cuando tenemos demasiados atributos y deseamos evitar demasiada sobrecarga de co
 
 
 *PATRONES ESTRUCTURALES
+Son patrones de diseño basados en herencia.
 Consiste en generar clases complejas y/o objetos complejos pertenecientes a estas clases a partir de módulos mas simples mediante herencia, con el objetivo de cumplir con principios SOLID. 
 Muchas veces cuando recien comenzamos a desarrollar un proyecto, no se tiene claridad acerca de propiedades y atributos finales que irán en una clase en particular. 
 Por ello en el medio del desarrollo, cuando ya existe cierta claridad sobre ello se le pide al desarrollador ir agregando estas propiedades, lo que obliga a modificar clases; el código del comienzo al agregarsele estos atributos la mayoria de las veces viola principios SOLID.
@@ -99,7 +100,7 @@ FLYWEIGHT
 Consiste en que cuando dos objetos o mas tienen muchos atributos en comun entre ellos, podemos separar las clases en clases que contengan los atributos en comun y otras que contengan los atributos exclusivos. Esto permite que quepan mas objetos en la memoria RAM, por lo que estaremos optimizando recursos.
 ¿Cuando usar? Cuando debemos accesar o renderizar desde una fuente externa (bbdd, servicio, etc.) demasiados objetos, cada uno de ellos conteniendo demasiados atributos, por lo que es factible que una maquina con pocos recursos se quede sin memoria.
 
-DAO (patron estructural, pero de arquitectura, no de diseño)
+DAO (patron estructural, pero de arquitectura, no de diseño??? Sera verdad esto)
 DAO data access object
 Video de mitocode para patrones de diseño DAO
 Es un patrón de diseño para accesar bases de datos. Generalmente se prueba primero su funciomamiento con datos "enduro" en la misma clase.
@@ -110,6 +111,7 @@ Es un patrón de diseño para accesar bases de datos. Generalmente se prueba pri
 
 
 *PATRONES CONDUCTUALES
+Son patrones de diseño basados en distinto comportamiento de un modulo segun destintos contextos.
 
 CHAIN OF RESPONSABILITY
 Consiste en dividir comportamientos o funcionalidades de un todo, asignando cada una de estos comportamientos a objetos individuales llamados Handlers. 
@@ -132,6 +134,16 @@ MEMENTO
 Obtenemos fotos instantáneas del estado de un objeto y las vamos almacenando, de manera de poder volver atrás si un estado es requerido. En el IDE ver el ejemplo de tutorialpoint, queda mejor explicado.
 ¿Cuando usar? Typically, the Memento Design Pattern will be used in situations where some actions are undoable, therefore requiring to rollback to a previous state. However, if the state of the Originator is heavy, using the Memento Design Pattern can lead to an expensive creation process and increased use of memory. 
 
+
 STATE
 Permite cambiar el comportamiento de un objeto según el estado interno en el que se se encuentre en ese momento.
 ¿Cuando usar? Cuando tenemos un número finito y pequeño de cambios de comportamiento en un objeto, de esta forma evitamos bloques if() o switch() en el objeto mismo.  
+
+STRATEGY
+Tiene la misma estructura que state, es decir tiene un context, una interfaz strategy que es igual a la interfaz state, clases concretas y un cliente y las relaciones entre ellos son las mismas. Ambas se basan en composicion y poliformismo.
+La diferencia es que los states pueden ser dependientes ya que uno va saltando de un estado al siguiente. Las estrategias en cambio son completamente independientes y no saben de la existencia de las demas estrategias.
+El patron Strategy consiste en tener diferentes implementaciones para lograr lo mismo. 
+
+TEMPLATE
+Es el tipico caso de uso de Clase abstracta para evitar escribir código que se repite (boilerplate), solo que en este patrón los métodos abstractos estan relacionados entre si ya que siguen una secuencia de ejecucion de uno despues de otro.
+¿Cuando usar? Cuando tenemos una secuencia de eventos que se ejecutan uno tras otro en un algoritmo y ademas tengamos boilerplate code dentro de este algoritmo.

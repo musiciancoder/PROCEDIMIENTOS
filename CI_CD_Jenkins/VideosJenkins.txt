@@ -1,0 +1,73 @@
+*Instalar Jenkins en EC2 
+1.Ingresar a una instancia funcionando en EC2 de AWS y setear estos comandos para instalar:
+rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
+yum install jenkins
+2.Con service jenkins start se inicia jenkins.
+3.Editar las reglas de entrada del grupo de seguridad de nuestra instancia en ejecución con Type TCP y puerto 8080, access from anywhere. Una vez q editamos copiar el DNS de la instancia.
+4.En el navegador escribimos el socket DNS:8080 que nos dará una ruta. copiar la ruta y en nuestra consola EC2 escribimos el siguiente comando: cat rutaCopiada. Esto nos da una clave la que pegamos en el navegador y estamos listos. Instalamos los plugins sugeridos.
+Finalmente nos pide en el navegador registrarnos con usuario y contraseña. Lo hacemos y esto nos lleva al dashboard.
+Si deseamos alguna vez desinstalar Jenkins debemos eliminar la carpeta de jenkins con comando  rm -rf /var/lib/jenkins.
+
+
+*Jenkins-->Global Tool Configuration
+En el dashboard click en Jenkins-->Global Tool Configuration y vamos pasando estos valores para java, maven y git
+Java Path:
+/lib/jvm/java-1.8.0-openjdk-1.8.0.242.b08-0.amzn2.0.1.x86_64
+Maven Path:
+/usr/share/maven
+Git Path:
+/usr/bin/git
+
+*Jenkins-->Configuration 
+En el dashboard Jenkins-->Configuration nos permite ver el directorio home donde tenemos jenkins en nuestra instancia y otras cosas mas
+
+*Configure root user permissions
+En consola EC2 modificar archivo jenkins con comando: vi /etc/sysconfig/jenkins en la linea JENKINS_USER debe ir "root". Con tenemos acceso como usuario root.
+Luego damos los permisos con los siguientes comandos:
+chown -R root:root /var/lib/jenkins
+chown -R root:root /var/cache/jenkins
+chown -R root:root /var/log/jenkins
+Reiniciamos con comando service jenkins restart
+Actualizamos la pagina de jenkins e ingresamos ahora con usuario:admin, password:admin
+ 
+*First Job
+En consola EC2:
+Crear un archivo de prueba con comando vi hello.sh
+Dar permisos con chmod 777 hello.sh
+ingresar al archivo y escribir echo "hello jenkins!!"
+Ejecutamos el archivo con ./hello.sh, debieramos ver Hello Jenkins.
+En Jenkins:
+Jenkins-->all--->New Item. 
+En Viñeta "General" Darle un nombre; En viñeta "Build" (que es donde setearemos las etapas que queremos que el jenkins ejecute), donde sale "Execute shell"  escribimos /root/hello.sh . Damos click en save.
+Damos click en workspace y veremos q hay un error pq no hay un workspace. Esto es porque aun no corremos un build. Al hacer click en build now ya tenemos un build.
+En la pantalla del job ya podemos ver todo lo referente a este. En Configure volvemos a la pantalla donde aparecian las viñetas de General, Build, etc.
+
+*Configuring a Maven Project.
+Nota: en su instancia en AWS ya tiene de otras secciones dos proyectos ademas de hello.sh. (se llaman java-project y java-web-project).
+ Jenkins-->all-->Enter an item name (javaproject) -->Build-->Add build step-->Invoke top level Maven Targets.
+Maven Version(maven); Goals (clean install);POM (/root/java-project/pom.xml).  Save.
+Jenkins-->javaproject(nombre q le dimos)->#1->Console Output ya podemos ver el install de maven ejecutado por jenkins
+ 
+*Work with git repo
+Jenkins-->all--->New Item, Enter an item name (githubjavamavenproject).
+En viñeta Source Code Management pegar la URL del repositorio de github (como si fueramos a clonarlo)
+En viñeta build mantenemos el pom.xml ya que el proyecto en github tiene pom. Click en save. 
+Click en Build Now y luego en Console podremos ver la ejecucion de comandos git. 
+
+*Build Triggers
+En cualquier Item en la viñeta Build Triggers (q esta al mismo nivel de General y Build en la pantalla) podemos especificar cuando queremos q se haga un build de nuestro proyecto. Hay varias opciones:
+-Build whenever a SNAPSHOT: Si tenemos dependencias SNAPSHOT en nuestro POM, cada vez que se actualice alguna de estas dependencias de ejecutará un build. Esto ocurre cuando nuestro proyecto maven depende de otros proyectos maven
+-Trigger builds remotely: aca escribimos un autentication token si se requiriera.
+-Build after other projects are build: si queremos que se ejecute antes o despues de otro proyecto lo queremos setear acá. Alternativamente (o previamente???)  debemos definir projecto upstream y proyecto downstream.
+-Build periodically: es para definir intervalos de tiempo entre ejecuciones (como archivo CRON).
+-Poll SCM : muy parecido a build periodically, pero ademas cada vez que hayan cambios en el repositorio se va a hacer un build.
+
+*Configure Security
+Para crear usuario:
+Jenkins-->Manage Jenkins-->Manage Users-->Create User (llenar el formulario).
+Otra forma:
+Jenkins-->Manage Jenkins-->Configure Global Security. Ahi marcar Jenkins' own user database y Allow users to sign in. Click en save.
+Click en logout de Jenkins. Luego click en Create an account y llenar el formulario, damos click en guardar y ahora vamos a estar logueados con ese usuario.
+Para dar accesos a los distintos roles que existen:
+Jenkins-->Manage Jenkins-->Configure Global Security. Ahi vamos a ver una tabla con Anonymous Users y Autenticated Users con todas las opciones. Con boton Add user group podemos setear un nuevo tipo de rol (admin, por ejemplo). Ojo, si estamos logueados con un usuario nuevo que no sea admin (o sea lo ultimo q hicimos) no va a permitir cambiar el Configure Global Security ya q tiene q ser con usuario admin admin.
+
