@@ -1,0 +1,18 @@
+1. Instalar Mongo como contenedor docker
+
+Con docker corriendo ejecutar docker pull mongo para descargar la imagen. 
+Luego correr la imagen con docker run -p 27017:27017 --mongodb_container -d mongo.
+Luego docker exec -it imageDeMongo bash va a poder correr desde dentro del container (desde la raiz del container)
+Luego escribir mongosh para ejecutar comandos de mongo.
+show dbs; mostrar bases de datos.
+use ems; : usar una base de datos
+db.employees.find(); mostrar la tabla employees
+db.employees.deleteMany({}); borrar todos los documentos de la tabla
+
+
+
+
+ENCONTRAR DOCUMENTOS
+db.nombreColeccion.find({claveVariableQueQueremosBuscar(firstName, por ejemplo): 'valorVariableQueQueremosBuscar' ('Andres', por ejemplo},{fistName:1, lastName:1,gender:1 }).pretty(); con 1 van las variables que queremos ver (si no las ponemos va a mostrar todo el document)
+BORRAR ATRIBUTO DE UN DOCUMENTO
+db.nombreColeccion.update({_id:ObjectId("hfhf664667fn")},{$unset:{lastName:1}})   Borra atributo lastname del documento con Id hfhf664667fn. con $inc en vez de $unset podemos sumar numeros por ejemplo (si fuera un numero la variable, aunq en este caso es un string)

@@ -1,0 +1,2 @@
+What is difference between RestTemplate and HttpClient?
+HttpClient is a general-purpose library to communicate using HTTP, whereas RestTemplate is a higher-level abstraction, dealing with JSON/XML transformation of entities, etc. RestTemplate delegates to a ClientHttpRequestFactory, and one of the implementations of this interface uses Apache's HttpClient.

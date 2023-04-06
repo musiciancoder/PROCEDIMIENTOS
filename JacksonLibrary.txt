@@ -1,0 +1,5 @@
+What is Jackson?
+
+Jackson is a library that allows us to convert Java objects into JSON and vice versa. That is from JSON.
+We can convert them back to Java objects. Jersey also supports the Jax B standard where we use certain annotations from the Jax B standard on our classes,
+and Jackson will take care of the serialization into JSON and back to JSON as well. Jackson not only supports JSON, it also supports XML.

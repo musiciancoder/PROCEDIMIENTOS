@@ -1,0 +1,6 @@
+Si tenemos una clase Person (parent data) q contiene una lista de phoneNumbers (chained data) como atributo, y consultamos a la bbdd si existe esa persona por lazyload, obtendremos solo la persona, pero no la lista de telefonos. 
+Para obtener la lista de telefonos por lazyload debemos especificarlo, por lo que los fetch son a pedido. 
+Esto mejora el rendimiento. 
+
+@OneToMany(fetch.FetchType.EAGER) // chained data is loaded inmediatly when the parent is fetched.
+@ManyToMany(fetch.FetchType.LAZY) //chained data is loaded on demand when the parent is fetched.

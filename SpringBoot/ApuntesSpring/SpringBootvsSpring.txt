@@ -1,0 +1,10 @@
+Ventajas de Spring Boot 
+1)Autoconfiguracion para:
+DispatcherServlet
+Datasource: A data source will be created for orm layer.
+TransactionManager: Is created and injected automatically.
+2)Se simplifica la compatibilidad de versiones, ya que las dependencias cuyas versiones solian causar problemas en spring,
+en springboot estan compatibilizadas y contenidas en las dependencias starter (spring-boot-starter-parent, spring-bot-starter-beb, spring-boot-starter-data-jpa).
+La version de estos starters no se pone en la dependencia misma, sino que se obtiene del parent spring-boot-starter-parent que va en el mismo pom.
+3)SpringBoot tiene servidores embebidos (Tomcat, Jetty, Undertow)
+4)SpringBoot contiene Actuators (autoconfig, mapping, info, health, metrics) que permiten monitorear nuestra app en distintos ambientes.

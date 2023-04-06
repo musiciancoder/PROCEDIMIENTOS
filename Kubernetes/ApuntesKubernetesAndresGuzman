@@ -8,14 +8,14 @@ Podemos darle instrucciones a nuestro Cluster por medio de un cliente externo qu
 El cliente envía instrucciones al cluster de kubernetes, el que por medio de la apiserver que se encuentra dentro del masternode se encarga de ejecutar adecuademente estas instrucciones, ya sea crear un pod, crear un deployment, etc.
 El Scheduler, que se encuentra dentro del masternode, se encarga de ver la disponibilidad de recursos de las maquinas, asignando el recurso recien creado (pod, deployment, etc.) a la máquina mas liviana.
 En el master node hay un componente llamado cloud controller manager manda una instruccion al cloud provider api (de AWS, por ejemplo) para q cree un load balancer.
-Como clientes podemos comunicarnos con el Cluster de forma imperativa (con lineas de comandos de kubetcl en local) o bien declarativa por medio de un archivo yampl que contenga la configuracion de lo que deseamos hacer en el Cluster
+Como clientes podemos comunicarnos con el Cluster de forma imperativa (con lineas de comandos de kubetcl en local) o bien declarativa por medio de un archivo yaml que contenga la configuracion de lo que deseamos hacer en el Cluster.
 El pod es un objeto de Kubernetes. Cada pod puede contener varios contenedores, pero lo usual es que sea solo uno. En el fondo es sólo una cáscara que envuelve al contenedor.
 Los contenedores de un pod se comunican entre ellos por localhost.
-Los pod se comunican entre si por IP adress, pero dado que los pods son altamente volátiles y desechables, no es recomendable unirlos de esta forma, sino por el IP estático de otro objeto como el service.
+Los pod se comunican entre si por IP adress (TODO: ¿pero para los pods de un mismo worker node o de diferentes worker nodes? En local con minikube no interesa tanto, pero en despliegue en produccion sí) , pero dado que los pods son altamente volátiles y desechables, no es recomendable unirlos de esta forma, sino por el IP estático de otro objeto como el service.
 Los pods tb pueden tener BBDD por medio de volúmenes, pero ya q los pod son desechables, se recomienda guardar BBDD en el cluster.
 
-El objeto deployment crea y administra los pods por nosotros. Es un archivo yaml con la configuracion de memoria, volumenes, etc. para nuestros pods. Lo mas importante es que contiene el estado deseado de despliegue para administrar los pods y los crea por nosotros.
-El objeto service crea y administra una red por nosotros. Por medio del nombre o el IP de esta red se comunican los pods entre ellos.
+El archivo deployment crea y administra los pods por nosotros. Es un archivo yaml con la configuracion de memoria, volumenes, etc. para nuestros pods. Lo mas importante es que contiene el estado deseado de despliegue para administrar los pods y los crea por nosotros.
+El service crea y administra una red por nosotros. Por medio del nombre o el IP de esta red se comunican los pods entre ellos.
 
 minikube es una herramienta que permite virtualizar kubernetes, pero solo para trabajar en nuestro local.
 kubectl es una herramienta que permite simular un cliente que está ejecutando kubernetes (en local kubectl se comunica con minukube).
@@ -24,12 +24,13 @@ Nota: Los comandos están en archivo "ComandosMiniKubeYKubectl".
 Nota: Revisar los comentarios para los archivos yaml. Los comentarios están repartidos entre todos estos archivos, ya q se fue tomando nota a partir de lo que Guzman decía, por lo que se recomienda revisarlos todos
 
 Lo que él hizo en local fue:
-1.Levantó el cluster virtual con minikube.
+1. Levantó el cluster virtual con minikube.
 2. Por medio del cliente kubectl creó imperativamente un deployment con la imagen mysql8 desde docker hub. Esto indirectamente generó ademas un pod. Notar que al parecer no existe un comando para crear pods directamente, sino q se hace a través de la creacion de un deployment.
 3. En el paso anterior se dió cuenta de que no se puede agragar variables de ambiente por comandos, por lo que mejor generó un archivo yaml de deployment (ver comandos) y le agregó las variables de ambiente (clave valor para password y database). Luego ejecutó este archivo yaml para crear un deployment declarativamente. 
-4. Creó un servicio al exponer el deployment de mysql8 (ver comandos), con el fin de obtener un nombre de dominio fijo y IP fija y de esta manera poder conectar los pod de mysql8 y msvc-usuarios, este último a ser creado aun.
+4. Creó un servicio al exponer el deployment de mysql8 (ver comandos), con el fin de obtener un nombre de dominio fijo y IP fija y de esta manera poder conectar internamente los pod de mysql8 y msvc-usuarios, este último a ser creado aun.
 5. Generó un deployment para msvc-usuarios, lo que indirectamente creó un pod. Lo hizo imperativamente, ya que acá sí tenía las variables de ambiente.
-6. Expuso el deployment de msvc-usuarios, lo que indirectamente generó un servicio, pero no para comunicacion interna como en el caso anterior, sino para comunicación externa con kubectl expose deployment msvc-usuarios --port=8001 --type=LoadBalancer
+6. Expuso el deployment de msvc-usuarios (=generó un servicio), pero no para comunicacion interna como en el caso anterior, sino para comunicación externa con kubectl expose deployment msvc-usuarios --port=8001 --type=LoadBalancer
+Notar en este punto que un servicio lo podemos crear con varias opciones (ver comandos) como con Load Balancer, etc.
 7. Obtuvo la IP externa de msvc-usuarios en minikube (ver comandos) y probó en postman con esta ip y el puerto externo con GET http://ipMinikube:30507. Obtuvo un array de usuarios vacío, que debemos poblar mandando POST a http://ipMinikube:30507 con datos de usuario.
 8. Actualizó la imagen de un deployment. 
 Para ello en la clase UsuarioController, con el objetivo de generar un crash en la aplicación, agregó:
@@ -41,7 +42,7 @@ A continuación construyó la imagen docker con este cambio y subió la imagen a
 Luego en el pod verificó el nombre del container que estaba usando y vió que no era la misma que acababa de subir a dockerhub. Por ello actualizó la imagen imperativamente (ver comandos).
 Luego probó en postman con http:172.3187477474:30507/crash y vio que se le reinició la aplicacion debido al crash ya que con comando kubectl get pods aparece RESTARTS en 1 y no en 0. Ojo, en el pod en status debe aparecer como Running, no como Completed para q este levantado (se puede demorar un poco y aparecer como Completed primero).
 Finalmente se creó una nueva imagen (o sea v3) eliminando los 20 seg en linea CMD del dockerfile de msvc-usuarios y volvió a revisar los pods. 
-9. Escaló el deployment msvc-usuarios con tres replicas, con ello generamos tres instancias, o sea tres pods con carga balanceada.
+9.  Escaló el deployment msvc-usuarios con tres replicas, con ello generamos tres instancias, o sea tres pods con carga balanceada.
 10. Probó en postman con http:172.3187477474:30507/crash y con kubectl get pods vió que un pod tenía un restart de 1 , pero los otros 2 tienen restarts de 0 y status de Running, con lo q se comprueba que la carga está balanceada.
 11. Volvió a escalar el deployment, pero solo con una réplica.
 12. Generó un nuevo archivo yaml para el servicio de mysql8. (ver archivo de nombre svc-mysql.yaml) Este lo editó, ya q borró metadata como fecha de creación y otros datos. En spec solo dejó los puertos. Port es el puerto externo y targetPort es el interno del contenedor (para nuesto caso en ambos es 3306).
@@ -56,7 +57,7 @@ Estos pods son volátiles, por lo que mejor usamos la IP del servicio o el Name 
 19. Ejecutó ambos archivos anteriores(con comando apply, ver comandos). Luego de ejecutar tiene 5 pods es este punto: los tres de msvc-usuarios (creados con las replicas), uno de mysql y uno de postgress.
 20. Escribió los archivos deployment-cursos.yaml y svc-cursos.yaml y los ejecutó (con comando apply). Obtuvo el puerto externo en forma análoga a como lo hizo para msvc-usuarios, pero esta vez para cursos (comando kubectl get services)
 21. Para msvc-cursos obtvo la IP de minikube (comando minikube service msvc-cursos --url) y probó en postman con ruta GET Pminikube/puertoExterno
-22. Luego de comprobar q funcionaba, en el mismo postman asignó usuarios a los cursos con la ruta PUT IPminikube/asignar-usuario/1 (1 porq es al curso numero 1)
+22. Luego de comprobar q funcionaba, en el mismo postman asignó usuarios a los cursos con la ruta PUT IPminikube/asignar-usuario/1 (1 porq es al curso numero 1).
 
 
 
@@ -87,7 +88,7 @@ Para pv:
 CONFIGMAP Y SECRET
 
 Nota:antes q nada en deployment-usuarios bajó el numero de replicas de tres a uno.
-Configmap es una configuracion personalizada en donde todos los deployments (en este caso nuestros deployments para usuarios y cursos) estan en un mismo archivo. Para el configmap, los puertos host y database los saca de application.properties, como siempre
+Configmap es una configuracion centralizada en donde el boilerplate q se repite en todos los deployments (en este caso nuestros deployments para usuarios y cursos) estan en un mismo archivo. Para el configmap, los puertos host y database los saca de application.properties, como siempre
 En los cuatro archivos yaml de deployments, debe hacerse referencia a las variables que seteamos en el configMap con valueFrom: y configMapKeyRef: (no lo puse en los archivos, pero se pueden ver al descargar los archivos del curso).
 El archivo secret.yaml permite codificar en base 64 la informacion sensible, como username (root) y password (sasa). En los archivos de deployment debe hacerse referencia al secret.yaml por medio de valueFrom: secretKeyRef:
 1. Escribió el configMap.
@@ -172,7 +173,7 @@ Tambien podriamos contratar un VPS en cualquier proveedor de VPS (incluso en ama
 Hacer click en "crear cluster". Entonces va a aparecer la pantalla de "configurar cluster" (ver pantallazos). Dar nombre, version y seleccionar rol.
 Si no se tiene un rol creado previamente, hacer click en "Guia usuario de Amazon".
 Despues va a pedir "especificar redes", pero nosotros estamos creando una red para comunicacion interna entre los pods y externa desde internet, por lo que debemos crear una pila, que es lo que nos proveerá de un conjunto de recursos de red para la VPC, como la red, subredes o subnet, internet gateway, natgateway, grupos de seguridad, etc.
-Para ello escribir cloudformation en el buscador de aws y llegar con los pantallazos hasta "crear pila". En la pantalla de crrear pila va a pedir la URL de amazon s3, que la obtenemos de la documentacion (pantallazos).
+Para ello escribir cloudformation en el buscador de aws y llegar con los pantallazos hasta "crear pila". En la pantalla de crear pila va a pedir la URL de amazon s3, que la obtenemos de la documentacion (pantallazos).
 Luego en pantalla de especificar detalles de la pila damos un nombre y dejamos todo lo demas por defecto y creamos la pila.
 Nos vamos a CloudFormation-->Pilas y revisamos q la pila se haya terminado de crear (tarda un poco). Esto nos proveerá de un VPC (virtual private cloud) que es una red virtual aislada, con subnet privada para comunicacion interna entre nuestros pods y publica para comunicación con internet.
 Luego vuelve a "especificar redes" y selecciona la pila recien creada. Cons la sola excepcion de donde dice "acceso al punto de enlace del cluster" que se debe dejar en publico y privado, todo lo demas es por defecto y creamos el cluster (se demora un buen rato).

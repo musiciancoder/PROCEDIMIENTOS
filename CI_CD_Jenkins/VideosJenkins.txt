@@ -71,3 +71,155 @@ Click en logout de Jenkins. Luego click en Create an account y llenar el formula
 Para dar accesos a los distintos roles que existen:
 Jenkins-->Manage Jenkins-->Configure Global Security. Ahi vamos a ver una tabla con Anonymous Users y Autenticated Users con todas las opciones. Con boton Add user group podemos setear un nuevo tipo de rol (admin, por ejemplo). Ojo, si estamos logueados con un usuario nuevo que no sea admin (o sea lo ultimo q hicimos) no va a permitir cambiar el Configure Global Security ya q tiene q ser con usuario admin admin.
 
+*Tomcat installation
+Creó una nueva instancia en AWS (de tipo Amazon Linux 2 AMI para q tenga java ya instalado) y le instaló tomcat con comando yum install tomcat.
+Con el siguiente comando agreagamos apps de prueba en tomcat: yum install tomcat-webapps tomcat-admin-webapps. 
+Editó el grupo de seguridad asociado a la instancia con reglas de entrada 8080 y conexion desde cualquier parte.
+Luego con el dns de laminstancia y el puerto 8080 en el navegador ya le mostró la pagina del tomcat.  
+
+*Configure Users
+Abrir el archivo de usuarios con comando: vi /usr/share/tomcat/conf/tomcat-users.xml. 
+Descomentar todas las lineas correspondientes a los roles (borramos caracter a caracter con tecla ESC). Editar las credenciales de admin con admin admin tambien. Guardamos y cerramos.
+Reiniciamos Tomcat con comando service tomcat restart. Vamos al navegador donde estabamos trabajando con tomcat, lo actualizamos, hacemos click en el boton Manager App y va a pedir credenciales. Le damos admin admin y entramos a la pagina de tomcat donde tenemos las aplicaciones.
+
+*Intalar deploy plugin.
+Este plugin se usa para ver el post build.
+Jenkins-->Manage Jenkins-->Manage Pluggins. Ir a viñeta "available" y ahi va a haber un buscador. Escribimos deploy to container, lo encuentra y abajito marcar el checkbox Artifact Uploaders y hacer click en boton Install without restart.
+
+*Continuous Integration in action
+Jenkins-->all--->New Item, Enter an item name (javawebautodeploy).
+En viñeta Source Code Management pegar la URL del repositorio de github (como si fueramos a clonarlo), con credenciales de github si tuvieramos.
+En viñeta build seleccionó Maven Version (maven) y Goals (clean package). En add postbuild action seleccionar deploy ear/war to container. En viñeta Post Build Actions llenar el formulario (minuto 2:54). En el formulrio va a pedir containers. Le damos
+la version de tomcat que instalamos en nuestra instancia con las credenciales de nuestro usuario de tomcat de pasos anteriores. En tomcat URL anotamos el socket de tomcat.
+Click en build now y luego nos vamos a la consola de Tomcat a ver como esta siendo desplegado el proyecto en Tomcat.
+En el navegador en tomcat ya debieramos ver nuestra app.
+
+*Webhooks intro
+Hasta el momento solo hemos hecho integracion continua manualmente, es decir subiendo nosotros un repositorio de git.
+Con webhooks (Estan en los settings de cada repositorio de github) podemos automatizar esto para q cada vez que haya un commit en github jenkins lo reconozca automaticamente.
+
+*Github webhooks in action
+Ir a settings-->webhooks (trabajo con proyecto java-project de secciones anteriores) y apretar boton Add webhook y se va a abrir un formulario.
+En el formulario en Payload URL copiar el socket de jenkins y pegarlo acá. En content type va application/x-www-urlencoded. El secret lo dejamos en blanco (es para mandar un valor como bandera a Jenkins pa q sepamos en cual commit vamos). Seleccionamos "Just the push event" y "Active". Click en add webhook.
+En Jenkins en viñeta Build Triggers setear Github hook trigger gor GITScm polling.
+Luego hacer un push en github, volver a Jenkins y en Build History ya deberiamos ver un pending con un #numero. Vamos a la consola de jenkins y vemos el despliegue.
+
+*Master and agent.
+La idea es dejar una instancia como maestro y otra como agente, para que cuando haya algun cambio en el master automaticamente el agente lo reciba.
+
+*Step 1: Generate the keys on master.
+Generar llava publica y privada mediante ssh (ver video, me dio lata)
+La llave privada la usaremos en Jenkins al configurar el agente y la publica es para cuando configuremos el node
+
+*Launch the agent instance
+Crear una nueva instancia (llamada jenkinsagent) en AWS mediante EC2.
+Una vez en la consola de EC2 en la nueva instancia escribir comando ls ~/.ssh/ y entonces mostrará authorized_keys que es donde van las llaves publicas.
+Escribir vi ~/.ssh/authorized_keys para abrir el archivo de llaves publicas. Al abrir el archivo ya va a haber una, no la tocamos, saltamos una linea y escribimos la llave publica de la primera instancia (o sea la del master).
+Luego comandos sudo -i y despues yum install java (jenkins necesita java instalado).
+ 
+*Create a node using the agente
+En este momento solo hay un nodo, debemos crear el segundo.
+Jenkins-->Manage Jenkins-->Manage Jenkins-->Manage Nodes-->New Node. En el formulario llenar Node name (nod1) y click en ok.
+En la siguiente pantalla q tambien es un formulario llenar Remote root directory (/home/ec2-user) q es donde se van a ir guardando el workspace; Usage (use this node as much as possible); Launch method (Launch agents via SSH); Host (copiar y pegar el ip publico del agente desde la pantalla de aws (ojo, acordars eq si no tenemos dns cambia y va a fallar el jenkins la segunda vez si es que reiniciamos nuestra instancia))
+credentials -->add y se va a abrir otro formulario. Lo llenamos (Kind (SSH Username with private key; Username(ec2-user); Private key (Enter directly y pegamos la llave privada)); Al volver al otro formulario debemos confirmar el usuario ec2-user en Credentials.
+En primer formulario: Host Key Verification Strategy (Manually trusted key...), lo demas lo dejamos por defecto y click en save.
+Entonces en la siguiente pantalla ya deberiamos ver master y node1 (agente). En la consola del agente podemos ver que se esta creando (toma un tiempo).
+
+*Agent 007 in action
+Jenkins-->all--->New Item, Enter an item name (agenttest).
+En viñeta build, en cuadro de texto command escribir sleep 30s y click en save.
+Luego ir al otro job (llamado firstjob) y tambien setear el sleep 30s.
+En el dashboard donde estan nuestros jobs, les damos click en build now a los dos jobs (debemos hacer click en las pelotitas para que salga la opcion build now).
+
+PIPELINES
+
+*Introduction
+Vamos a crear pipelines por medio de archivos pipeline (no pasó el archivo ni se pueden sacar pantallazos, pero esta en minuto 2:50) que contienen diferentes agents (maquinas) y stages (etapas de ejecucion en Jenkins).
+Una vez en ejecucion el pipeline se puede ver en Stage View (indio no lo dijo, pero de mi cosecha te digo q se puede ver mejor en blue ocean).
+De stackoverflow: Jenkins Job and Jenkins Pipeline are basically the same. In a pipeline you define the steps of your job as groovy code (actually it is CPS https://github.com/jenkinsci/workflow-cps-plugin, but that should in general just be a custom groovy interpreter).
+
+*First Pipeline
+Jenkins-->all--->New Item, Enter an item name (firstpipeline), seleccionar la opción "pipeline" y click en ok.
+En la viñeta Pipeline llenamos el formulario con Definition (Pipeline script); Script(Hello World), al seleccionar esto automaticamente en el cuadro de texto va a salir un codigo de groovy con el pipeline los agents y stages. Notamos q los stages a su vex pueden tener multiples steps, en este caso el stage ''Hello' contiene un solo step (echo 'Hello World'). El checkbox use groovy.. debe estar activado en esta viñeta.
+Click en save y build now. En Build History vemos q se ejecuta y en Stage View tb.
+
+* Multi Stage Pipeline
+Jenkins-->all--->New Item, Enter an item name (multistagepipeline), seleccionar la opción "pipeline" y click en ok.
+En la viñeta Pipeline llenamos el formulario con Definition (Pipeline script); Script(try sample Pipeline);
+En cuadro de texto Script escribimos:
+pipeline{
+   agent any
+   stages{
+     stage("Checkout"){
+	   steps{
+	     echo 'checking out'
+		 }
+	 }
+	      stage("Build"){
+	   steps{
+	     echo 'building'
+		 }
+	 }
+	      stage("Test"){
+	   steps{
+	     echo 'testing'
+		 }
+	 }
+	      stage("Deploy"){
+	   steps{
+	     echo 'deploying'
+		 }
+	 }
+	}
+Click en Save y luego en Build Now. Ya debieramos ver el pipeline multietapas ejecutandose.
+	  
+*Reading environment variables
+Copiar el url de Jenkins (dns:8080), abrir otro navegador, pegar la url y agregar el endpoint /env-vars.html/  Entonces debieramos ver las variables de entorno disponibles.
+Editamos el pipeline escrito en la leccion anterior (click en configure e ir a viñeta pipeline), agregando debajo de la linea echo 'checking out' la linea echo "Running ${env.BUILD_NUMBER} on {env.JENKINS_URL}" (ta bn q sea comilla doble y simple en la linea anterior).
+Click en Save y Build Now y ya cuando esté corriendo hacer click en el primer cuadrado verde claro donde salen los milisegundos q lleva corriendo. Con ello podremos ver los logs y verificar el mensaje "Running 2 on url de jenkins".
+
+*Pass parameters to the pipeline
+Editamos el pipeline multistagepipeline (click en configure e ir a viñeta General). Marcamos el checkbox This project is parameterized y click en Add Parameter.
+Seleccionar Boolean Parameter.
+Se abrirá un formulario y lo llenamos con Name (skiptests); Default value (si lo marcamos el boolean por defecto es true).
+Luego en viñeta Pipeline editamos el codigo agregando la linea echo "${skiptests}" debajo la linea echo 'testing'.
+Click en save, y ahora aparece Build with parameters en vez de build now. Click en Build with Parameters y deseleccionamos el checkbox skiptests. 
+Click en boton Build y chequeamos los logs de la forma explicada en clase anterior.
+
+*Requesting user input.
+Esto es para ejecutar una especie de escanner con el usuario final
+Editamos el pipeline escrito en la leccion anterior (click en configure e ir a viñeta pipeline). Agregamos otro stage entre los stages Test y Deploy:
+stage("Approve Deployment"){
+	   steps{
+	     input "Have all the tests passed?"
+		 }
+	 }
+Click en save, y en Build with parameters. Notar q cuando acaba la etapa build en el pipeline nos pregunta Have all the tests passed? junto con botones abort y proceed
+
+*Create a Java Project Pipeline
+Jenkins-->all--->New Item, Enter an item name (javaprojectpipeline), seleccionar la opción "pipeline" y click en ok.
+En viñeta Build Triggers seleccionar GitHub hooñ trigger....
+En viñeta pipeline en el formulario seleccionar Definition (Pipeline script) y en cuadro texto Script escribir el pipeline (este código en realidad va en github, mas abajo lo explica, ocupó el cuadro de texto de Jenkins simplemente para darle formato al código):
+pipeline{
+   agent any
+   stages{
+     stage("Build"){
+	   steps{
+	     sh 'mvn -DskipTests clean package'
+		 }
+	 }
+	      stage("Test"){
+	   steps{
+	     sh 'mvn'
+		 }
+	 }
+  }
+  }
+  Luego en el mismo formulario cambiar la Definition a Pipeline script from SCM. Cambiará entonces el formulario. SCM (Git); Repository URL (pegamos el del proyecto en github).
+  En github al nivel del pom creamos un archivo llamado Jenkinsfile con el mismo código groovy del pipeline que sale mas arriba en esta clase. y le damos un commit.
+  Volver al formulario de Jenkins y en Script Path escribimos Jenkinsfile, para q nos tome el archivo Groovy q escribimos en github
+Click en Save.
+
+*Test Pipeline
+Click en Build Now. Las etapas q deberiamos ver ejecutándose son Declarative Checkout SCM, Build, Test.
+Luego comitear algo en github y al hacerlo debieramos ver una segunda ejecucion en Jenkins (Se recomienda siempre correr la primera vez el pipeline manualmente con build now).

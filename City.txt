@@ -1,0 +1,6 @@
+JBoss
+Websphere (parecido a weblogic)
+ActiveMQ
+Team City-->Puerto 8111
+Urban Code Deploy -->Version (instalacion en servidor segun ambiente)
+Arnaldo-->aa12329

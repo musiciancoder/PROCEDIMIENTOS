@@ -1,0 +1,3 @@
+@EventListener  //esta anotacion permite procesar automaticamente los eventos recibidos por url en el controlador
+Se usa en Event Driven Programming
+Ver proyecto llamado "events" en curso de arquitectura.

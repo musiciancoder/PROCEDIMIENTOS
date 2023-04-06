@@ -1,0 +1,2 @@
+Entidad es una clase que siempre representa los mismos atributos que los nombres de columnas de una tabla en nuestra base de datos.
+Un modelo representa un objeto que no necesariamente esta en la bbdd. Frecuentemente es un elemento físido medible como clase Persona, por ejemplo.

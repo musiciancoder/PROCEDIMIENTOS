@@ -1,0 +1,9 @@
+Chef, Puppet and TerraForm for Infrastructure Management??
+
+Continous integration: run integration tests authomatically every time a new commit is pushed, and it stops right there.
+Continuous delivery: extends continous integration and runs production like tests (acceptance tests) in a stage environment (ambiente de prueba) automatically. The last step (deployment) can be made manually, and it is not automated
+Continous deployment: No more manual steps, everything is projected automatically into deployment throughout automated Commit/Build/Test/Stage(environments)/Deploy
+
+
+DevOps is an agile development practice and mindset that uses agile principles (collaboration, communication, utilizing the right tools) to streamline software building, testing, and release.
+CI/CD is a DevOps tactic, which makes use of the right automated testing tools to implement agile development.

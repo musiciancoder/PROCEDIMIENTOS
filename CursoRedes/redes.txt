@@ -99,7 +99,7 @@ Hola master, ya estoy finalizando este curso, pero he vuelto a este video porque
 
 ORIGEN:
 En términos simples es la url del cliente.
-Para desarrollos en local, la definicion de origen es protocolo+ip+puerto, con ip pudiendo ser localhost (q es lo mismo q escribir la ip de nuestro computador, o sea 172.algo...) o una ip de otra máquina en la que esté corriendo una api, por ejemplo.
+Para desarrollos en local, la definicion de origen es protocolo+ip+puerto, con ip pudiendo ser localhost (q es lo mismo q escribir la ip de nuestro computador (ip privada), o sea 172.algo...) o una ip de otra máquina en la que esté corriendo una api, por ejemplo.
 Por ejemplo: http://localhost:9000 vs. http://localhost:8080 son origenes distintos
 
 Para desarrollos en producción, la definicion de origen es protocolo+subdominio(opcional, pero si estuviera presente debe ser el mismo)+dominio secundario+top-leveldomain+puerto(opcional, pero si estuviera presente debe ser el mismo)+path(opcional, pero si estuviera presente debe ser el mismo)

@@ -1,0 +1,5 @@
+Both these annotations are used to mark the controller classes , the controller annotation is used to mark a class that is a part of a typical Web application.
+And the methods in this class are expected to return back a view which could be a JSP, a timely template, etc. that should go back to a Web browser, whereas the rest controller is used to mark the restful
+end point are the rest controllers, which expose out restful APIs, the rest controller annotation is a combination of the controller annotation, plus the response body annotation.
+It is internally marked with the response body annotation. And unlike the Web application controller classes, the rest controller class methods will return backa domain object, not a view, but a domain object.
+And thanks to this response body, it will take care of converting these domain objects into JSON or other formats required by the restful client applications.

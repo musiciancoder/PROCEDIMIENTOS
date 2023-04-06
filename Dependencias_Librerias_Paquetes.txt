@@ -1,9 +1,12 @@
 
 Existen dos tipos de librerias externas (las librerias son siempre externas, nunca "internas") en un proyecto:
-1.Las generadas por el JRE (En intellij en External Libraries -->1.8, en eclipse JRE System Library).
+1.Las generadas por el JRE (En intellij en External Libraries -->1.8 o 17 o la version de java q tengamos, en eclipse JRE System Library).
 2.Las generadas por las dependencias del pom de maven (En intellij en External Libraries -->Maven, en Eclipse en Maven Dependencies).
 Una librería es un archivo .jar. Una dependencia de maven puede tener una o mas librerías (o archivos .jar).
 Estos archivos .jar (=librerias) poseen dentro de ellos varios paquetes, que son facilmente visualizables en Eclipse (paquete café), pero en Intellij estos paquetes
 se visualizan como carpetas. Por ejemplo: junit y org.junit son paquetes de la libreria junit:junit:4.11, generada por la dependencia en el pom con groupId:junit,artifactId:junit, version:4.11.
-A nuestras clases podemos importar todos estos paquetes con el nombreDelPaquete.*; o bien nombreDelPaquete.clase; Las clases disponibles de cada paquete se pueden ver facilmente en cada paquete.
+A nuestras clases podemos importar todos estos paquetes con el nombreDelPaquete.*; o bien nombreDelPaquete.Clase; Las clases disponibles de cada paquete se pueden ver facilmente en cada paquete y van siempre con mayuscula.
+En intelliJ en la ventana de Maven podemos ver a qué librería declarada (las librerías declaradas son las que estan escritas explicitamente en pom) corresponde cada librería transitiva (librerías transitivas son las que no estan escritas explicitamente en pom y dependen implicitamente de una libreria declarada). Notar que los proyectos
+usan frecuentemente librerias generadas por el JRE que NO las veremos en nuestras dependencias en la ventana de maven.
 Al posicionar el mouse sobre un import podemos ver a qué librería pertenece.
+¿Como saber a qué librería pertenece un paquete que tenemos en nuestros import?-->Marcar con el mouse solo el paquete q queremos buscar (solo paquete, no clase). Una vez seleccionado el paquete con ctrl + b podemos ver el paquete, que puede haber sido generado por el JRE (en cuyo caso NO lo veremos en nuestras dependencias en la ventana de maven) o bien por nuestro pom de maven (en cuyo casi SÍ las veremos en nuestras dependencias en la ventana de maven).

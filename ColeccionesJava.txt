@@ -1,14 +1,28 @@
 INTERFAZ LIST (permiten registros duplicados)
 *ArrayList: eficiente leyendo, no tanto agregando o eliminando elementos
-*LinkedList: agregando o eliminando elementos, no tanto leyendo
+*LinkedList: agregando o eliminando elementos (no tanto leyendo) ya que contiene prev() y next() pointers.
+*Vector: last-in-first-out. Sincronizado siempre (thread safe). 
 
-INTERFAZ SET (no permiten registros duplicados, poca eficiencia al ordenar)
+INTERFAZ SET (no permiten registros duplicados, poca eficiencia al ordenar (excepto TreeSet))
 *HashSet: igual a ArrayList
 *LinkedHashSet: igual a Linkedlist
+*TreeSet: muy util para ordenar la data
 
 INTERFAZ MAP (asociacion tipo clave valor, no permite claves duplicadas por lo que si queremos guardar en un Map una clase que hemos creado nosotros debemos siempre
 sobreescribir metodos equals y hashcode)
-*HashMap
-*HashLinkedMap
+*HashMap: No mantiene el orden en que agregamos las clave-valor
+*LinkedHashMap: Sí mantiene el orden en que agregamos las clave-valor
 
-*INTERFAZ QUEUE (rapido al acceder al primer o ultimo valor, lento para acceder a valores intermedios)
+INTERFAZ QUEUE (rapido al acceder al primer o ultimo valor, lento para acceder a valores intermedios). FirstIn-FirstOut
+*Priority Queue
+*BlockingQueue-->allows implementing provider/consumer pattern easily.
+
+CONCURRENT COLLECTIONS
+Lets suppose we are running threads on objects belonging to non-concurrent collections such as ArrayList, Hashset, HashMap.
+When the first thread gets a lock on one of these objects, no other thread will be able to access the entire object unless the lock is released.
+Also, these collection classes implement fail fast iterators. That is when we use one of the iterators written by these classes to iterate through the elements and also parallel try to modify them, that collection will get a concurrent modification exception.
+With concurrent collections such as CopyOnWriteArrayList, CopyOnWriteArraySet we allow multiple threads to access the same collection and modify it at the same time by creating a copy of that collection. Also, these collection classes implement fail safe iterators.
+
+
+
+

@@ -63,7 +63,7 @@ con git diff nombredearchivo muestra los cambios en el archivo (esto debe hacerc
 Una vez hecho esto si escribimos git status va a salir "On branch Manager", nothing to commit working directory clean
 
 git log   (para ver el commit en la rama master)
-git log --oneline para ver el c�digo del commit
+git log --oneline para ver el c digo del commit
 
 $ git commit -am "Algun comentario de la modificacion" (esto es para guardar directamente algun cambio en el archivo en la rama principal sin tener que hacer git add.
 
@@ -78,7 +78,7 @@ git reset --hard claveDeCommitAEliminar elimina ese commit (no se vuelve al esta
 
 
 ---------------------------abrir un commit anterior--------------------------
-cerrar el archivo, cerrar el servidor y escribir escribir git checkout codigoCommit (en este caso fb0a834), entonce se cambiar� el HEAD al que nos interesa y al abrir el archivo en la ventana de windows aparecera con los cambios.
+cerrar el archivo, cerrar el servidor y escribir escribir git checkout codigoCommit (en este caso fb0a834), entonce se cambiar  el HEAD al que nos interesa y al abrir el archivo en la ventana de windows aparecera con los cambios.
 
 Luego de lo anterior, 
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
@@ -87,7 +87,7 @@ $ git branch rama20 fb0a834
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
 $ git status
 HEAD desacoplada en fb0a834
-nada para hacer commit, el �rbol de trabajo est� limpio
+nada para hacer commit, el  rbol de trabajo est  limpio
 
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
 $ git checkout rama20
@@ -96,7 +96,7 @@ Cambiado a rama 'rama20'
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
 $ git status
 En la rama rama20
-nada para hacer commit, el �rbol de trabajo est� limpio
+nada para hacer commit, el  rbol de trabajo est  limpio
 
 Andres@LAPTOP-0JOL34HF /www/curso-mean2/client
 $ git log --oneline
@@ -110,7 +110,7 @@ PARA SUBIR LA RAMA Q HEMOS CREADO EN LOCAL A REMOTO: git push -u origin rama20
 
 
  
-git reset HEAD~1 vuelve atras el ultimo commit, git reset HEAD~2 vuelve atras el penultimo commit, etc. Al darle git status aparecera en rojo, es decir en el estado anterior a add. Los archivos se podr�n volver atras en el editor (pregunta si o no en el mismo editor)
+git reset HEAD~1 vuelve atras el ultimo commit, git reset HEAD~2 vuelve atras el penultimo commit, etc. Al darle git status aparecera en rojo, es decir en el estado anterior a add. Los archivos se podr n volver atras en el editor (pregunta si o no en el mismo editor)
 
 ---------------------Buscar commit-------------
 $ git log --grep=palabraencomentario : busca segun el titulo/comentario
@@ -142,9 +142,9 @@ git init (aca se inicia en local el archivo.git)
 git add README.md
 git commit -m "first commit"
 git remote add origin https://github.com/musiciancoder/nombrerepositorio.git
-git push -u origin master
+git push -u origin master git pull origin branchname --allow-unrelated-histories
 
-luego intentar un cambio peque�o y guardarlo en local con git add* , luego git commit -m"primer cambio"
+luego intentar un cambio peque o y guardarlo en local con git add* , luego git commit -m"primer cambio"
 
 Finalmente guardar este cambio en remoto: con git push origin master
 
@@ -176,7 +176,8 @@ Clonar rama git clone --branch nombreRama urlProyecto
 
 Actualizar proyecto desde rama remota
 git pull origin nombreRamaRemota hace mergin automatico
-git fetch origin nombreRamaRemota hace mergin manual
+git fetch origin nombreRamaRemota -->hace mergin manual
+git pull origin branchname --allow-unrelated-histories:primer pull
 
 
 Alguien creo otra rama y yo quiero meter esa rama en una rama local y poder verla
@@ -189,14 +190,45 @@ se realiza con git fetch origin nombreRama y luego git status. git fetch NUNCA m
 para ver qué archivos serían modificamos si hicieramos un pull: git fetch && git diff HEAD @{u} --name-only, luego abrir nuestro archivo y los archivos en github y compararlos en un notepad o algo asi.
 para ver donde vamos con respecto al remoto (y ver un panorama claro del remoto) --> git log origin/nombreRama ^nombreRama
 
-Comparar dos ramas
-git branch rama2
+ELIMINAR COMMITS
+git reset idCommit -->elimina forever los commits que estan despues de idCommit 
+git revert idCommit -->NO elimina los commits que estan despues de idCommit, sino que crea un nuevo commit igual a idCommit pero con otro idCommit (con otro id) y la cabeza se queda en él. Es mucho mas preferido y mas seguro. 
+
+
+VER DIFERENCIAS
+
+Nota:Fijarse en los colores, no en los signos menos ni mas. Lo siguiente es suponiendo que estamos trabajando en nuestra rama.
+
+git diff --> Ver diferencias en local (antes de hacer el stage, despues de hacer el stage este comando no funciona) entre el head y lo último guardado.  
+
+Ver diferencias entre dos commits de una misma rama en local:
+git log -->ver idCommit
+git diff idCommitMasViejo idCommitMasNuevo -->Va a mostrar en verde lo que esta en commit mas nuevo pero no en el mas viejo y en rojo lo que esta esta en commit mas viejo pero no en el mas nuevo.
+
+Ver diferencias antes de hacer un push a github:
+git diff --stat --cached origin/nombreRama-->solo menciona el archivo
+git diff origin/main-->muestra las diferencias. En verde lo q tenemos en local y no en remoto.
+git cherry -v-->list of commits waiting to be pushed
+
+Ver diferencias antes de hacer un pull desde github:
+git fetch y despues git log --name-status origin/nombreRama-->va a mostrar los logs de donde voy yo (el HEAD) en verde y donde va la rama remota en rojo
+git fetch && git diff ramaLocal origin/ramaRemota-->Va a mostrar las diferencias. En verde lo que esta en remoto y yo no tengo en local. En rojo lo que yo tengo en local y no esta en remoto.
+
+Resolucion de conflictos.
+Si al hacer un pull tenemos conflictos, debemos ir al al/los archivos y modificarlos por lo general dejando el commitId remoto en el archivo y eliminando HEAD en el mismo archivo. Luego hacemos un commit en local e intentamos hacer el pull nuevamente.  
 
 
 
+VER RAMAS
+git fetch --all--> actualizar el remoto. Este es el primer paso para ver si ha habido cambios en otras ramas diferentes de las que hemos venido trabajando.
+git branch -v -a-->muestra en verde nuestras ramas locales y en rojo las ramas remotas que aun no tenemos en nuestro local
+traer rama remota a rama local-->git checkout -b local_branch_name origin/remote_branch_name (NO hay que crear rama local primero!!)
+git diff otraRama --> compara la rama en la que estamos parado con otraRama
 
 
-
+MODO DE TRABAJO:
+Siempre siempre todos los dias antes de empezar a trabajar checkear si hay cambios en la rama master o en la main (suponiendo que comenzamos a trabajar en nuestro desarrollo a partir de ellas). con git fetch && git checkout -b master origin/master (pararnos en la master/main al ejecutar este comando en local).
+Si hay cambios hacer inmediatamente un pull a nuestro main/remote local, luego comparar main/remote con la rama q estemos trabajando (comando git diff otraRama), ver si afecta nuestro desarrollo y si no hacer merge (mucho ojo con el merge, se recomienda respaldar el archivo antes de darle un merge, porque en las pruebas que hice me eliminó lo que sale en verde, o sea lo q teniamos inicialmente en nuestra rama de trabajo antes del merge )
 
 
 

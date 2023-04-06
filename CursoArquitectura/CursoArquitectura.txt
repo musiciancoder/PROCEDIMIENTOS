@@ -2,7 +2,7 @@
 
 *Clean (from now on CA) & Hexagonal Architecture (from now on HA): Isolated domain logic/layer from outside dependencies and runtime tools.
 *HA is also known as "Ports and adapters"
-*CA (Robert Martion 2012) involves HA + Onion Architecture + detailed definition on the domain layer. Despite of this differenciation, sometimes CA is referred to as HA and viceversa.  
+*CA (Robert Martin 2012) involves HA + Onion Architecture + detailed definition on the domain layer. Despite of this differenciation, sometimes CA is referred to as HA and viceversa.  
 
 We will create a food app with 4 microservices which are going to comunicate between them using message pass which will be kafka (Ver figura section-1).
 1.Estos microservicios en conjunto estaran diseñados siguiendo HA (de nuevo, ver figura), es decir la capa de dominio estará aislada de infraestructuras y dependencias externas. Esto se logra separando el microservicio en unidades desplegables por separado (Business logic, API, Messagging, Data Access  q en el caso de Order Service componen en conjunto la capa/logica de dominio, por ejemplo), por lo que se tendrán módulos (del curso o de código??) separados para cada uno de estos componentes.

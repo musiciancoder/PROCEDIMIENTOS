@@ -8,6 +8,8 @@ It belongs to JEE.
 ORM
 Object Relational Model
 Is any kind of library (not only java) that binds an object to a database model.
+Comes with:1)Specifications for providers and APIs for us developers. Since JPA is a kind of ORM it therefore contains Specifications for Hibernate, OpenJPA, EclipseLink, etc. and JPA API (EntitiManager, EntityManagerFactory for 
+instance, which are actually no longer needed in Spring Data JPA). 
 
 
 JPA
@@ -34,8 +36,8 @@ HIBERNATE vs JPA
 There is no point to this comparison since hibernate implements JPA and therefore it does not have more features than JPA. JPA cannot do without an implementator.
 
 SPRING DATA JPA
-Is a Spring module that belongs to Spring Data which allows us to simplify data persistance by using the repository concept, which is basically very similar to DAO design pattern)
-It adds an abstraction layer to the JPA.
+Is a Spring module that belongs to Spring Data which allows us to simplify data persistance by using the repository concept, which is basically very similar to DAO design pattern.
+It adds an abstraction layer to the JPA. Before Spring Data JPA, we had to write boiler plate code (EntityManager, EntityManagerFactory) to persist data into our database; with Respository, JPARespository interfaces this is no longer needed.
 
 SPRING DATA JPA vs HIBERNATE
 Hibernate implements JPA, which makes it a provider)

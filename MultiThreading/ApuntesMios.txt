@@ -1,10 +1,10 @@
 *Cuando se inicializa un programa, el SO genera un un PROCESO (tambien llamado contexto) que es una instancia del programa.
-*Los hilos son porciones de código que al ejecutarse realizan alguna funcion del programa. Cada proceso a su vez puede o no tener uno o varios hilos en ejecución.
+*Los hilos son porciones de código que al ejecutarse realizan alguna funcionalidad del programa. Cada proceso a su vez puede o no tener uno o varios hilos en ejecución.
 *Los hilos de un mismo proceso siempre comparten memoria heap; cada hilo en cambio tiene siempre su propia y exclusiva memoria stack y su propio y exclusivo pointer.
-*Dos o mas hilos corriendo en un solo nucleo pueden 'simular' multithreading; Dos hilos corriendo en dos nucleos en forma separada pueden en cambio ejecutar un 'real' multithreading
-*Cada vez que se inicializa la ejecucion de un segundo hilo la CPU  debe detener antes la ejecucion del primera hilo (este primer hilo vuelve a correr milesimas de segundo despues que el segundo hilo ya esta en ejecucion). Este es el principal precio a pagar debido a la concurrencia y es conocido como Context Switch.
+*Dos o mas hilos corriendo en un solo nucleo pueden 'simular' multithreading; Dos hilos corriendo en dos nucleos (multicore, multiprocesador) en forma separada pueden en cambio ejecutar un 'real' multithreading
+*Cada vez que se inicializa la ejecucion de un segundo hilo la CPU debe detener antes la ejecucion del primera hilo (este primer hilo vuelve a correr milesimas de segundo despues que el segundo hilo ya esta en ejecucion). Este es el principal precio a pagar debido a la concurrencia y es conocido como Context Switch.
 *Un context switch de dos hilos de un mismo proceso es menos costoso que un context switch de dos hilos pertenecientes a dos procesos distintos.
-*Solo si dos tareas de un proceso tienen mucha data en comun o si la seguridad es una prioridad, se aconseja ocupar programacion concurrente.
+*Solo si dos tareas (tareas segun stackoverflow es un grupo de instrucciones que serán cargadas en memoria, o sea segun yo un pedazo de codigo que al ejecutarse realiza algo) de un proceso tienen mucha data en comun o si la seguridad es una prioridad, se aconseja ocupar programacion concurrente.
 *The SO maintains a dynamic priority for each thread to prioritize interactive threads and to avoid starvation for any particular thread in the sistem. La elección de de hilos por parte del SO no es aleatoria!!
 *Podemos crear threads de dos formas: 
 1. Implementando la interfaz runnable sobrescribiendo el método run. Esto se aconseja cuando queremos hacer pruebas simples, ya que los threads los podemos crear en el mismo metodo main con operador new Thread (new Runnable {
@@ -15,10 +15,11 @@
 2. Creando una o mas clases que extiendan de la clase Thread. En el metodo main creamos una lista de instancias de estas clases y las hacemos correr. Este approach es mas recomendado para aplicaciones reales.
 
 *Interrumpir la ejecución de un Thread.
-Razones para interrumpir un thread ya que esta consumiendo memoria y recursos de CPU innecesariamente: 
+Razones para interrumpir un thread para que no consuma memoria y recursos de CPU innecesariamente: 
 - El thread ya ha terminado, sin embargo la aplicacion sigue corriendo. Se debe limpiar los recursos que ha ocupado este thread.
 - El thread no responde porque algun calculo de la tarea demora demasiado, por ejemplo, o bien esta requiriendo recursos a un servidor que no responde.
-Para interrumpir un thread, se debe enviar una señal desde otro hilo (normalmente el hilo principal) con thread.interrupt() y en el hilo mismo en la parte donde vemos que hay problema debemos escribir currentThread().isInterrupted(); Otra forma es hacerlo con dameon con thread.setDaemon(true) le decimos que termine el programa cuando se termine de ejecutar el hilo principal. La segunda forma es usualmente mas infalible; 
+Para interrumpir un thread, se debe enviar una señal desde otro hilo (normalmente el hilo principal) con thread.interrupt() y en el hilo mismo en la parte donde vemos que hay problema debemos escribir currentThread().isInterrupted().
+Otra forma es hacerlo con dameon con thread.setDaemon(true) le decimos que termine el programa cuando se termine de ejecutar el hilo principal. La segunda forma es usualmente mas infalible; 
 
 *Detener la ejecución de un thread para esperar a los demas hilos
 Si el valor de una variable o condición en un hilo depende de la ejecucion de un segundo hilo puede ser recomendable esperar el primer hilo hasta que el segundo hilo termine su ejecucion.
@@ -48,7 +49,7 @@ System.out.print(String.valueOf(duration));
 
 
 2.Throughput
-Cuando corremos varias subtareas independientes que no apuntan a un resultado global entre todas ellas el parametro ideal para medir rendimiento es el thugput.
+Cuando corremos varias subtareas independientes que no apuntan a un resultado global entre todas ellas, el parametro ideal para medir rendimiento es el througput.
 Se define como el numero de tareas por segundo.
 Supongamos que tenemos varias peticiones http a un servidor. El thrugput es entonces en este caso (numero de peticiones)/segundo. 
 La principal técnica para aumentar el througput es crear un Thread Pool, que como su nombre lo dice contiene varios hilos por los que va pasando una fila de tareas, las que son tomadas por cada uno de estos hilos una a una. Los hilos no se destruyen en memoria, sino que se reutilizan, con el consiguiente aumento en rendimiento.
@@ -56,19 +57,28 @@ Existen varios modos de implementar un Thread Pools que ya vienen en el JDK, sie
 Thread Pool Executor:
 int numberOfThreads = 4;
 Executor executor = Executors.newFixedThreadPool(numberOfThreads); 
-Con Jmeter se observa que El thrugput aumenta consistentemente en forma lineal a medida que aumentamos el numero de hilos hasta que sigue aumentando linealmente pero con menos pendiente. Ese es el punto en que se alcanza el numero de cores fisicos. 
+Con Jmeter se observa que El througput aumenta consistentemente en forma lineal a medida que aumentamos el numero de hilos hasta que sigue aumentando linealmente pero con menos pendiente. Ese es el punto en que se alcanza el numero de cores fisicos. 
 Pasado ese punto sigue aumentando con pendiente menor debido a los cores virtuales hasta alcanzar un maximo de Thhrugput y luego se mantiene constante.
 
-*Sincronizacion, atomicidad y volatilidad
-Un recurso (variable o método, por ejemplo) es atómico si y solo si puede ser ocupado por un hilo a la vez, ya sea porque por definición es atómico (definicion de primitivas, getters y setters) o bien porque nosotros se lo especificamos con las palabras reservadas syncronized o volatile.
+*Sincronizacion, atomicidad y volatilidad.
+Un recurso (variable o método, por ejemplo) es atómico si y solo si puede ser ocupado por un hilo a la vez, ya sea porque por definición es atómico (definicion de primitivas, getters y setters) o bien porque nosotros se lo especificamos con la palabras reservadas syncronized.
 Por lo general lo que buscamos es que los recursos sean atómicos (atómico = en una sola operacion de hardware), aún cuando buscamos concurrencia, para aumentar performance. Double por ejemplo no es atomico porque en un cpu de 64 bits para guardarse necesita del upper 32 bits y del lower 32 bits.
-Para volver atómico un método que es compartido por varios hilos, debemos especificarlo con la palabra reservada Sincronized, de esta forma el método queda bloqueado para el resto de los hilos hasta que el hilo que lo esta ocupando llega al final del método.
+Race condition: dos o mas hilos compitiendo por un recurso (variable o metodo) no atómico. Con la palabra reservada syncronized volvemos el recurso atómico, evitando race condition.
+Data Race: es cuando la CPU y compilador comienzan a correr lineas de código en orden aleatorio (esto a veces la CPU lo hace para optimizar rendimiento, pero obviamente el resultado es coherente). Con la palabra reservada volatile forzamos a la CPU y compilador a seguir el mismo orden de nuestro código fuente, evitando data race.
+volatile int sharedVariable
+public void method (){
+...//All instructions will be executed before
+read/write(sharedVariable);
+...//All instructions will be executed  after
+}
+Para volver atómico un método que es compartido por varios hilos, debemos especificarlo con la palabra reservada Syncronized, de esta forma el método queda bloqueado para el resto de los hilos hasta que el hilo que lo esta ocupando llega al final del método.
 Ademas, con Syncronized podemos no solo volver atomico un metodo, sino que cualquier pedazo de codigo, con Object lock = new Object(); y syncronized(lock){}, siendo Object normalmente el recurso a compartir por los threads; (para bloquear debemos usar solo el objeto lock y ningun otro. Ademas, la instanciacion de la clase q contiene los metodos a bloquear en el main debe hacerse para solo un objeto, sino el bloqueo no funcionará).
 Con la palabra reservada "volatile" en la definicion de una variable long o double, volvemos atomicas estas dos primitivas (que por definicion no lo son), con lo que evitamos Race Condition.
 Con "volatile" en la definicion de cualquier variable evitamos el data race, o sea cuando la CPU comienza a correr variables en orden aleatorio (esto a veces la CPU lo hace para optimizar rendimiento).
 
-*Locking.
-Ya está dicho que cuando un recurso (variable, metodo) es compartido por dos o mas hilos debemos intentar sincronizar. Sin embargo mientras mas codigo sincronizamos (usando sincronized en la declaracion del metodo por ejemplo), pagamos el precio en rendimiento y tiempo ya que mas cerca lo dejamos de una aplicacion no concurrente. Esto se conoce como Coarse Grinding
+
+*Locking
+Ya está dicho que cuando un recurso (variable, metodo) es compartido por dos o mas hilos debemos intentar sincronizar. Sin embargo mientras mas codigo sincronizamos (usando sincronized en la declaracion del metodo por ejemplo), pagamos el precio en rendimiento y tiempo ya que mas cerca lo dejamos de una aplicacion no concurrente. Esto se conoce como Coarse Grinding.
 Mientras menos código sincronizamos (usando sincronized dentro del metodo, por ejemplo), permitimos mas concurrencia (esto es conocido como fine-grinding), pero pagamos el precio en context switch y ademas corremos el riesgo de un Deadlock.
 Deadlock: Supongamos que el Hilo1 y el Hilo2 corren concurrentemente ocupando los recursos compartidos A y B que hemos protegido o sincronizado. 
 El Hilo1 ocupa el recurso A por lo que lo bloquea para el hilo2. El hilo2 corre a su vez ocupando y bloqueando el recurso B, hasta que llega al recurso A y no puede seguir hasta que el hilo1 lo libere.
@@ -100,8 +110,9 @@ lockObject.unlock();
 }}
 
 -LockInterruptibility() para parar externamente un hilo que esta pasando por codigo protegido
--tryLock() para proteccion condicional de código. Retorna true y permite acceder a codigo/recurso si esta disponible.Retorna false y se no queda esperando si el codigo/recurso no esta disponible, sino que se mueve al else del if y podría volver al codigo/recurso despues una vez que este se libere. Esta es la gran diferencia comparado con el metodo lock() (que tambien pertenece a la clase reentrantLock), que sí se queda esperando hasta que el codigo/recurso se libere, o sea puede bloquear, en cambio trLock() nunca bloquea.
-De esta manera, al usar el bloque trylock()
+-tryLock() para proteccion condicional de código. Retorna true y permite acceder a codigo/recurso si esta disponible.Retorna false y se no queda esperando si el codigo/recurso no esta disponible, sino que se mueve al else del if y podría volver al codigo/recurso despues una vez que este se libere. 
+Esta es la gran diferencia comparado con el metodo lock() (que tambien pertenece a la clase reentrantLock), que sí se queda esperando hasta que el codigo/recurso se libere, o sea puede bloquear, en cambio trLock() nunca bloquea.
+
 
 2.ReentrantReadWriteLock
 Para operaciones de lectura deseamos por lo general que los procesos sean concurrentes, es decir que puedan haber varios clientes, servicios, etc. leyendo desde una bddd aunque los hilos compartan recursos entre ellos.
@@ -178,3 +189,25 @@ isComplete=true;
 this.notify();
 }
 }
+
+Multithreading en Sistemas Distribuidos.
+
+¿Qué es un sistema distribuido?
+Un sistema distribuido es un conjunto de programas informáticos que utilizan recursos computacionales en varios nodos de cálculo distintos para lograr un objetivo compartido común.
+La finalidad de los sistemas distribuidos es eliminar los cuellos de botella o los puntos de error centrales de un sistema.
+
+Consiste en tener una red de varias maquinas (computadores) conectados en red (mediante protocolos http, tcp, etc). 
+Ya que en este caso no existe un heap que pueda ser compartido intermaquinas, debemos tener un Distributed Shared Database para almacenamiento de datos.
+Ademas de todos los problemas anteriores (context switch, data racing, race condition, etc.) debemos sumar fallas de red, particiones de red o fallas de hardware o software.
+En sistemas distribuidos debemos poner atención a odefinir los siguientes conceptos: 
+*Leader Election: eleccion del nodo (maquina) lider.
+*Failure Dtection: el host no esta disponible y otro nodo tiene q tomar su lugar.
+*Recovery: algoritmos para cuando el problema en la red haya sido resuelto.
+*Replication: to make sure that no data is lost if a particular machine dies.
+*Escalamiento: para cuando aumente la demanda de informacion.
+Big data es una subdivision de un sistema distribuido que lidia con el problema de cantidades gigantes de informacion. Apache Hadoop y Apache Spark.
+
+
+
+
+

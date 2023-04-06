@@ -1,0 +1,7 @@
+Docker                                                              									  Kubernetes
+Dockerfile --> genera un container							                                              Deployment -->genera un pod. Solo necesitamos un dockerfile, pero no construir la imagen ni ejecutarla nosotros.
+comando build image: crea la imagen a partir del Dockerfile en el proyecto								  comando create deployment: crea un archivo de deployment a partir de un dockerfile
+comando run: ejecuta un container a partir de la imagen creada											  comando apply: ejecuta un deployment, o sea ejecuta los pods adentro de él no expuestos (y ejecuta los containers que estan dentro de los pods?)
+
+Servicio de ECS: hace correr las tareas con los containers dentro.
+Servicio de K8: expone los pods con los containers dentro, para que un cliente se pueda comunicar desde fuera.
