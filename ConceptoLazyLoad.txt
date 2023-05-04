@@ -4,3 +4,15 @@ Esto mejora el rendimiento.
 
 @OneToMany(fetch.FetchType.EAGER) // chained data is loaded inmediatly when the parent is fetched.
 @ManyToMany(fetch.FetchType.LAZY) //chained data is loaded on demand when the parent is fetched.
+
+3546-->pirates
+3352-->indian
+3345-->mina oeste
+5244-->flamenco dancer
+
+Colocacion
+Estratificacion
+Integracion-->estamos kgados
+
+https://www.ebay.com/itm/394154777982?hash=item5bc5749d7e:g:gaUAAOSwmiJiyDDC -->saloon (boxed)
+https://www.ebay.com/itm/155362126478?hash=item242c4dea8e:g:elAAAOSwtj1jxWIq--> safari 3414 (boxed)

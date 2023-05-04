@@ -132,7 +132,7 @@ pasar unaRama a la rama master: git merge unaRama  (esto debe hacerse estando pa
 -----------------------
 
 
----------------------github------------------
+---------------------github (o bitbucket)------------------
 para subir archivos.
 NO HACER NADA EN LOCAL, PRIMERO SE INICIA EL REPOSITORIO EN REMOTO, SIN README.md
 1.crear el repositorio en github con nombrerepositorio sin README.md
@@ -142,7 +142,8 @@ git init (aca se inicia en local el archivo.git)
 git add README.md
 git commit -m "first commit"
 git remote add origin https://github.com/musiciancoder/nombrerepositorio.git
-git push -u origin master git pull origin branchname --allow-unrelated-histories
+git pull origin branchname --allow-unrelated-histories
+git push -u origin master
 
 luego intentar un cambio peque o y guardarlo en local con git add* , luego git commit -m"primer cambio"
 

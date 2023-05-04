@@ -5,6 +5,8 @@ docker info : mostrar informacion sobre containers
 docker run --help : mostrar comandos
 service docker start: comenzar el docker daemon
 docker build -t nombreImagenACrear: crea una imagen
+cat nombreArchivo.extension --> muestra el archivo en consola sin dejar tomada la consola
+docker cp rutaArchivoACopiarFueraDelContenedor/nombreArchivo.ext rutaArchivoACopiarEnelContenedor/nombreArchivo.ext 
 docker images: muestra las imagenes
 docker run  nombreImagen :ejecuta un container a partir de una imagen
 docker run -p 8000:8001 nombreImagen : ejecuta un container a partir de una imagen con puerto externo 8000 para que pueda acceder desde fuera y puerto interno 8001 (se debe configurar el aplication properties con spring.datasource.url=jdbc:mysql://host.docker.internal:3306/msvc_usuarios). Se puede igual dar el mismo puerto de entrada y salida 8001:8001
@@ -19,6 +21,7 @@ docker start -a idContainer : reiniciar container en estado exited (lo muestra e
 docker logs idContainer: ver logs de un container que esta en estado dettached
 docker logs -f idContainer: ver logs de un container que esta en estado dettached y dejarlo atachado de ahora en adelante
 docker mv nombreNuevo nombre antiguo: cambiar nombre archivos como docker-compose u otros.
+docker info | grep -i root: saber donde docker esta guardando las imagenes descargadas.
 
 
 docker ps -a : para ver todos los containers que han sido creados en ese directorio y el status de cada uno

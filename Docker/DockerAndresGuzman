@@ -38,6 +38,9 @@ pp/Login.java.
 
 *Docker-Compose
 Debemos instalarlo, no basta con tener docker.
+docker-compose up: Builds, (re)creates, and starts containers. It also attaches to containers for a service.
+docker-compose run: Run one-off or ad-hoc tasks based on the business requirements. Here, the service name has to be provided and the docker starts only that specific service and also the other services to which the target service is dependent (if any). It is helpful for testing the containers and also for performing tasks
+docker-compose start: Start the stopped containers, can't create new ones.
 
 *COMUNICACION ENTRE COMPONENTES
 En el application.properties debemos escribir: spring.datasource.url=jdbc:postgresql://localhost:host.docker.internal/nombreMicroservicio ; Ademas en el cliente rest debemos escribir el nombre del otro microservicio (con el que nos queremos comunicar, por ejemplo @FeignClient(name="msvc-cursos", url="msvc-cursos:8002") 

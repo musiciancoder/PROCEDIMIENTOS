@@ -1,0 +1,175 @@
+Seccion 2: Introduction and installation.
+Instalo una Maquina virtual tipo centOS  por medio de VirtualBox.
+Se conectó a esta máquina usando SSH.
+Instaló docker en la máquina virtual  e instaló docker compose.
+Descargó desde internet una imagen de jenkins y  en base a ella escribió un archivo docker compose.
+Creó un container docker al levantar este archivo docker compose.
+
+
+Explicó que se puede crear un Job en jenkins ya sea  presionando New Job o  presionando New Item.
+Mencionó que estaremos trabajando en el contenedor que contiene Jenkins,  pero que fuera de este (sí salí con comando docker exit -ti jenkins bash) podemos ejecutar una consola bash normal.
+Volvió al jenkins y en pestaña build environment le dio un echo "hello world" en execute shell.  Lo guardó y volvió a él  haciendo clic en "configure".
+Con  build now podemos correr el job.  Apretando en el número de la ejecución que aparece en build history podemos ver los logs  respectivos. En console output podemos ver el resultado de la ejecucion.
+Luego probó un execute shell parametrizado con:
+NAME=Ricardo
+echo "Hello," $NAME, current date is $(date)>/tmp/info (tmp/info es carpeta/nombreDeArchivo q se va a crear con esto adentro).
+Tambien podemos tener el archivo .sh con un script ya guardado en la consola, y en Execute shell (o sea en la interfaz grafica solamente escribimos /ruta/nombrearchivo.sh Ricardo Gonzalez (el script tenia $NAME y $LASTNAME) para parametrizar.
+Tambien se le pueden dar al job parámetros tipo clave valor en General-->marcar checkbox "This project has parameters". Las claves se deben escribir en el execute shell, pero es mejor darselas al hacer click en Build With Parameters.
+En los parametros tambien se pueden agregar una lista de valores para la misma clave con la opcion Choice Parameter (en vez de Add Parameter para solo un valor). Entonces cuando demos click en Build with Parameters tendremos la opcion de seleccionar un elemento de la lista de valores.
+En los parametros tambien se pueden agregar booleanos seleccionando Boolean Parameter y en el checkbox le damos el tru o false.Así, en el script podemos escribir:
+NAME=$1
+LASTNAME=$2
+SHOW=$3
+if["$SHOW"="true"];then
+ echo "Hello, $NAME $LASTNAME
+else
+ echo "error"
+ 
+Sección3: Jenkins & Docker
+Va a crear un nuevo contenedor en la misma máquina virtual para actuar como segundo servidor. Para ello generó un docker file a partir de centos,  que pueda instalar ssh  con un usuario llamado remote_user al que le asignó credenciales y permisos.
+Luego agregó una instrucción para que al ejecutarse el docker file genere llaves públicas ssh mediante keygen  y las copié a una carpeta del contenedor donde están estas llaves.
+Luego en el docker compose que teníamos anteriormente para el primer contenedor,  agregó el  segundo contenedor como host  en la Network. En el build agregó la imagen del segundo contenedor. 
+Luego ejecutó un build docker-compose para construir la imagen (que esta en el docker-compose). Luego levantó los contenedores con docker-compose up.
+Finalmente mediante un comando solamente (no usando puti para ssh),  conectó el primer container de jenkins al Host.
+Instaló el plugin de ssh (dashboard->manage jenkins -->manage pluggins)
+Se conectó al host pero ahora desde la interfaz grafica de jenkins. Para ello primero estableció credenciales: dashboard->credentials-->system-->global credentials-->add credentials. Pegamos el username y la llave privada q generamos en los pasos anteriores
+Luego dashboard->manage jenkins -->configure system-->buscar donde esta escrito ssh remote host y click en boton "add". Elegir las credenciales que seteamos en el paso anterior, con puerto 22.
+Finalmente corrió un job desde interfaz grafica conectandose por ssh al container de docker. Para ello new job-->build environment-->add step (elegir "execute shell script on remote host using ssh"). Al entrar a la pantalla siguiente, en el input "SSH site" ya debiera estar autocompletado.Escribir un script y este se va a guardar en una carpeta del host (explica lo de las carpetas en pasos anteriores, me dio lata).
+
+Sección4:
+Agregó los datos para crear un tercer container (llamado "db", pero alojado en un servicio llamado "db_host") en el docker compose,  incluyendo la imagen desde internet para mysql,  credenciales para mysql,  volúmen e  incorporación a nuestra network. Levantó los containers con  docker-compose up -d. En docker entró al container db e ingresó a mysql con mysql -u root -p.
+Modificó el dockerfile del segundo contenedor (el del remote-host)  para instalar mysql en este contenedor también. Además agregó las líneas para instalar y correr aws cli. Le damos un docker-compose build para que construya las imagenes. Luego las levantamos con docker-compose up -d.
+Entró al container de remote_host y se logueó en mysql con mysql -u root -p. Creó una base de datos llamada "info" con name, lastname y age. Insertó un registro.
+
+
+
+Seccion5: Jenkins & AWS: Creó un bucket en S3 en la interfaz de AWS. S3-->create bucket (lo llamó "jenkins-mysql-backup").
+Creó un user IAM (Identity and Access Management) para autenticarse en AWS. services-->escribir IAM en la lupa de busqueda. Luego cliick en "users" (a la izquierda de la pantalla) y click en add user. Dar nombre y seleccionar checkbox Programmatic access. En set permissions Attach existing policies directly y en la misma pantalla buscar "s3". De todas las policy names que salen seleccionar AmazonS3FullAccess. Entonces se creará el usuario que tendrá un Access key ID y un Secret Access key Id.
+Desde el remote_host en docker aprendimos como ir guardando los registros mysql en el servicio db_host con comando mysqldump -u root -h db_host -p testdb >/tmp/db.sql (se crea testdb como bbdd de prueba). Luego desde el container db se logueó en el S3 con export AWS_ACCESS_KEY_ID=laObteniaEnPasoAnterior y export AWS_SECRET_ACCESS_KEY=laObteniaEnPasoAnterior. A continuacion subió el archivo db.sql desde el container deb con comando aws s3 cp /tmp/db.sql s3://jenkins-mysql-backup/db.sql. Actualizamos en la interfaz de aws y la lo tenemos.
+Formuló un archivo .sh con el script del paso anterior para parametrizar las fechas de envío cada  vez que se traspase de db al S3. (me dio lata) 
+Integró las credenciales de IAM al script del paso anterior para automatizar aun mas.
+Explicó como guardar credenciales en interfaz de jenkins. Credentials-->System-->Global Credentials (guardó las de mysql que estaban en el docker-compose y luego guardó las del user IAM).
+Corrió un job en Jenkins que ejecuta el script en contenedor remote-host para subir la base de datos a AWS. Agregó como parámetros:
+CLAVE                VALOR
+MYSQL_HOST           db_host
+DB_NAME              testdb
+AWS_BUCKET_NAME      jenkins-mysql-backup
+
+En build environment checkbox Use secret text or file, luego Bindings-->Add->Secret text y luego lo siguiente:
+VARIABLE            CREDENTIALS
+MYSQL_PASSWORD       MYSQL_PASSWORD
+AWS_SECRET_KEY       AWS_SECRET_KEY
+
+En Build-->Add build step-->execute shell script on remote host using ssh
+El input SSH site ya esta llenado y en command escribimos /tmp/script.sh $MYSQL_HOST $MYSQL_PASSWORD $DB_NAME $AWS_SECRET_KEY $AWS_BUCKET_NAME. Click en vuild with parameters para correrlo
+Guardó el script.sh como volumen en el archivo de docker-compose, para q al eliminar el contenedor aún esté ahí.
+Creó una nueva bbdd llamada test2 en contenedor db_host. Creó un segundo bucket en interfaz S3 llamada mysql-jenkins-2. En parametros de Jenkins guardó AWS_BUCKET_NAME mysql-jenkins-2.
+
+Seccion6:Jenkins&Ansible.
+Instaló ansible en el primer contenedor que hicimos (el contenedor llamado "jenkins"). Escribió un dockerfile a partir de jenkins seteandolo para que instale ansible en el contenedor. Editó el docker-compose para incluir esta imagen en el primer contenedor que hicimos (el q se llama jenkins). Le dió un docker-compose build.para construir los containers y luego un docker-compose up -d para levantar.
+Traspasó las credenciales de ssh desde la maquina virtual fuera de los containers al volumen del container de jenkins para q no se borre.
+Generó en el contenedor "jenkins" un archivo de inventario ansible llamado "hosts". Contiene lo siguiente:
+#tipo de coneccion
+ansible_connection:ssh
+#nombre del grupo de servidores
+[test]
+#test1 es un alias que le damos a nuestro host. ansible_host, ansible_user, ansible_private_key_file son palabras clave de ansible para designar maquina host, usuario y ruta de credenciales respectivamente. Recordar q remote_user fue el nombre de usuario que dimos en el dockerfile.
+test1 ansible_host=remote_host ansible_user=remote_user ansible_private_key_file=/var/jenkins_home/ansible/remote-key
+Probó la coneccion a remote_host mediante ansible con comando  ansible -i hosts -m ping test1.
+Escribió un archivo playbook llamado play.yml  de ansible que contiene todas las tareas a realizar.Lo hizo en maquina host porque en los contenedores no tiene instalados procesadores de texto, pero luego lo traspasó a contenedor "jenkins"
+-hosts:test1
+ tasks:
+  -shell echo Hello World>/tmp/ansible-file.
+Se ejecuta desde "jenkins" con comando ansible-playbook -i hosts play.yml. Luego se va a remote-host y verifica q exista el archivo ansible-file con Hello World dentro..
+Para integrar ansible con Jenkins en interfaz de jenkins -->Manage-->Manage pluggins-->buscar ansible pluggin, instalar y reiniciar jenkins.
+Para ejecutar un playbook de ansible en un job, en sección Build seleccionamos "Invoke ansible playbook". En input Playbook path lo llenamos con ruta/play.yml. En File path or comma separated host list /var/jenkins_home/ansible/hosts . Click en Build now para correr. Se dió cuenta que en el container de remote-host tenia lo mismo por lo q modificó el play.yml (solo la parte del hola mundo, para verificarlo ), corrió de nuevo y ahi si pudo apreciar un cambio en el resultado en el container de remote-host.
+Paara pasar parametros desde Jenkins a Ansinle editó el job anterior agregando un String Parameter con Name ANSIBLE_MSG y Default Value-->Hello World. En la misma pantalla pero mas abajo hizo click en advanced y luego click en Add Extra Variable en la pantalla siguiente. En Key llenamos con MSG y en Value llenamos con $ANSIBLE_MSG. Guardamos y luego en el contenedor jenkins editamos el play.yml con lo siguiente:
+-hosts:test1
+   tasks:
+    -debug:
+	   msg:"{{MSG}}"
+Click en build with parameters. Entonces nos llevará a una pantalla donde tendremos la opcion de modificar ANSIBLE_MSG. Escribió Hello world. This is a cool integration of ansible and jenkins.
+Instaló el pluggin ansicolor para poder ver en colores las ejecuciones en jenkins en Console Output. En el Build marcamos los checkbox Colorized stdout y Extra Variable.
+Creó una bbdd llamada people en mysql, q dentro contiene una tabla llamada register.
+Creó una lista con nombres y apellidos en el archivo llamado people.txt. Lo guardó en la maquina virtual al igual que el archivo en lenguaje bash put.sh (despues los pasó al container db) q contiene lo siguiente (con $1 y $2 siendo nombre y apellido en people.txt):
+#!/bin/bash
+counter=0
+while [$counter -lt 50]; do
+  let counter=counter+1
+  name=$(nl people.txt|grep -$counter | awk '{print$2}'|awk -F ',' '{{PRINT $1}')
+  lastname=$(nl people.txt|grep -$counter | awk '{print$2}'|awk -F ',' '{{PRINT $2}')
+  age=$(shuf -i 20-25 -n 1) // numero cualquiera
+  mysql -u root -p1234 people -e "insert into register values ($counter, '$name', '$lastname', $age)" //poblar tabla register
+  echo "$counter, $name, $lastname, $age was correctly imported" // imprimir estos parametros
+Se ejecuta (al igual q cualquier archivo ./sh) con ./put.sh. Verificó que el mysql estuviera populado.
+Video Start building a Docker Nginx Web Server + PHP - I 
+
+Seccion7:Jenkins&Security
+Global Security-->checkbox "allow users to sign up" permite que los usuarios puedan llenar el formulario de registro de Jenkins.
+Instaló el plugin de Role-Base Strategy authorization. Luego Global Strategy-->checkbox Role-Base authorization. Luego en Manage Jenkins aparece una nueva seccion llamada Manage and Assign roles.
+Con el plugin anterior se pueden crear usuarios manualmente en Jenkins con Manage Users-->Create User y llenamos el formulario. En este punto debido al cambio en el checkbox del paso anterior los nuevos usuarios les aparecerá "access denied" cuando se registren (si no hubieramos hecho esto funcionaría).
+Manage Jenkins-->Manage and Assign roles-->Manage roles-->dar los permisos. Acá se puede crear un rol tambien(creó el rol read-only). Recordar setear checkbox de Overall Read, sino vamos a tener el error del paso anterior!!
+Manage Jenkins-->Manage and Assign roles-->Assign roles. Aca se pueden asignar los roles a usuarios y grupos de usuarios manualmente.Primero asignó read-only al usuario creado hace dos pasos atrás y luego modificó read-only para que este rol tuviera permisos de lectura de jobs.
+Se puede setear tambien para q un usuario solo tenga acceso a ciertos jobs, no a todos. Está en seccion "Learn how to restrict jobs..."
+
+Seccion 8:Tips and Tricks
+Si buscamos en google "building a software project jenkins" encontraremos el primer resultado que es para variables globales q ya vienen por defecto en Jenkins. Estas variables las podemos recuperar en un job al escribir en la linea de comandos el Execute Shell echo "nombre_variable: $nombre_variable".
+Como crear mis propias variables globales o variables de entorno?. Manage Jenkins-->Configure System--> Global properties setear el checkbox de Environment Variables y escribir las variables de entornos. En el execute shell de Jenkins se llaman igual q en el paso anterior.
+Modificar url de Jenkins para q no aparezca la DNS. Manage Jenkins-->Configure System--> Global properties y editar la url a jenkins.local:8080
+En cualquier job se puede setear un CRON. Al construir el job en Build Triggers seteamos checkbox "build periodically" y en cuadro de texto scheduel seteamos el CRON. El formato de CRON se saca facil de google.
+Tambien se pueden ejecutar jobs desde otros lugares aparte de la interfaz de jenkins (desde sripts de bash .sh, por ejemplo). Para ello primero debemos asignar los permisos al usuario. Manage Jenkins-->Manage users-->create user. Luego Manage and assign roles y crear el rol trigger-jobs con permisos build and read y asignarlo al user recien creado.
+Luego q tenemos los permisos en el paso anterior lo ejecutamos desde la maquina virtual, fuera de los contenedores, creando en la maquina virtual un archivo crumb.sh y ejecutandolo (lo q va adentro de este archivo me dio lata pareo esta en los videos).
+En el siguiente video se explica que se pueden pasar parametros en el crumb.sh
+
+Seccion9:Jenkins&email
+Instalar el pluggin "Mailer pluggin".
+1)En aws:
+Primero configurar el mail en AWS-->escribir SES en la lupa de AWS y mandar un mail al correo para verificar. 
+En jenkins: Manage Jenkins-->Configure System--> scroll hasta el final y veremos "Email Notification".
+Volvemos a amazon y click en "Create SMTM credentials" y obtener un token.
+Volvemos a jenkins y lo escribimos en el input que corresponde (UserName). Mucho mas arriba en el scroll esta el input "System Admin email address" donde escribimos el email y listo. Al guardar debieramos recibir un segundo correo de verificacion.
+2)En gmail (si no tuvieramos una cuenta en aws, gmail igual funciona).
+Escribir en chrome "Less secure app" y setear el checkbox de Lesser secure aplications en chrome. En el input donde dice SMTP server llenar con smpt.gmail.com
+En UserName va el correo de gmail y en password el de gmail.
+3)Notificar al correo cada vez q corre un job: En el build del job click en "Add post-build action"-->Email notification. En "E-mail Notification" en input "Recipients" escribir el correo
+
+Seccion10:Jenkins&Maven
+Instalar el pluggin "Maven integration" y el pluggin "Git".
+En Jenkins generar un nuevo job llamado "mave-job" En el build del job, en "Source Code Management setear la url del repositorio de github. Normalmente se clona la rama master. Por el momento no pide credenciales (mas adelante se vera esto). Siempre toda la info de ejecucion de un job se guarda en el workspace (la ruta del workspace aparece en la ejecucion del job en la consola).
+Construir JAR -->Manage Jenkins-> Global Tool Configuration-->boton "add maven", ahi dar un nombre y agregar version de apache (la por defecto esta bien). Luego en el Build del job click en boton "add build step"-->click en "invoke top level maven targets" y seleccionamos el nombre que dimos anteriormente. En el input de "Goals" le damos el Goal (-B Dskip Tests clean package). La primera vez solamente Jenkins va a descargar la version del package de maven. En el workspace va a guardar el jar.
+Ejecutar unit tests-->en el build del job click en "invoke top level maven targets". En Goals escribir "test". Si hay error copiar la variable de entorno del video.
+Se puede tambien ejecutar el jar que se esta generando agregando una linea en el exeucte shell-->en el build del job click-->add new step-->Execute shell-->echo "Deploying jar" java -jar /var/jenkins_home/workspace/nombre_job/my-app-1.0-SNAPSHOT.jar.
+Para desplegar los resultados de los unit tests. en el build del job click en "Publish JUNIT test result report". En input Test report XNLs escribir target/surefire-reports/* .xml Con esto va a crear un gráfico en la interfaz de jenkins.
+Archivar como jar solo la ultima ejecucion exitosa. En el build del job click en "post-build actions". En input Files to archive escribir target/* .jar. Seteat checkbox "Archive artifacts only if build is successful".
+
+Seccion 11: Jenkins and GIT.
+Es posible levantar un servidor gitlab en internet como servicio/container en Docker. Agregó el container en el docker-compose que tenía anteriormente, lo levantó. Luego se fue a gitlab.example.com:8090 en el navegador y vió comprobó q estuviera levantado.
+Creó un repositorio privado en gitlab con grupo llamado "jenkins" y proyecto llamado "maven".
+Agregó un nuevo usuario en gitlab y seteó credenciales para este usuario. En el proyecto "maven" en boton "manage access" se pueden dar permisos a este usuario.
+Luego clonó un repositorio desde github a la maquina virtual y lo subió a gitlab desde ahi.
+Construyó un job para desplegar el proyecto ("maven") que esta en el servidor de gitlab. 
+
+Seccion 12: Jenkins DSL
+Es para escribir un template para jobs que puedan usar los jobs hijos.
+Instaló el pluggin DSL.
+Creó en la interfaz un job llamado "job-dsl". En el build del job-->"add building step"-->"process job dsl".
+En "process job dsl"-->checkbox "use the provided DSL script"-->job('job_dsl_example'). Con esto se creará un job child llamado job_dsl_example'. El seed-job es "job-dsl". Se le da un build now al seed job pero en los resultados de la ejecucion se busca el child.
+Se puede tambien agregar una descripcion al child job (la descripcion se hace desde comandos en consola desde la maquina virtual de jenkins)
+Se pueden pasar parametros en el seed para verlos en el child. En el build del seed-->marcar checkbox "Use the provided DSL script" y en el input "DSL script" escribir los parametros. Se ejecuta el seed y los resultados debieran estar en el child.
+Se puede definir un Source Code Manager (SCM), o sea un repositorio en DSL. Igual q antes se modifica el seed, se ejecuta y se busca la ejecucion del child. En el configure del child debiera estar marcado el checkbox de git con un repositorio en el input.
+Se pueden definir triggers en DSL. Igual q antes se modifica el seed en el build del seed-->marcar checkbox "Use the provided DSL script" y en el input "DSL script" escribir los triggres (un cron por ejemplo). Se ejecuta y se busca la ejecucion del child. En el Build Triggers del child debiera estar marcado.
+Se pueden agregar comandos shell por DSL. En el build del seed se agregan como siempre en "add build step"-->Escribir en input "execute shell" el script de bash a ejecutar (un echo por ejemplo o un /tmp/script.th. Se ejecuta el seed y en el child debiera aparecer la ejecucion de este script.
+Se pueden agregar mails de notificacion agregandolos al seed y buscandolos en el child.
+En el input DSL Script (aparece al hacer click en "use the provided DSL script") se pueden escribir todos los childs que uno quiera uno tras otro.
+Recreó el script del job de la seccion de maven con DSL, editandolo en la VM y copiando las secciones respectivas en la interfaz de jenkins en el build del seed. Ejecutó y vio que los mismos valores estan ahora en el build del child.
+Se pueden guardar los seteos de un job usando git hooks de un repositorio remoto SCM (él lo hace en gitlab pero debiera servir para cualquier SCM). De esta manera cada vez que haya un push y alguien modifique algo del codigo va a correr el job automaticamente.
+Para ello se fue al container de gitlab y modificó un hook para agregarlo . Luego en el build del seed, en Source code management agregamos la url del repositorio en gitlab y en "Process Job DSL" seteamos el checkbox Look on filesystem y escribimos en el input "DSL scripts" el nombre del archivo de script que esta en ese repositorio de gitlab. En Jenkins-->"Configure global security" debemos marcar el checkbox de "enable script security for DSL scripts". Hacemos un cambio en el seed  y lo subimos a github (en este caso no hizo un cambio sino mas bien subio un child nuevo en el archivo de script.
+
+
+Seccion 14: JenkinsFile.
+Un pipeline es un job que se ejecuta mediante un archivo Jenkinsfile.
+En https://www.jenkins.io/doc/book/pipeline/ esta tanto el pipeline declarativo (o sea un template) como el scripted pipeline (con groovy). En el curso se usará mas el primero.  
+Instaló el pipeline pluggin.
+
+ 
+

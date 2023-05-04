@@ -1,0 +1,9 @@
+Respuesta de Ali:
+
+Hi Pedro 
+
+The idea behind creating a new module for each component is to create reusable jar file that can be developed and deployed independently. When you create a new module, a new jar file will be created which is the deployable unit of a java application. When you have the jar file for each component, you can reuse it from other modules (possibly from multiple modules) and can deploy them without requiring the other components. If you create packages in the same project you would end up a monolith application and any change in any package will require to recompile, rebuild and redeploy the whole application instead of working on different components independently.
+
+Regards,
+
+Ali

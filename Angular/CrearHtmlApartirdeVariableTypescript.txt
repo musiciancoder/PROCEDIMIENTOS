@@ -1,0 +1,3 @@
+    //lo siguiente es para agregar un marcador en el mapa que diga 'Hola Mundo'
+    const markerHtml:HTMLElement = document.createElement('div');
+    markerHtml.innerHTML='Hola Mundo';

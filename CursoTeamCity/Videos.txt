@@ -1,0 +1,19 @@
+Video "Connection to a VCS" --> Explicó como conectarse a github desde teamcity. Existen dos formas: por medio de https con credenciales normales (nombre y password) o por ssh con private y public key. 
+Con bitbucket debieran estar estas dos opciones disponibles tambien.
+Video "VCS Open connections.."-->Explicó que se puede crear una coneccion entre team city y cualquier VCS (bitbucket incluido) de una sola vez y que servirá para todos los proyectos futuros (queda seteado).
+Video "Ways of organizing your projects"-->Existe el Root Project que es el que contiene la configuracion estandard de TeamCity para todos los proyectos hijos. Se ocupará la siguiente configuración en el curso:
+Root Project
+ -->Accounting(project)
+    -Build and package
+	-Deploy to QA environment
+	-Deploy to Production environment
+ -->Fixed Assets(project)
+    -Build and package
+	-Deploy to QA environment
+	-Deploy to Production environment
+Video "Creating your first TeamCity project". -->Clic en projects y en new. Eligió manually y seteo manualmente el VCS.
+Volvió a los projects y pudo ver Accounting (este fue el nombre q le dio al proyecto). Le dió click a run (por ahora solo extrae el repo desde github). El run se corre desde Root Project-->Nombre del proyecto (Accounting)-->Build and Package (esta bajo Build Configurations, "Build and Package" al parecer es el nombre de una Build Configuration que él le dió (ver fig1).
+En "Build log" se pueden ver los logs
+Video "Build Steps, Parameters and Templates"-->Explicó como hacer un template de un runner.  Para ello primero se configuran Parameters (que pueden ser generales, system o environment) y se incorporan al Template como Build Steps.
+Desde el proyecto en un primer momento vamos a poder ver el Parameter, pero solo en Parameters. no como Build Steps. Para verlo como Build step, en el proyecto debemos incorporar el template donde dice "default template".
+En los tres videos siguientes explicó como setear builds (runners) para ASP.NET, por lo que no pesqué mucho.
