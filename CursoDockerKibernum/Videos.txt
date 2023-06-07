@@ -170,6 +170,50 @@ Seccion 14: JenkinsFile.
 Un pipeline es un job que se ejecuta mediante un archivo Jenkinsfile.
 En https://www.jenkins.io/doc/book/pipeline/ esta tanto el pipeline declarativo (o sea un template) como el scripted pipeline (con groovy). En el curso se usará mas el primero.  
 Instaló el pipeline pluggin.
+Construyó el primer pipeline llamado "pipeline" escribiendo en la seccion "pipeline" en el build del job el mismo codigo q aparece en el pipeline declarativo de dos lineas arriba. Lo desplegó en el workspace  del container "jenkins". En los resultados vemos q se ejecutan 3 stages:build, test y deploy.
+Modificó el jenkinsfile del pipeline anterior para que ejecutara solo el build.
+En el jenkinsfile para cada stage podemos asignar cierto numero de retries por si falla.
+En el jenkinsfile tambien es posible setear un timeout, para que el pipeline aborte si algo se demora mas de lo razonable.
+En el jenkinsfile tambien se pueden setear palabras de entorno.
+En el jenkinsfile tambien se pueden pasar credenciales para cada stage (estas crefenciales deben ser previamente seteadas en credenciales globales en el dashboard de Jenkins).
+En el jenkinsfile tambien se pueden dar instrucciones post-build por medio de 'always','success','failure','unstable'
 
+Seccion 15
+En esta sección va a usar Jenkins  para construir una imagen de docker y desplegarla como servicio Maven
+Entró al container de jenkins en Docker y averiguó q tenía SO debian, por lo que debe instalar docker para debian. Para ello instaló docker en este contenedor de jenkins por medio de un dockerfile queademas contiene la info para instalar ansible. Editó el docker-compose de la maquina virtual (o sea fuera del contenedor jenkins) para incluir este dockerfile en la seccion del archivo del contenedor jenkins.
+Levantó el docker-compose (docker-compose up). Después mapeó el archivo docker.dock q esta en la VM al container de jenkins (ver video, esta enredado y me dio lata).
+Creó un Jenkinsfile al mismo nivel de directorios que el dockerfile del video anterior (o sea en la carpeta pipeline), conteniendo stages build, test, push y deploy, aun sin nada dentro de estos stages.
+Construyó un jar. Para ello a la carpeta "pipeline" movió "java-app"  de secciones anteriores, que contiene código a ser ejecutado.Luego hizo un docker pull maven:3-alpine que es la imagen va a ser ocupada en vez del pluggin de maven q se usó anteriormente para hacer el build. Corrió esta imagen con docker run $PWD/java-app:/app maven:3-alpine sh (esto creo por lo tanto el container "app").
+Se fue al container app y vio que tenia el codigo disponible (jenkins, pom.xml,src). 
+Pasó el contenido desde /root/.m2 de la VM a /root/.m2 del contenedor "app" para no tener problemas de dependencias. Construyó el jar con mvn package.
+Generó un archivo de script bash .sh para construir el jar del paso anterior, para guardar este código bash para futuras ejecuciones. Lo corrió en el contenedor "app" con ./nombreArchivo.sh
+Recordemos que en directorio pipeline/jenkins/build/ contiene todo lo relativo al build (en este punto solo tiene el archivo mvn.sh). Copio el jar de my-app a este directorio. En este mismo directorio generó un dockerfile a lartir de 8-jre-alpine con app.jar (lo seteó para que fuera igial a my-app.jar) adentro. Corrió la imagen para generar container (le puso por nombre test).
+Generó un docker-compose que en su interior refiere al dockerfile del video anterior. Levantó este docker-compose.
+Modificó el script .sh que tenía para las ejecuciones de comandos para incluir los comandos del video anterior.
+Se fue al jenkinsfile y en el stage de "build" agregó las lineas:
+sh ./jenkins/build/mvn.sh -B -DskipTests clean package (para el build del jar mediante maven)
+ ./jenkins/build/build.sh (que contenia la imagen docker para construir el container desde videos anteriores)
+Probó el código con comando docker run --rm -v $PWD/java-app:/app -v /root/.m2/:root/.m2/ -w /app maven:3-alpine mvn test
+Escribió un script llamado mvn.sh para ejecutar el comando de la linea anterior. Lo guardó en ./jenkins/test/mvn.sh mvn test
+Modificó el jenkinsdile para incluir el script de la linea anterior en el stage de 'test'. sh './jenkins/test/mvn.sh mvn test'.
+Construyó otra VM (llamada linuxfacilito) para desplegar en esa VM. Es una CentOS con docker y docker-compose instalados igual q como lo hizo anteriormente. Se conecta por ssh, generando las private y public keys mediante keygen como lo hizo anteriormente.
+Explicó como crear un repositorio en docker hub
+Explicó como hacer push hacia un repositorio en docker hub y hacer pull.
+En el contenedor de jenkins en el directorio pipeline/jenkins/push creó el archivo push.sh que contiene el script para automatizar los push a github de la linea anterior.
+Agregó el script de la linea anterior al stage 'Push' del jenkinsfile.
+Creó un archivo de despliegue de prueba en containter jenkins  /tmp/.auth y le fue pasando parametros desde la linea de comandos (esto ultimo se haria en AWS si se hiciera el despliegue por este medio). Lo seteó en el mismo archivo para q al ejecutarse se traspasara mediante ssh a la VM linuxfacilito (acá el archivo de llama deploy.sh).
+Desplegó manualmente la aplicacion en la VM linuxfacilito. Para ello subió desde jenkins la imagen a docker-hub y en VM linuxfacilito escribió un docker-compose q en su interior tenia la imagen q acaba de subir. fue seteando los parametros por comando (export IMAGE=$algo por ejemplo) de cponsola al igual q en el paso anterior. Se autenticó en docker hub desde consola y luego al levantar el docker-compose se descargó la imagen de docker hub, desplegandose el container en la VM linuxfacilito (en un caso real esto se haria con kubernetes o docker swarm).
+Escribió un script .sh para pasar los comandos de la linea anterior (o sea los exports para los parametros), el login en dockerhub y ejecutar el docker-compose.
+Ejecutó el script de la linea anterior.
+Se fue al jenkins file y pego el script .sh de la linea anterior en el stage "Deploy".
+Subió todo lo anterior al SCM - gitlab (java-app con codigo fuente, carpeta "jenkins" con todos los scripts que fuimos crendo para build, deploy, push y test y el jenjinsfile). 
+En el jenkins dashboard creo el pipeline "pipeline-docker-maven" y eb el build setió el gitlab de la linea anterior con credenciales. Ejecutó y verificó que la ejecucion fuera guardada en el directorio workspace del contenedor jenkins.
+Modificó el script mave.sh , en la paert del docker run para que le cree volumenes. Lo comitio a gitlab.
+Pasó las credenciales de docker hub en el dashboard de jenkins(en "global credentials". En el jenkinsfile escribió un setero para que reconociera las credenciales del jenkins dashboar. Subió a gitlab.
+Movió las credenciales ssh (la que le puso por nombre "prod" anteriormente) al container jenkins y con estas credenciales ingresó a VM linuxfacilito. 
+Modificó el jenkinsfile para agregar post actions en el stage de test (para que genere un reporte junit) y en el stage de build para archivar los artifactos que se construyeron exitosamente. Subio a gitlab
+Ejecutó lo anterior en dashboard con "Build now".
+Creó un hook para el proyecto "pipeline-docker-maven", de esta manera toda vez que alguien comitee algo se ejecutará el pipeline.
+Modificó el código en el SCM y desplegó el pipeline de nuevo para repasar todo el proceso.
  
 

@@ -1,0 +1,14 @@
+1.CONFIGURACIONES
+En archivo angular.json en "test" debe estar como en el video.
+En karma.conf.js se puede cambiar el puerto y setear si se desean correr los test cada vez con "restartOnFileChange"="true".
+
+2.CARPETA COVERAGE
+En el index.html de la carpeta coverage estan los porcentajes de covertura. Se puede hacer click en cada link para ver por donde va pasando el código en archivos .ts y cuantas veces esta pasando.
+
+3.Lanzar tests
+Se lanzan los tests de karma con comando ng test en la terminal. Entonces se abre un navegador en el puerto que seteamos en la configuracion.
+Con ng test --no-watch no se abre el navegador y con --code-coverage es para q se cree la carpeta coverage (si por defecto estuviera seteado para q no se creara).
+Otra forma es dar una clave valor en package.json en la seccion de "scripts". por ejemplo "my-test":"ng test --no-watch --code-coverage". Luego se puede correr con el comando npm run my-test
+
+4.Nueva dependencia en Karma (Angular 11 o superior).
+Puede salir un warning de karma-coverage-istanbul-reporte Si es asi instalamos la dependencia npm install karma-coverage --save-dev. Vamos a karma.conf.js, comentamos el plugin de karma-coverage-istanbul-reporte y agregamos la de karma-coverage.
