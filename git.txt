@@ -155,7 +155,7 @@ para bajar archivos
 3.para guardar algun cambio desde remoto a local: con git pull origin master
 
 
-DECCARTAR CAMBIOS EN UN ARCHIVO: git restore ruta absoluta del archivo
+DECCARTAR CAMBIOS EN UN ARCHIVO: git restore ruta absoluta del archivo (no hacer git add* ni git commit)
 
 
 

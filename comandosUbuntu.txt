@@ -1,3 +1,15 @@
+COMANDOS WINDOWS
+Crear archivo: type NUL > HelloWorld.java  o nombreArchivo.extension
+Editar archivo: "c:\Program Files\Git\usr\bin\nano.exe" nombreArchivo.extension
+Mover un archivo a otra carpeta (c:\statistics): move stats.doc c:\statistics
+
+
+
+
+
+
+
+
 El comando (sudo su) permite a los usuarios ejecutar programas con los privilegios de seguridad de otro usuario (normalmente el usuario root) de manera segura, convirtiéndose así temporalmente en súper usuario.
 Sintaxis: sudo [opciones]
 Opciones comando sudo:
@@ -83,7 +95,8 @@ copiar directorio: estando en el directorio q contiene el archivo a copiar: cp -
 
 Hindú
 ls / listar archivos
-cat> myfile.txt crear archivo de texto (en la siguiente linea comenzar a escribir lo q ira dentro del archivo
+los cat funcionan en git bash
+cat> myfile.txt crear archivo de texto (en la siguiente linea comenzar a escribir lo q ira dentro del archivo. Se guarda y sale con ctrl + d
 cat myfile.txt ver archivo
 ls -a ver archivos ocultos
 ls -r ver subdirectorios
