@@ -232,6 +232,6 @@ Siempre siempre todos los dias antes de empezar a trabajar checkear si hay cambi
 Si hay cambios hacer inmediatamente un pull a nuestro main/remote local, luego comparar main/remote con la rama q estemos trabajando (comando git diff otraRama), ver si afecta nuestro desarrollo y si no hacer merge (mucho ojo con el merge, se recomienda respaldar el archivo antes de darle un merge, porque en las pruebas que hice me eliminó lo que sale en verde, o sea lo q teniamos inicialmente en nuestra rama de trabajo antes del merge )
 
 
-
+GIT STASH
 
 
