@@ -1,6 +1,9 @@
 S3:
 
-S3 es equivalente a google drive, tambien se puede almacenar contenido por URL, para despues compartir esas URL.
+SYSTEM STORAGE SERVICE
+
+S3 es un sistema de almacenamiento similar a google drive. Dedemos en AWS irnos a nuestro servicio de S3 y crearnos un bucket para almacenar info. Cada Bucket contiene 100 GB, permite 20000 gets y 2000 puts al mes.
+Dentro del bucket se guarda la info que puede ser de tipo .txt .jar .war u otro recurso que el devops pida generar y guardar en el bucket. Se accesar a estos recursos por URL desde cualquier lugar de internet.
 Para ello escribir S3 en la busqueda de AWS y dar click a crear bucket. En el bucket podemos subir archivos o descargarlos.
 Para compartir lo que hay un bucket, dar click en "permisos" y desactivar lo que viene por defecto, para asi hacerlo publico.
 Para mostrar un archivo, dar click en "acciones" y "abrir".
@@ -35,20 +38,33 @@ yum install java-1.8.0-openjdk
 
 alternatives --config java
 
-Desplegar un JAR:
+Desplegar un JAR en S3: 
 
-En Spring tools suite, clickderecho sobre la aplicacion, click en maven install. Seleccionar una maquina virtual y subir el archivo JAR. luego que se ha subido, seleccionar el jar, click en acciones y hacerlo publico.
-Luego, en putty escribir wget url del jar (copiar y pegar desde AWS). Luego escribir comando para desplegar spring: java -jar couponservice-0.0.1-SNAPSHOT.jar
+En Spring tools suite, clickderecho sobre la aplicacion, click en maven install. Seleccionar una maquina virtual y subir el archivo JAR al bucket de S3 como se explicó mas arriba. luego que se ha subido, seleccionar el jar, click en acciones y hacerlo publico.
+Luego, en putty (o sea desde nuestra instancia EC2) escribir el comando wget url del jar (esto va a copiar y pegar desde S3). Luego escribir comando para desplegar spring: java -jar couponservice-0.0.1-SNAPSHOT.jar
 Luego, asignar el puerto. Para ello seleccionamos la casilla de nuestra instancia en AWS y hacemos scroll hasta abajo, y en Security Groups,hacemosclick en el 'wizard', click en edit inbound rules, click en add new rule y asignamos el puerto q estamos ocupando, y en la casilla del lado (custom) hacer click en "anywhere"
-Para probar en postman, cambiar la palabra 'localhost' en la barra de direcciones url por el public DNS (IPV4) (copiar y pegar desde AWS)
+Para probar en postman, cambiar la palabra 'localhost' en la barra de direcciones url por el public DNS (IPV4), que en el caso de la instancia creada por EC2 va a ser el nombre de la instancia (copiar y pegar desde AWS).
 
 Configurar para q una aplicacion corra automaticamente cuando se inicie la instancia a la que pertenece:
 Mover el jar de la aplicacion hacia el home con cp nombreAppp-0.0.1-SNAPSHOT.jar /home/ec2-user/
-Editar el archivo de configuracion con vi /etc/rc.local  Al final del archivo escribir java -jar /home/ec2-user/nombreAppp-0.0.1-SNAPSHOT.jar (guardar con :wq).
+Editar el archivo de configuracion con vi /etc/rc.local  Al final del archivo escribir java -jar /home/ec2-user/nombreAppp-0.0.1-SNAPSHOT.jar (guardar con :wq). Ojo que puede haber problemas con rc.local, en el video de mas adelante sale como solucionarlo.
 En AWS detener la instancia y reiniciarla. pegar el DNS en la barra de direcciones de cualquier navegador y comprobar q la app esta corriendo.
 
-Habilitar Load Balancer:
+Instalar paquete 'epel' para efectuar stress: ejecutar comando: amazon-linux-extras install epel -y (en versiones anteriores de aws era yum install stress -y, pero ya no).
 
-Esto es para que cuando recibamos demasiados request no se caiga la app. Para ello creamos un Load Balancer haciendo click en rquilibriadores de carga en el menu de la izquierda em AWS.
-Sola hay que seleccionar dos instancias identicas en configuracion. Importante: No olvidar habilitar puerto 80 en el security group. No viene por defecto!
+Duplicar una instancia preexistente usando Amazon Machine Image (AMI):
+Ir a EC2-->Images-->AMI. Teniendo la instancia seleccionada hacemos click en actions-->image-->create image, luego le damos un nombre a la instancia nueva y listo. Tener mas de una instancia nos permite balancear la app.
+
+
+Habilitar Load Balancer para dos instancias de EC2:
+Nota: esto no lo hizo Guzmán, ya que el en la seccion de EC2 solo estaba interesado en comunicar cursos con usuarios, no en balancear la carga , aunque sí creó despues un load balancer pero usando ECS.
+Esto es para que cuando recibamos demasiados request no se caiga la app. Para ello creamos un Load Balancer haciendo click en equilibriadores de carga en el menu de la izquierda em AWS (Load balancing-->load balancers-->create load balancer), entonces seleccionamos 
+"classic load balancer" y seguimos los 7 pasos para crear el classic load balancer, de los cuales los pasos mas importantes son el Health check donde se setean los puestos y el numero de veces a probar para que la aplicacion sea calificada como 'healthy' 'Add EC2 instances' para agregar las instancias. Luego de creado el load balancer se puede editar o hacer modificaciones haciendo click en la viñeta de 'actions' en la seccion donde se visualiza el load balancer.
+Esto nos entrega un DNS, que al igual que en la seccion ECS de Guzman sirve para probar en la barra de url del navegador.
+
+
+Lambda Functions
+Es un servicio tipo servless de AWS que se ejecuta en respuesta a eventos en otros componentes del mismo AWS (como S3) o bien otros triggers como SMS, etc.
+Ya sea en amazon sam cli o en la consola de amazon debe escribirse una funcion handler en cualquier lenguaje de programacion para conectar los eventos de los triggers. Estos handlers por lo general constan de 3 capas: controlador servicio y dao igual que un servicio de pring.
+Además necesitamos tener un IAM Role para ver los logs y u IAM Resource policy para que los componentes o triggers se comuniquen entre ellos.
 

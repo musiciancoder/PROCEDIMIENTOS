@@ -2,5 +2,5 @@
 
 El paquete reflect (a menudo llamado coloquialmente "reflection") nos permite
 inspeccionar y/o modificasr calquier atributo de clase, interfaces, variables y metodos en tiempo de ejecucion.
-Es muy util cuando desconocemos nombre de algun componente de clase en tiempo de compilacion, o si queremos modificarlo.
-Relentiza el tiempo de ejecución, por lo que solo se debe usar si es estrictamente necesario para averiguar algo desconocido en tiempo de compilacion.
+Es muy util cuando desconocemos nombre de algun componente de clase en tiempo de compilacion, o si queremos modificarlo, como por ejemplo llamar a un metodo privado desde otra clase (lo que normalmente no se podría hacer).
+Relentiza el tiempo de ejecución y por lo tanto el rendimiento, por lo que solo se debe usar si es estrictamente necesario para averiguar algo desconocido en tiempo de compilacion.

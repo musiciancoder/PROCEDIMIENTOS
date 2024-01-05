@@ -1,0 +1,4 @@
+Cuando no especificamos ningun starter en particular en nuestras dependencias, al crear un proyecto spring con spring inizializer automaticamente se incluirá <artifactId>spring-boot-starter</artifactId> explicitamente como dependencia en nuestro pom.
+En cambio si especificamos algun starter en particular, como <artifactId>spring-boot-starter-data-jpa</artifactId> o <artifactId>spring-boot-starter-web</artifactId>, no aparecerá <artifactId>spring-boot-starter</artifactId> explicitamente como dependencia en nuestro pom ya que estará como dependencia transitiva de las anteriores.
+	
+	

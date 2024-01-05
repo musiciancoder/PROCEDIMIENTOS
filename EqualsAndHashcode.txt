@@ -11,3 +11,10 @@ entonces va a buscar dos objetos distintos en memoria heap cuando es el mismo ob
     //Caso 2: Objetos con los mismos atributos, que SI son equals, pero que NO tienen el mismo hashcode. Se generan cuando sobrescribimos solo equals. Los objetos son los mismos en memoria, pero tienen diferentes hashcode. Es decir dos referencias apuntando al mismo objeto
     //Caso 3: Objetos con los mismos atributos, que NO son equals, pero que SI tienen el mismo hashcode. Se generan cuando sobrescribimos solo hashcode. Los objetos no son los mismos en memoria, pero tienen el mismo hashcode. Esto está altamente desaconsejado!
     //Caso 4: Objetos con los mismos atributos, que SI son equals, que SI tienen el mismo hashcode. Se generan cuando sobrescribimos ambos métodos. Los dos objetos son exactamente el mismo objeto.
+
+
+Supongamos que obj1 y obj2 pertenecen a una clase que hemos creado nosotros y que tienen los mismos atributos.
+obj1==obj2 va a ser siempre false.
+obj1.equals(obj2) va ser por defecto false a menos que sobreescibamos el metodo equals (se recomienda tambien sobrescribir hashcode), en cuyo caso va a ser true. Para los strings no se necesita sobreescribir equals, ya que siempre str1.equals(str2) va a ser true.
+
+

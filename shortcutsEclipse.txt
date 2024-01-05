@@ -1,0 +1,7 @@
+CTRL + SHIFT + X --> cambiar texto seleccionado a mayuscula
+CTRL + SHIFT + Y --> cambiar texto seleccionado a minuscula
+escribir "main" + ctrl +space -->metodo principal
+CTRL + SHIFT + o --> importar clases faltantes (el IDE va a preguntar antes cual queremos si hay dos clases llamadas iguales pertenecientes a paquetes distintos).
+CTRL +  o --> mostrar todos los metodos de la clase
+CTRL + d --> borrar linea
+CTRL + SHIFT + L -->mostrar todos los shortcuts

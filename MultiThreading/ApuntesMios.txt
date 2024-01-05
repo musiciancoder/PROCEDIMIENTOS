@@ -2,10 +2,10 @@
 *Los hilos son porciones de código que al ejecutarse realizan alguna funcionalidad del programa. Cada proceso a su vez puede o no tener uno o varios hilos en ejecución.
 *Los hilos de un mismo proceso siempre comparten memoria heap; cada hilo en cambio tiene siempre su propia y exclusiva memoria stack y su propio y exclusivo pointer.
 *Dos o mas hilos corriendo en un solo nucleo pueden 'simular' multithreading; Dos hilos corriendo en dos nucleos (multicore, multiprocesador) en forma separada pueden en cambio ejecutar un 'real' multithreading
-*Cada vez que se inicializa la ejecucion de un segundo hilo la CPU debe detener antes la ejecucion del primera hilo (este primer hilo vuelve a correr milesimas de segundo despues que el segundo hilo ya esta en ejecucion). Este es el principal precio a pagar debido a la concurrencia y es conocido como Context Switch.
+*Cada vez que se inicializa la ejecucion de un segundo hilo la CPU debe detener antes la ejecucion del primera hil (este primer hilo vuelve a correr milesimas de segundo despues que el segundo hilo ya esta en ejecucion). Este es el principal precio a pagar debido a la concurrencia y es conocido como Context Switch.
 *Un context switch de dos hilos de un mismo proceso es menos costoso que un context switch de dos hilos pertenecientes a dos procesos distintos.
 *Solo si dos tareas (tareas segun stackoverflow es un grupo de instrucciones que serán cargadas en memoria, o sea segun yo un pedazo de codigo que al ejecutarse realiza algo) de un proceso tienen mucha data en comun o si la seguridad es una prioridad, se aconseja ocupar programacion concurrente.
-*The SO maintains a dynamic priority for each thread to prioritize interactive threads and to avoid starvation for any particular thread in the sistem. La elección de de hilos por parte del SO no es aleatoria!!
+*The SO maintains a dynamic priority for each thread to prioritize interactive threads and to avoid starvation for any particular thread in the system. La elección de hilos por parte del SO no es aleatoria!!
 *Podemos crear threads de dos formas: 
 1. Implementando la interfaz runnable sobrescribiendo el método run. Esto se aconseja cuando queremos hacer pruebas simples, ya que los threads los podemos crear en el mismo metodo main con operador new Thread (new Runnable {
             @Override
@@ -111,7 +111,7 @@ lockObject.unlock();
 
 -LockInterruptibility() para parar externamente un hilo que esta pasando por codigo protegido
 -tryLock() para proteccion condicional de código. Retorna true y permite acceder a codigo/recurso si esta disponible.Retorna false y se no queda esperando si el codigo/recurso no esta disponible, sino que se mueve al else del if y podría volver al codigo/recurso despues una vez que este se libere. 
-Esta es la gran diferencia comparado con el metodo lock() (que tambien pertenece a la clase reentrantLock), que sí se queda esperando hasta que el codigo/recurso se libere, o sea puede bloquear, en cambio trLock() nunca bloquea.
+Esta es la gran diferencia comparado con el metodo lock() (que tambien pertenece a la clase reentrantLock), que sí se queda esperando hasta que el codigo/recurso se libere, o sea puede bloquear, en cambio tryLock() nunca bloquea.
 
 
 2.ReentrantReadWriteLock

@@ -9,6 +9,8 @@ Setear Maven en el IDE
 distinto al que descargamos, el que normalmente se debe guardar en la carpeta C/Usuarios/ahd1/.m2
 4.Agregar variables de entorno:
 
+
+
 		MAC:
 
 			export M2_HOME=/Users/bharaththippireddy/Documents/apache-maven-3.3.9/

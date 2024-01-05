@@ -14,7 +14,7 @@ instance, which are actually no longer needed in Spring Data JPA).
 
 JPA
 Java Persistance API is java standard technology for manipulating databases by mapping databases with java classes through objects of these classes, therefore it is one kind of ORM (Object Relational Model)
-Was launched in 2006 as part of Java EE 5, and uses the novel java anotations concept as one of it's primary features. Therefore, just as JDBC, JPA belongs Java EE 
+Was launched in 2006 as a part of Java EE 5, and uses the novel java anotations concept as one of it's primary features. Therefore, just as JDBC, JPA belongs Java EE 
 which means JPA is one of Java EE many specifications, and as so it can also be used outside Java EE despite the fact that it belongs to it. 
 
 JPA vs JDBC

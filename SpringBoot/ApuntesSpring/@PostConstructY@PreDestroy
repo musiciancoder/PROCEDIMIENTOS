@@ -1,8 +1,5 @@
-	//ejecucion de código despues de la creacion del Bean, equivalente al método Init del ciclo de vida de un bean
-	@PostConstruct //solo se puede usar con singleton, son void y no reciben argumentos
-	
-	//ejecucion de código despues de apagado contenedor Spring, equivalente al metodo Destroy del ciclo de vida de un bean
-	@PreDestroy //tambien solo se puede usar con singleton, son void y no reciben argumentos
+@PostConstruct annotated method will be invoked after the bean has been constructed using the default constructor and just before its instance is returned to the requesting object.
+@PreDestroy annotated method is invoked just before the bean is about to be destroyed inside the bean container.
 	
 
 1.Se crea el bean (los objetos)

@@ -1,0 +1,8 @@
+
+public sealed interface MyInterface permits ClassA, ClassB {
+//Only ClassA, ClassB can implement MyInterface
+}
+
+public sealed class MyClass permits ClassA, ClassB {
+//Only ClassA, ClassB can extend MyClass
+}

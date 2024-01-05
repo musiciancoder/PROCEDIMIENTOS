@@ -1,0 +1,24 @@
+PREDICATE
+What is a predicate, a predicate is a function with a single argument that returns a boolean, true
+
+or false back. To create a predicate, we use the functional interface predicate that takes a generic
+
+type, and it has a single method called test that takes the generic type and returns a boolean value
+
+back.
+
+Since it is a functional interface, we can express it using lambda expressions.
+
+
+FUNCTION
+What is the function? Function is just like a predicate, except for it can return any type of value,
+
+not just a boolean value we can pass in what type of data it will accept and the return type as well.
+
+And we can express it as a lambda expression because it has only one method called apply it is a functional
+
+interface with a method called apply.
+
+Whatever logic we implement using the lambda expression will be used and that value will be returned
+
+back instead of a boolean value.

@@ -1,0 +1,5 @@
+Recordar que la clase interna tiene acceso a la clase externa, pero no al revés.
+Para acceder a los campos privados de una clase desde otra clase.
+Para ocultar una clase pertenecientes al mismo paquete.
+Para crear clases internas anónimas muy útiles para gestionar eventos y retro llamadas.
+Cuando solo una clase debe acceder a los campos de ejemplar de otra clase.

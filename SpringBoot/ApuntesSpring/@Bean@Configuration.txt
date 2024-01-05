@@ -132,5 +132,5 @@ return new NombreClaseImplementadora
 }
 
 
-
+Otra forma de crear un bean es anotar la clase con la anotacion @Component. Entonces el scan de beans reconecerá y creará automaticamente un bean de esta clase cuando se inicie la app.
 

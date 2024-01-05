@@ -1,0 +1,331 @@
+La bases de datos no relacionales siguen la arquitectura de documentos, donde cada documentos pueden tener varios fields. Each field can be of different types (Strings, integers, etc). Documents structure follow a JSON format.
+There are 6 different json types: string, number, boolean, array (can contain different types), object (can nest other objects), null. Checkout pdf slides.
+BSON format (Binary json) contains many more types than JSON and it is used to store documents in mongoDB. 
+Very often we need to convert from JSON to BSON. We can achive this by using Extended JSON.
+There are two modes for extended JSON. Shell Mode, which is simpler, can take on functions and is widely used in mongo shell, and Strict Mode which uses '$' and is readable by every environment, not only shell).
+Database -->collection-->documents (organized in BSON format).
+MongoDB architecture consists of Mongo server (called Mongod), Mongo shell and many other tools such as mongodump, mongorestore, mongoimport, mongoexport,etc.
+To interact with mongo server from our local machine we use mongo shell (many other visual applications use mongo shell aswell). To interact from another server to mongo server we need a mongo driver which is specific
+for each language (Java, python, .net, etc.). The connections must support SSL (in fact mongo shell  supports SSL).
+There are three MongoDB options: 
+1)Locally on my PC. 
+En windows:
+-Ir a la pagina de mongodb y descargar el ejecutable para windows 64 bits
+-Ejecutar el ejecutable.
+-Abrir un cmd como administrador (C:/Windows/system32) y crear un directorio nuevo con comando md \data\db
+-Desde C:/Windows/system32 ejecutar comando que él pasó para instalar el servidor mongod
+-Desde C:/Windows/system32 ejecutar comando que él pasó para instalar el servidor mongo shell.
+Con comando show dbs vemos las bbdd y con db.version() vemos la version de mongo
+2) On a dedicated or VPS server.
+2.1)Lanzar una instancia de EC2 en AWS.
+2.2)Instalar MongoDB mediante sudo
+2.3)Configurar en shell con sudo para que cualquier maquina pueda tener acceso a MongoDB 
+2.4)Habilitar el puerto 27017 en los grups de seguridad en la consola de aws (inbound rules)
+-Conectarse a la instancia mediante SSH
+-Comando: use admin (admin es una db q viene por defecto)
+-escribir
+db.createUser({
+    user: "admin",
+    pwd: "securePassword",
+    roles: [
+        {
+          role: "root",
+          db: "admin"
+        }
+    ]
+})
+2.5)Conectarse desde el local a mongodb que esta instalado la instacia de amazon mediante el usuario que creamos en 2.5
+3) On the cloud. Podemos manejar mongo como un servicio en forma similar a ECS en AWS mediante cloud mongoDB (llamado coloquialmente mongodb Atlas). Esto es muy conveniente en produccion. Para ello debemos crearnos un cluster en la consola de atlas y conectarnos mediante mongo shell a este cluster.
+
+Intaló herramientas graficas q se conectan con c/u de los 3 modos anteriores. Estas herramientas graficas son mongo compass y robo 3T.
+
+Mongo Shell.
+En la sección de mongo shell mediante robo se conectó a mongodb atlas (podria haberse conectado a cualquiera de los otros dos servidores tambien).
+Options-->View-->text view (para ver resultados mas facilmente)
+Verify mongodb server version
+mongod --version
+db.version()
+db.buidServerInfo()-->muestra info del servidor. Muestra la version y el motor que esta construido sobre javascript "javascriptEngine":"mozjs".
+Ya que esta construido sobre javascript, usaremos siempre la notacion db.metodo(), con db siendo un objeto de javascript
+
+Verify mongodb shell version
+mongo --version
+version()
+It's possible to have different versions of MongoDB Shell and MongoDB server. But, of course it`s recommended to match MongoDB Shell and MongoDB server versions.
+db.help()-->muestra todos los comandos disponibles
+db.stats()-->muestra capacidad de almacenamiento
+db. y apretamos dos veces tab para mostrar todos los metodos a nuestra discposicion
+
+
+Types Syntax in Mongo shell mode
+
+TYPE                          SYNTAX
+String						""
+Object						{}
+Array						[]
+Boolean						NumberInt()
+32-bit Integer				NumberLong()
+64-bit IntegerDouble		0.0
+Date						ISODate()
+ObjectId					ObjectId()
+
+If the number is not specified, it will be stored as Double BSON value
+
+Podemos usar mongoshell para inicializar objetos de javascript y trabajar con ellos
+var obj = {a:"", b: {}, c:[], d:true}; 
+print(obj); //imprime
+objc. instanceof Array; //true
+Very important notice - we have just looked at value types using JavaScript, and "typeof" and" instanceof" are JavaScript operators which gave us information about JavaScript types, not BSON types.
+BSON types will be assigned to the values when this object will be passed to the MongoDB server.
+But for those types (Strings, Objects, Arrays and Booleans) types will be preserved and will match JavaScript types.
+En BSON cada tipo tiene un identificador (type identifiers) que puede ser un Number ID (2,3,4,8,16, etc (ver slides)o un String ID ("string", "object", etc). You can use both Number IDs and String IDs in the special "$" type operator in MongoDB Shell.
+Let's summarize key points of this module: we have discussed most commonly used BSON types.
+Now you know that "_id" is a mandatory field and it must be present in each MongoDB document.
+And values of this field must be unique across MongoDB collection.
+You know that ObjectID (este es el tipo del "_id") helps you to generate this unique "_id" value and ObjectID consists of timestamp, process ID, machine identifier and counter.
+We have also discussed how to properly store numbers in the MongoDB Database.
+By default each number is stored as a "double" type.
+But for example if you want to store integer you need to use special MongoDB syntax such as "NumberInt".
+We also discussed Mongo Dates and ISODates BSON type.
+
+Basic CRUD
+nota: recordar que al pulsr tecla tab se va a poder autocompletar los comandos.
+db --> mostrar base de datos activa (por defecto es admin)
+show collections-->mostrar colecciones de la bbdd activa
+show dbs-->mostrar bbdd disponibles (si una bbdd aun no tiene colecciones no va a aparecer!)
+use nombreBbdd -->cambiar a base de datos llamada nombreBbdd (tambien se usa para crear una bbdd si no esta creada, ya que no existe un comando tipo create nombreBbdd como tal)
+db.createCollection("nombreColeccion") -->crear collection
+db.getCollection("nombreColeccion").drop() -->eliminar collection
+db.dropDatabase()-->eliminar bbdd
+Si estamos usando una interfaz grafica como Robo3T tambien se pueden crear colecciones del mismo modo como se crean clases java en un IDE.
+Si pulsamos + abajo en la consola de robo 3T tambien podremos crear BBDD.
+Insert new Documents (ojo, que cada uno de estos tres devuelven diferentes cosas, revisar las slides de la seccion)
+Nota: db.getCollection('nombreColeccion') es lo mismo que db.nombreColeccion en la linea de comandos shell.
+1)Insert one or many documents --> db.collectionName.insert(<Object> or <ArrayOfObjects) va a crear un objeto con _id generado automaticamente.
+2)Insert one document --> db.collectionName.insertOne(<Object>) (por ejemplo db.mycoleccion.insert({}) tambien va a crear un objeto con _id generado automaticamente.
+2)Insert many documents --> db.collectionName.insertMany(<ArrayOfObject>)
+db.collectionName.find()-->muestra los documentos de esa coleccion. Se ocupa luego de cualquiera de los tres comandos mencionados anteriormente
+db.collectionName.remove({})-->elimina los documentos de una coleccion.
+"_id" es único para una coleccion, pero puede tener duplicados en colecciones distintas en una bbdd.
+db.getCollection('first').insertOne({
+"string":"Hello World",
+"boolean":true,
+"number":10, //esto va a guardar un decimal 10.0
+"numberInt":"numberInt(100),
+"numberLong":NumberLong(27746535535353546),
+"date":new Date(),
+"object":{
+"a":10,
+"b":true
+},
+"array":[1,2,3]
+})
+Para operaciones de lectura se ocupa:
+db.collectionName.findOne()-->devuelve un único doc
+db.collectionName.find({})-->devuelve desde mongoDB server un tipo cursor, con el que con MongoDB Client podemos iterar grupos de elementos a ser obtenidos mediante batch. 
+Batch size -->Maximal number of documents that can be sent from the server to the client in a one response. First time is 101, from then on it can be more.
+By default iterator size in the MongoDB shell is 20 documents. It can be customized.
+cursor.toArray() -->mete todos los elementos de un iterator en un array
+cursor.forEach(function)-->cada elemento del iterator va a ser pasado por la funcion
+cursor.forEach(doc=>print(`Index of the doc is ${doc}`))
+cursor.count-->numero de documentos
+cursor.limit-->Limit number of the documents in the cursor
+cursor.skip(number)-->Skip certain number of the documents
+cursor.sort({<fieldName1>:	1,	<fieldName2>:	
+-1,	...})	-->sort documents
+doc.index -->devuelve el indice
+doc._id-->devuelve el _id
+
+Operators
+En esta seccion no tomé apuntes por no considerarlo necesario, ya que con el pdf basta y sobra. Es para hacer busquedas por filtros con método find({}), con $ne, $gte, etc.
+
+Update Documents
+db.nombreColeccion.insertMany([{index: NumberInt(1)}, {index: NumberInt(2)}, {index: NumberInt(3)}, {index: NumberInt(4)}]) -->insertar n (en este caso 4) documentos.
+db.nombreColeccion.metodo(query,update,options)--> esta es la sintaxis
+{$set: {fieldName1:value1, fieldName2:value2 }}--> modificar un fieldname
+db.getCollection('nombreColeccion')
+.update(
+//query   //si no ponemos query se modifica solo el primer registro que el sistema encuentra. Esto para $unset tambien funciona asi
+{index:2}, 
+//update
+{$set: {
+     cartId:NumberInt(325),
+	 customer: {
+	   name:"MikeFoster",
+	   email:"mfoster@gmail.com,
+	   age:numberInt(27)
+	   },
+	   cart:[]
+	   }},
+//update options (Optional)
+{}
+)
+{$unset: {fieldName1:anyvalue, fieldName2:anyvalue }}--> quitar un fieldname (no borra el resto de los fieldnames del documento, que permanecen iguales)
+db.nombreColeccion.update({},{$set: {fieldName: value}},{multi:true}) -->procesa los valores encontrados en ese fieldname en todos los documentos de la coleccion
+db.nombreColeccion.updateOne({{fieldName1: value}},{$set: {fieldName2: value}},{}) -->procesa un solo valor, pero nosotros tenemos el control de este valor a modificar con fieldName1 (NOTA: fieldName1 y fieldName2 tambien pueden ser iguales)
+db.nombreColeccion.updateMany({{fieldName1: value}},{$set: {fieldName2: value}},{}) --> procesa varios valores simultaneamente para fieldname escogidos
+db.nombreColeccion.replaceOne({{fieldName1: value}},{replacementObject},{}) -->esto es para reemplazar todo un documetno por otro. Notar que _id no cmbia
+$rename: se usa iguail que $set, pero para cambiar el nombre de algun campo. Revisar slides para ver sintaxis.
+$currentDate:se usa para guardar la fecha de modificacion o de creacion como campo en el documento. Revisar slides para ver sintaxis.
+Operadores de Array
+$push:{nombreArray: {$each: [item1,item2] }}-->añade items a un array. Si el array no esta creado lo crea automaticamente.Acepta valores repetidos 
+$addToSet -->igual que $push pero solo introduce valores que no estan repetidos.
+$pop:{nombreArray:1 ó -1}-->borra un item de un array, ya sea el primero (-1) o el ultimo (1). Revisar slides para ver sintaxis.
+$pull --> es para eliminar elementos del array que cumplan con ciertas condiciones (mayor que, por ejemplo)
+$pullAll--> es para eliminar elementos del array que sean valores concretos.
+operador $ --> (escribi el ejemplo porque es peludo de cachar). Este operador apunta al indice del item indicado
+db.getCollection('shoppingCart')
+.updateOne(
+//query
+{cartId:561, cart:"item2}, //cartId:561 es para seleccionar el documento que contiene cartId:561, o sea es un campo:valor que esta fuera del array llamado 'cart'. Por otra parte cart:"item2 es el array que vamos a modificar en este documento
+//update
+{
+  $set:{
+  "cart.$":"updatedItem2" //$ apunta al indice de item2. updatedItem2 es lo que estamos escribiendo (vamos a reemplazr "item2" pot "updatedItem2"
+  }
+  },
+  //update options
+  {}
+  )
+Tambien se puede usar el operador $ en nested documents. Si no ocupamos $elemMatch en la query, los fieldname1:value1, fieldname2:value2  que escribamos pueden pertenecer al mismo elemento del array o a elementos distintos del array. Si usamos $elemMatch en la query, los fieldname1:value 1, fieldname2:value2  que escribamos siempre seran del mismo elemento del array
+
+Delete Operations
+db.getCollection('collectionName').remove({})-->borra todos los documentos de la coleccion
+db.getCollection('collectionName').remove({query},true)-->borra el documento de la query
+db.getCollection('collectionName').deleteOne({query})-->borra solo un documento, por lo que normalmente se usa con queries que se refieran al _id o al index
+db.getCollection('collectionName').deleteMany({query})-->borra varios documentos que cumplen con la query, por lo que normalmente no se usa con queries que se refieran al _id o al index
+db.getCollection('collectionName').drop()-->borra la coleccion
+use databaseName y luego databaseName.dropDatabase()-->borra la base de datos. Nunca debe usarse en la database llamada 'admin'.
+
+Aggregation Framework.
+Permite agrupar documentos que contienen un cierto tipo de informacion que es común.
+db.nombreColeccion.aggregate([stage1, stage2,....stageN])-->devuelve un cursor desde el servidor al cliente. Si no se pasa ningun argumento devuelve todos los documentos al igual que el metodo .find(). Ojo que el orden de los stages influye en el resultado q obtenemos.
+db.nombreColeccion.aggregate([{$match: {query}}] -->es exactamente igual al metodo find, pero aca estamos usando el framework aggregate.
+db.nombreColeccion.aggregate([{$group: {_id:"fieldname"}}]) -->agrupa segun todos los valores posibles de fieldname. Si el fieldname por ejemplo es "name" va a mostrar todos los nombres posibles "_id": Andres Diaz, "_id": Claudio Diaz, etc.
+El agrupamiento tambien es posible en campos anidados. db.nombreColeccion.aggregate([{$group: {_id:"company.location.country"}}-->muestra "_id": Spain, "_id":Italy, etc.
+db.nombreColeccion.aggregate([{$group: {_id:{eyecolor:"eyecolor",favouriteFruit:"favouriteFruit"}}}]) -->obtenemos todas las combinaciones posibles color de ojos vs fruta favorita.
+db.nombreColeccion.aggregate([
+//stage 1
+{match: {gender:"female"}},
+//stage 2
+{$group: {_id: {age:"age", gender:"gender"}}]) -->todas las combinaciones posibles de edad y genero perosolo para las mujeres.
+db.nombreColeccion.aggregate([
+//stage 1
+{$group: {_id: {age:"age", eyecolor:"eyecolor"}}},
+//stage 2
+{match: {gender:"female"}}]) --No da ningun resultado porque trata de hacer coincidir un gender female desde todas posibles combinaciones de colordeojos y edad.
+db.nombreColeccion.aggregate([
+//stage 1
+{$group: {_id: {age:"age", eyecolor:"eyecolor"}}},
+//stage 2
+{match: {"_id.eyeColor":"blue"}}])-->acá si obtenemos resultados porque eyecolor si era un campo que estaba en el stage1
+db.nombreColeccion.aggregate([
+//stage 1
+{$count: "allDocumentsCount"},
+//stage 2
+])-->cuenta todos los documentos de la coleccion-
+db.persons.aggregate([{$count:"total"}])-->devuelve "total":1000 (o sea un objeto)
+db.persons.find({}).count()-->devuelve 1000 (o sea un number). Lo que pasa es que Find count() is a wrapper of Aggregate $count
+db.persons
+.aggregate([
+//stage 1
+{$match:{age:{$gte:25}}}, //todos los documentos con personas edad mayor a 25 
+//stage 2
+{group:{}_id:{eyeColor:"$eyeColor", age:"age"}}}, //todas las combinaciones posibles de color de ojos y edad
+//stage 3
+{$count:"eyeColorAndAge"} //contar 
+])-->da como resultado un objeto "eyeColorAndAge":48
+db.persons
+.aggregate([{$sort:{age:-1,gender:-1,eyeColor:1}]} //clasifica priero por edad descendente, luego por gender descendente y por ultimo por color de ojos asendente
+])
+db.persons
+.aggregate([
+//stage0
+{limit:1000},-->solo muestra los primeros mil documentos que coincidan con lo q esta mas abajo
+//stage1
+$match:{eyeColor: {$ne:"blue"}}}, //selecciona orden alfabetico mayor o igual a blue
+//stage2
+{$group: {_id:{eyeColor:$"eyeColor", //agrupa comninaciones de color de ojos vs fruta favorita
+favouriteFruit: "$favouriteFruit"}}},
+//stage3
+{$sort:{"_id.eyeColor":1, "_id.favouriteFruit":-1}}} //ordena primero por color de ojos y luego por fruta favorita
+}}
+db.persons
+.aggregate([
+//stage1
+{$project:{isActive:0, name:0, gender:0}}
+])-->selecciona todos los documentos que no contengan los campos isActive, name ni gender
+db.persons
+.aggregate([
+//stage1
+{$project:{isActive:1, name:1, gender:1}}
+])-->selecciona todos los documentos que contengan los campos isActive, name y gender
+unwind-->sirve para trabajar con arrays. Por cada elemento del array va a crear un subdocumento aparte.
+db.persons
+.aggregate([
+//stage1
+{$unwind:"$tags"}, -->por c/u de los elementos del array tags va a crear un subdocumento
+//stage2
+{$project:{isActive:1, name:1, gender:1}} -->selecciona los subdocumentos anteriores q tienen isActive, nombre y gender.
+])
+db.persons
+.aggregate([
+//stage1
+{$unwind:"$tags"}, -->por c/u de los elementos del array tags va a crear un subdocumento
+//stage2
+{$group:{_id: "$tags"}} -->cada subdocumento va a tener un id_ que es igual a c/u de los elementos del array "tags"
+])
+Acumulators--> muestran sumas, promedios, etc. de groups de elementos
+db.persons
+.aggregate([
+{$group: {_id:"age",-->agrupa todas las posibles edades
+count:{$sum:1}}} -->cuenta cuantas personas por ejemplo tienen 27 años, 34 años o cualquier otra edad
+])
+db.persons
+.aggregate([
+//stage1
+{$unwind:"$tags"},-->crear subdocumentos para cada elemento
+//stage2
+{$group:{_id: "$tags",
+         count:{$sum: NumberInt(1)}}} --> en cada subdocumento va a agregar el campo "count" con el numero coincidencias de ese elemento del array en todos los documentos originales
+		 
+])
+db.persons
+.aggregate([
+//stage1
+{group: {
+_id:"company.location.country", //agrupa por pais
+avgAge: {$avg:"$age"} //muestra la edad promedio del agrupamiento, en este caso la edad promedio de personas q viven en italia
+}}
+])
+Unary operators-->type, etc. muestran valores solo para cada documento
+db.persons
+.aggregate([
+//stage1
+{$project: {
+   name:1, -->seleccione c/u de los documentos que llevan nombre
+   nameType: {$type:"$name"}, -->para c/u de de esos documentos muestreme el tipo del campo nombre
+   ageType: {$type:"$age"}, -->para c/u de de esos documentos muestreme el tipo del campo edad
+   tagsType: {$type: "$tags"} -->para c/u de de esos documentos muestreme el tipo del campo tages (es un array)
+   }},
+   //stage2 (opcional)
+   {out: "outCollection"}-->crea una nueva coleccion para los resultados de stage1
+   ])
+   
+   Indexes.
+   Indexes improve query performance.
+   Without indexes query performance will not be optimal.
+    And for each query MongoDB Server will need to scan entire collection, document by document.
+    That's why you must always pay attention and create indexes for main fields that are used in the queries.
+   _id_ es un atributo que viene por defecto para la coleccion y no se puede cambiar ni borrar.
+   _id en cambio es un atributo por defecto para un objeto en particular.
+   Resulta que para cada campo de una coleccion uno puede crear un indice.
+   ejemplo: db.getCollection('persons')
+   .createIndex({name:1},{unique:true})-->crea indices para el campo name.
+   db.getCollection('persons').getIndexes() -->vemos los resultados del comando anterior.
+   db.getCollection('persons').find({age:{$gt:27}}).explain(executionStats)--> esto es pa analizar performance. En el resultado hay un objeto llamado queryPlanner que muestra el performance. En este objeto esta el campo "stage", que si hemos agregado indices para el campo de interes (en nuestro caso el campo de interes es "age"), va a mostrar "stage":"IXCAN", q significa que busca solo los indices y no toda la coleccion. La query en este caso es mas rápida debido al uso de indices.
+   Ademas en el objeto executionStats (es opcional en el argumento) va a mostrar mas datos de performance como tiempo de ejecucion.
+   db.getCollection('persons').createIndex({age:1},{name:"customAgeIndex"})-->crea indice de nombre personalizado para el campo age.
+   db.getCollection('persons').find({gender:"male"}).explain("executionStats")-->Aca no estamos usando indexes. Como resultado obtenemos result:"stage:COLLSCAN", o sea se escanea absolutamente todo y no solo los indexesn lo q no es bueno para el performance.
+   db.getCollection('persons').dropIndex({age:1})-->elimina este index
+    db.getCollection('persons').dropIndexes()-->elimina todos indexes

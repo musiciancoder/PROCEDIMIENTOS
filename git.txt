@@ -233,6 +233,25 @@ Si hay cambios hacer inmediatamente un pull a nuestro main/remote local, luego c
 
 
 GIT STASH:
+es para guardar cambios sin hacer un commit, cosa que si no queremos guardar esos cambios en la rama actual pero sí en otra rama podamos hacerlo.
+1.git stash save "algo algo"-->guarda los cambios en el stash. Si luego damos un git status veremos que ya no tenemos nada para comitear, esto es porque se gurdaron los cambios en el stash.
+2.cambiarse de rama o crear rama nueva
+3.(esto es opcional) Si deseamos ver el stash se puede hacer con git stash list
+4. Con git stash apply podemos agregar el stash a nuestra rama nueva, pero ojo si tenemos mas cosas desde antes en el stash porque tambien se van a agregar (esto se puede ver con el comando anterior). De ser asi podemos seleccionar el item (e 1 por ejemplo) de la lista del stash q queremos agregar con el comando git stash pop stash@{1}.
+5. (opcional )Con git stash clear borramos todo el stash. 
 
+"please enter a commit message to explain why this merge is necessary"
+The commit message is from Git, but it is actually the editor that keeps you from quitting. This is because Git uses your default editor, which for a variety of reasons is usually set to vi (it might be something else on your OS, like pico).
 
+To write a commit message and get out of VI, follow these steps:
+
+press i (i for insert)
+write your merge message
+press esc (escape)
+write :wq (write & quit)
+then press enter
+You can also configure Git to use another editor to avoid having to use VI (or its close cousin VIM)
+
+RESET VS REVERT
+Si tenemos commit1, commit2, commit3, con el head en commit3 y queremos volver a dejar el head en commit2 y damos reset va a volver al commit2 el head borrando el commit3 forever, mientras que con revert no borra el commit3 sino que crea un nuevo commit4 que será igual al commit2 y el head estará en commit4.
 

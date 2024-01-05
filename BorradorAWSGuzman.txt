@@ -1,0 +1,11 @@
+NOTA: Hay que traspasar esto al documento original de los apuntes de Guzman que no los puede encontrar rapidamente.
+EC2 (elastic cloud computing) se diferencia de ECS (elastic cloud service) en que en EC2  nosotros gestionamos nuestras apps a traves de una o mas instancias de maquinas virtuales generadas por AMIs (amazon moving images),
+en cambio en ECS es amazon quien regula nuestras aplicaciones por medio de cluster (o red)-->servicios que levantan tareas-->tareas que contienen containers-->containers (de docker por ejemplo) que son capas finas de algun sistema operativo + JDK + aplicacion mediante docker-compose o dockerfile (habiendo previamente subido nuestros cambios de nuestra app a dockerhub).
+
+En ECS:
+En el cluster debemos dar los security groups (o firewall) que contienen los inbound rules y outbound rules con los protocolos y puertos.
+Cuando creamos un servicio en el cluster nos pide que setiemos un listener, que va a captar el numero de peticiones que van llegando. El listener va a requerir un load balancer que es el que se encarga de darnos un DNS fijo que dura independientemente de cuantas veces
+la app se cae, se baja o se levanta y ademas permite autoescalar (él no lo hizo). Ademas logicamente debemos setearle los tasks unidos a este servicio, por lo que previamente debemos crear nuestros tasks con los containers que queramos dentro, pero ademas al crear el task va a pedir 
+un IAM Role para poder chequear roles.
+En el servicio tambien deberá ir un "target group" que permite enlazar el container con el load balancer.
+Las pruebas las hace en postman con dns:puerto

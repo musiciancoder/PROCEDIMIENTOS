@@ -1,4 +1,4 @@
-minikube es una herramienta que permite virtualizar kubernetes, pero solo para trabajar en nuestro local.
+minikube es una herramienta que permite virtualizar un cluster de kubernetes, pero solo para trabajar en nuestro local.
 kubectl es una herramienta que permite simular un cliente que está ejecutando kubernetes (en local kubectl se comunica con minukube)
 
 

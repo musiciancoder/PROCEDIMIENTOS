@@ -1,0 +1,106 @@
+ Section3
+ 1.Install MongoDB server and started it in our local machine on port 27017.
+ 2.Install Studio 3T (differet from robo 3T and serves for same purpose) and connect to MongoDB server previously installed on our local machine.
+ 3.Created a Database
+ 
+ Section4
+ 1.Create 'student' collection (using studio 3T only).
+ 2.Create 3 different documents (using studio 3T only).
+ 3.Try a query using studio 3T only, no commands involved. On the "query" input in studio 3T just write the key:value pair you need. i.e "name":steve".
+ 4.Try a query using studio 3T only, no commands involved using operators $or and $and. Same thing as db.getCollection.find({$and:[{"key1":"value1"},{"key2":"value2"}]}) for ucranian guy, except now he just writes {$and:[{"key1":"value1"},{"key2":"value2"}]} on the "query" input in studio 3T.
+ 5. Try a query using studio 3T only, no commands involved using operators $in. {"name":{$in:["John","Peter"].
+ 4.To pass line commands, on studio 3T got o IntelliShell and then pass the path were mongo is installed (usually Srver-->3.2.-->bin-->mongo).
+ 5.Write update query on the command prompt db.student.update(
+                                         {
+										 "name":"John"
+										 },
+										 {
+										 $set: {
+										 "mail":"john@gmail"
+										 }
+										 }
+										 )
+6.Explain updateOne() and updateMany(), same thing as the ucranian guy.
+7.Explain delete using  db.student.remove({"name":"John"}).
+8.Explain find query with db.student.find({
+										 "name":"John"
+										 }).
+										 If he just types {
+										 "name":"John"
+										 } on the "query" input in studio 3T will be the same thing.
+9.Explain how to switch between databases by using 'use' command. 
+
+Section5
+1.Add to pom.xml spring.boot-starter-web and spring.boot-starter-data-mongodb
+2.In application.properties add:
+spring.data.mongodb.host=localhost
+spring.data.mongodb.port=27017
+spring.data.mongodb.database=spring
+3.Map java class
+@Document(collection= "student")
+public class Student
+
+//if we have more than one constructor we need to add @PersistenceConstructor annotation just before the second constructor. In his case he did not use them since he doesnt have constructors
+ {
+ @Id //mandatory, this is the field that is automatically managed by mongo and is equivalent to _id object, so it is not required on the requests.
+ private String id;
+ 
+ @Field(name = "name") //since in the database the field is named "name", @Field in this case is optional
+ private String name 
+ 
+ @Field(name = "mail") //since in the database the field is named "mail", @Field in this case is mandatory
+ private String email;
+ 
+ private Department department;
+ 
+ private List <Subjects> subjects;
+ 
+ getters y setters
+ }
+ 
+ //For Subjects and epartments he added @Fields in those classes whenever needed
+ 
+ 4.Creó interface StudentRepository
+ 
+ @Repository
+ public interface StudentRepository extends MongoRepository<Student, String> //Es string ya q el @Id en clase student es String. 
+ 
+ 5.En la clase principal del proyecto agregó la anotacion @EnableMongoRepositories("nombrePaqueteJavaQContieneNuestrosRepositorios")
+ 
+ Section6
+ 1.Agregó @ComponentScan("com.example.*") justo arriba de la clase principal llamada MongoDbApplication.
+ 2.Creó el Controller StudentController 
+ 
+ @RestController
+ @RestMapping("/api/student")
+ public class StudentController {
+ 
+ @Autowired
+ StudentService studentService;
+ 
+ @PostMapping("/create")
+ public Student createStudent (@RequestBody Student student){
+ return StudentService.createStudent(student)
+ }
+ }
+ 
+ 3.Creó clase StudentService en forma absolutamente convencional
+ 
+ @Service
+ public class StudentService{
+ 
+ @Autowired
+ StudentRepository studentRepository;
+ 
+ public Student createStudent (Student student) {
+ return studentRepository.save(student);
+ }
+ 
+ public Student getStudentById(String id){
+ return studentRepository.findById(id).get();
+ }
+ }
+ 
+ 4.Se fue a postman y mandó un json con todos los campos de student excepto id. Revisó en studio 3t que el documento que mandó estuviera guardado adecuadamente.
+ 5.En postman buscó el documento recien guardado por el id generado por congo con un GET localhost:8080/api/student/getStudentById/5e65648fgggd66
+ 

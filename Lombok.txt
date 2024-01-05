@@ -1,0 +1,14 @@
+1.Para q no reclame el intellij: Preferences-->Build, execution, deployment-->Compiler-->Annotation Processors-->Enable annotation Processing (checkbox)
+2.Agregar la dependencia de lombok en el pom
+
+@Data -->getters. setters, equalsandhashcode, tostring
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class User {
+
+private String firstName;
+private String lastName;
+private String email;
+
+}
