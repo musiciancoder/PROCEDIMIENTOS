@@ -103,4 +103,36 @@ public class Student
  
  4.Se fue a postman y mandó un json con todos los campos de student excepto id. Revisó en studio 3t que el documento que mandó estuviera guardado adecuadamente.
  5.En postman buscó el documento recien guardado por el id generado por congo con un GET localhost:8080/api/student/getStudentById/5e65648fgggd66
+ 6.Para obtener todos los documentos creados, en el controlador creó el metodo
+ @GetMapping("/all")
+ public List <Student> getAllStudents (){
+ return studentService.getAllStudents();
+ }
+ Luego probó en postman.
+ 7.Para hacer update a un documento en el controlador creo el metodo
+ @PutMapping("/update")
+ public Student updateStudent (@RequestBody Student student){
+ return studentService.updateStudent(student);
+ }
+ Luego en el postman tenemos dos opciones:1: pasamos el id en el body, por ejemplo "id":"54e77758884cv6664" en cuyo caso actualizara ese documento o bien 2.no le psamos ningun id y simplemente se creara un documento nuevo.
+ 8.En el controlador creo el metodo para borrar por id.
+ public String deleteStudent (String id){
+ studentRepository.deleteById(id);
+ return "Student has been deleted";
+ Lo probo en postman con GET localhost:8080/api/delete/5e65648fgggd66
+} 
  
+ Seccion7
+ Empezó a hacer varias queries segun nombre, email, etc. No hay nada muy nuevo en esta seccion.
+ Llama en el controlador con @RequestParam nombreCampo.
+ 1. findByName en el postman escribe GET localhost:8080/api/student/getStudentByName/john-1 ,con GetMapping("/studentsByName/{name}") en el controlador
+ 2.  findByNameAndEmail en el postman escribe GET localhost:8080/api/student/studentsByNameAndEmail?name=john&email=john@gmail.com ,con GetMapping("/studentsByNameAndEmail") en controlador
+ IMPORTANTE: Desde aca para abajo hay q ver el proyecto MongoDB, porque hay mucho código
+ 4. Para obtener los documentos con paginacion los llama con GET localhost:8080/api/student/allWithPagination?pageNo=2&pageSize=10
+ 5. Para obtener los documentos ordenados por algun campo lo hacemos con GET localhost:8080/api/student/allWithSorting
+ 6. Para obtener un subdocumento (en este caso nombre del departamento que se encuentra en el subdocumento department) en el editor de robo 3T lo hacemos con 
+{
+"department.department_name": "Computer Science"}. Ver código para llamar con postman mediante GET localhost:8080/api/student/byDepatmentName?deptName=Computer Science
+7. Recordar que subjects en nuestro proyecto en particular es un array de subdocuments. Se llama con GET localhost:8080/api/student/bySubjectName?subName=java
+8. Para operador like (que se usa con regular expressions) llamamos con GET localhost:8080/api/student/emailLike?email=yahoo
+9. Para startsWith (que se usa con regular expressions) llamamos con GET localhost:8080/api/student/nameStartsWith?name=john

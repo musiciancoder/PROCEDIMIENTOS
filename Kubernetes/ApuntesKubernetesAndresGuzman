@@ -4,7 +4,7 @@ Importante: cosas como comentarios y explicaciones de archivos yaml estan en est
 Sin embargo, el proyecto como tal (codigo) se sigue modificando de lo q venia en Docker, o sea aca: C:\Users\andre\Desarrollo\Curso_Microservicios_Docker_Kubernates_AWS. 
 En estas rutas estan los archivos con comentarios, sin embargo, si queremos copiar para pegar en otro proyecto, mejor descargar de los archivos del curso. 
 
-Podemos darle instrucciones a nuestro Cluster por medio de un cliente externo que se está comunicando
+Podemos darle instrucciones a nuestro Cluster (minikube) por medio de un cliente externo (kubectl) que se está comunicando
 El cliente envía instrucciones al cluster de kubernetes, el que por medio de la apiserver que se encuentra dentro del masternode se encarga de ejecutar adecuademente estas instrucciones, ya sea crear un pod, crear un deployment, etc.
 El Scheduler, que se encuentra dentro del masternode, se encarga de ver la disponibilidad de recursos de las maquinas, asignando el recurso recien creado (pod, deployment, etc.) a la máquina mas liviana.
 En el master node hay un componente llamado cloud controller manager manda una instruccion al cloud provider api (de AWS, por ejemplo) para q cree un load balancer.
@@ -17,20 +17,20 @@ Los pods tb pueden tener BBDD por medio de volúmenes, pero ya q los pod son des
 El archivo deployment crea y administra los pods por nosotros. Es un archivo yaml con la configuracion de memoria, volumenes, etc. para nuestros pods. Lo mas importante es que contiene el estado deseado de despliegue para administrar los pods y los crea por nosotros.
 El service crea y administra una red por nosotros. Por medio del nombre o el IP de esta red se comunican los pods entre ellos.
 
-minikube es una herramienta que permite virtualizar kubernetes, pero solo para trabajar en nuestro local.
+minikube es una herramienta que permite virtualizar kubernetes y generar un cluster virual con un solo worker node, pero solo para trabajar en nuestro local.
 kubectl es una herramienta que permite simular un cliente que está ejecutando kubernetes (en local kubectl se comunica con minukube).
 
 Nota: Los comandos están en archivo "ComandosMiniKubeYKubectl".
 Nota: Revisar los comentarios para los archivos yaml. Los comentarios están repartidos entre todos estos archivos, ya q se fue tomando nota a partir de lo que Guzman decía, por lo que se recomienda revisarlos todos
 
 Lo que él hizo en local fue:
-1. Levantó el cluster virtual con minikube.
-2. Por medio del cliente kubectl creó imperativamente un deployment con la imagen mysql8 desde docker hub. Esto indirectamente generó ademas un pod. Notar que al parecer no existe un comando para crear pods directamente, sino q se hace a través de la creacion de un deployment.
+1. Levantó el cluster virtual con minikube (que permite solo un worker node, por lo q todos los pods estaran en este worker node)
+2. Por medio del cliente kubectl creó imperativamente un deployment con la imagen mysql8 desde docker hub. Esto indirectamente generó un pod. Notar que al parecer no existe un comando para crear pods directamente, sino q se hace a través de la creacion de un deployment.
 3. En el paso anterior se dió cuenta de que no se puede agragar variables de ambiente por comandos, por lo que mejor generó un archivo yaml de deployment (ver comandos) y le agregó las variables de ambiente (clave valor para password y database). Luego ejecutó este archivo yaml para crear un deployment declarativamente. 
-4. Creó un servicio al exponer el deployment de mysql8 (ver comandos), con el fin de obtener un nombre de dominio fijo y IP fija y de esta manera poder conectar internamente los pod de mysql8 y msvc-usuarios, este último a ser creado aun.
+4. Creó un servicio al exponer el deployment de mysql8 (ver comandos --type ClusterIP), con el fin de obtener un nombre de dominio fijo y IP fija y de esta manera poder conectar internamente los pod de mysql8 y msvc-usuarios, este último a ser creado aun.
 5. Generó un deployment para msvc-usuarios, lo que indirectamente creó un pod. Lo hizo imperativamente, ya que acá sí tenía las variables de ambiente.
 6. Expuso el deployment de msvc-usuarios (=generó un servicio), pero no para comunicacion interna como en el caso anterior, sino para comunicación externa con kubectl expose deployment msvc-usuarios --port=8001 --type=LoadBalancer
-Notar en este punto que un servicio lo podemos crear con varias opciones (ver comandos) como con Load Balancer, etc.
+Notar en este punto que un servicio lo podemos crear con varias opciones (ver comandos) como con ClusterIP (para comunicacion entre los pods solo dentro del cluster, por ello ClusterIP es uma IP privada (funciona solo dentro de la red), con Load Balancer (que por ahora muestra un status pending en minikube, pero que da la facultad para posteriormente tener una IP publica por medio de algun proveedor de nube como amazon para comunicacion externa (fuera del cluster) ademas de interna (dentro del cluster)).
 7. Obtuvo la IP externa de msvc-usuarios en minikube (ver comandos) y probó en postman con esta ip y el puerto externo con GET http://ipMinikube:30507. Obtuvo un array de usuarios vacío, que debemos poblar mandando POST a http://ipMinikube:30507 con datos de usuario.
 8. Actualizó la imagen de un deployment. 
 Para ello en la clase UsuarioController, con el objetivo de generar un crash en la aplicación, agregó:
@@ -40,9 +40,9 @@ public void crash() {
 } 
 A continuación construyó la imagen docker con este cambio y subió la imagen a docker hub.
 Luego en el pod verificó el nombre del container que estaba usando y vió que no era la misma que acababa de subir a dockerhub. Por ello actualizó la imagen imperativamente (ver comandos).
-Luego probó en postman con http:172.3187477474:30507/crash y vio que se le reinició la aplicacion debido al crash ya que con comando kubectl get pods aparece RESTARTS en 1 y no en 0. Ojo, en el pod en status debe aparecer como Running, no como Completed para q este levantado (se puede demorar un poco y aparecer como Completed primero).
+Luego probó en postman con http:172.3187477474:30507/crash y vio que se le reinició la aplicacion debido al crash ya que con comando kubectl get pods aparece RESTARTS en 1 y no en 0. Ojo, en el pod en status debe aparecer como Running, no como Completed para q este levantado (se puede demorar un poco y aparecer como Completed primero). Podemos analizar el estado de los containers del pod con comando "describe" (ver comandos). Al parecer esto es debido a que cuando un pod esta funcionando por defecto levanta automaticamente los containers que se caen. 
 Finalmente se creó una nueva imagen (o sea v3) eliminando los 20 seg en linea CMD del dockerfile de msvc-usuarios y volvió a revisar los pods. 
-9.  Escaló el deployment msvc-usuarios con tres replicas, con ello generamos tres instancias, o sea tres pods con carga balanceada.
+9.  Escaló el deployment msvc-usuarios con tres replicas (ver comandos), con ello generamos tres instancias, o sea tres pods con carga balanceada.
 10. Probó en postman con http:172.3187477474:30507/crash y con kubectl get pods vió que un pod tenía un restart de 1 , pero los otros 2 tienen restarts de 0 y status de Running, con lo q se comprueba que la carga está balanceada.
 11. Volvió a escalar el deployment, pero solo con una réplica.
 12. Generó un nuevo archivo yaml para el servicio de mysql8. (ver archivo de nombre svc-mysql.yaml) Este lo editó, ya q borró metadata como fecha de creación y otros datos. En spec solo dejó los puertos. Port es el puerto externo y targetPort es el interno del contenedor (para nuesto caso en ambos es 3306).
@@ -65,20 +65,21 @@ VOLUMENES
 
 Las BBDD si no se crean volúmenes  se encuentran en los containers. Sucede que muchas veces producto de trafico excesivo o de autoescalamiento el o los containers de un pod se reinician, perdiendose estos datos.
 Es posible en Kubernetes tambien guardar volumenes en los pods (ver pdf de guzman), sin embargo si el pod se elimina tambien se pierde la informacion.
-Es por ello que debemos crear volumenes que pertenezacan al worker node (o sae a la maquina) y no al container ni al pod, para persistir datos y que se puedan compartir siempre entre containers pertenecientes a la misma maquina.
-Para ello requerimos un driver. Existen varios driver (driver=Types of Volumes) dependiendo del proveedor (aws, azure), etc, del numero de nodos y de otros factores. Uno de estos driver es CSI, que es una especificación que debe ser implementada por algun proveedor (como Hibernate implementa JPA) como AWS. CSI trabaja con varios nodos y por lo mismo suele ser ocupado en produccion
-Para nuestro caso sin embargo que trabajamos com minikube con un solo nodo, usaremos el driver hostPath, q sirve para un nodo unico. 
+Es por ello que debemos crear volumenes que pertenezacan al worker node (o sea a la maquina) y no al container ni al pod, para persistir datos y que se puedan compartir siempre entre containers pertenecientes a la misma maquina.
+Para ello requerimos un driver. Existen varios driver (driver=Types of Volumes) dependiendo del proveedor (aws que tiene el servicio EFS para estos fines, azure), etc, del numero de nodos y de otros factores. Uno de estos driver es CSI, que es una especificación que debe ser implementada por algun proveedor (como Hibernate implementa JPA) como AWS. CSI trabaja con varios nodos y por lo mismo suele ser ocupado en produccion.
+Para nuestro caso sin embargo que trabajamos com minikube con un solo nodo, usaremos el driver hostPath, q sirve para un nodo unico y estaremos guardando el volumen fuera del pod, para que cuando el pod se destruya no se elimine la data en mysql ni en postgres
 
 Para la siguiente configuración, recordar q aunque el volumen está fuera del pod pero dentro del nodo debido al uso de hostPath, la configuración se hace en el deployment. 
 
-1. Modificó el archivo deployment-mysql.yaml (ver archivo) incluyendo la configuracion de volumenes.
+1. Modificó el archivo deployment-mysql.yaml (ver archivo) incluyendo la configuracion de volumenes. Notar que en el deployment.yaml el "volumeMounts" es la ruta dentro del container (obviamente en el pod) y el "volume" es el volumen.
+Notar q el deployment en este caso se encarga del pod y del volumen, pero ambos son independientes entre ellos.
 2. Con comando minikube service msvc-usuarios --url  y despues minikube service msvc-cursos --url verificó IP y puertos para probar en postman con ip:puerto con los GET y los POST
 3. Ejecutó el deployment-mysql.yaml con comando apply (esto reinicia los containers, por lo que solo por esta vez el GET para usuarios estará vacío ). Para comprobarlo vió el log del pod con kubectl logs claveDelPod y se fijó q habia un error.
 4. Con comando kubectl delete -f.\deployment-mysql.yaml borró el deployment (con los pods) debido a la situacion del punto anterior y luego lo creó de nuevo con comando apply. Comprobó q ahora si se estan guardando los datos aun si bota el pod debido al volumen q está fuera de este.
 5. Realizó los mismos cuatro pasos anteriores pero para la BBDD de Postgres con el archivo deployment-postgres.yaml (no esta en el archivo mio porque es lo mismo y me dio lata, pero se puede descargar al final de la seccion)
 
 Aparte de lo anterior existe la posibilidad de tener una configuración para volumenes que pertenezca al cluster y que no esté anclado a un despliegue en particular, por lo q el volumen no va a estar anclado a un pod o a un nodo. Esto se logra con
-Persistant Volumes, en donde se tiene un archivo yaml con configuracion general, que podrá ser ocupado por uno o varios nodos o pods. En el yaml individual del pod debemos llamar a este archivo general a través de claims para tener acceso a los recursos guardados en el cluster.
+Persistant Volumes, en donde se tiene un archivo yaml con configuracion general para volumenes, que podrá ser ocupado por uno o varios nodos o pods. En el yaml individual del pod debemos llamar a este archivo general a través de claims para tener acceso a los recursos guardados en el cluster.
 Para pv:
 1. Escribir el archivo de persistent volume (ver archivo mysql-pv.yaml).
 2. Escribir el archivo de persistent volume claims para los pods (ver archivo mysql-pvc.yaml).
@@ -100,9 +101,14 @@ El archivo secret.yaml permite codificar en base 64 la informacion sensible, com
 
 SPRING CLOUD KUBERNETES
 
+Spring Cloud Kubernetes provee una integración de Spring Cloud que permiten a los desarrolladores crear y ejecutar aplicaciones de Spring Cloud en Kubernetes.
+-DiscoveryClient: Resuelve los nombres de servicios en los servicios de Kubernetes
+-Configuracions:  Carga las configuraciones del application.properties desde Kubernetes ConfigMaps y Secrets
+-Spring Cloud balancer: Provee implementación de balanceador de carga basado en Kubernetes Service
+
 Modificó los proyectos para q se pudieran comunicar mediante spring cloud kubernetes.
 Para ello en ambos proyectos:
-1. Agregó las tres dependencias de kubernetes.
+1. Agregó las tres dependencias de kubernetes (spring-cloud-starter-kubernetes, spring-cloud-starter-kubernetes-client y spring-cloud-starter-kubernetes-loadbalancer)
 2. Eliminó las url en las interfaz UsuarioClientRest y CursoClientRest, ya q en kubernetes la comunicacion es solo mediante nombre de servicio (que se encuentra en application.properties)
 3. En ambas clases main agregó la configuracion @EnableDiscoveryClient //para poder usar spring cloud kubernetes
 4. Generó las imagenes para ambos servicios en docker y las subió a docker hub.
@@ -140,9 +146,9 @@ Por ejemplo si existe un pod que no esta funcionando bien, las peticiones se der
 1. Agregar en pom dependencia de spring boot actuator, que permite ademas chequear otras cosas interesantes ademas de readiness y liveness como metricas, chequeos de url, etc.
 2. En application properties escribir la configuracion para readiness y liveness. En archivo deployment (en este caso deployment-usuarios-seccion-spring) escribir variables de ambiente para readiness y liveness.
 3. Subir la imagen de nuevo a dockerhub. Ejecutar el archivo de deployment (deployment-usuarios-seccion-spring en nuestro caso).
-4. Probar en postman. Primero igual que en los casos anteriores (para confirmar q funciona). Luego con un GET probar para msvc-usuarios con GET http://172.18.2013.250:31320/actuator luego http://172.18.2013.250:31320/actuator/info y luego http://172.18.2013.250:31320/actuator/health y luego http://172.18.2013.250:31320/actuator/env y luego con http://172.18.2013.250:31320/actuator/health/readiness y luego http://172.18.2013.250:31320/actuator/health/liveness
+4. Probar en postman. Primero igual que en los casos anteriores (para confirmar q funciona). Luego con un GET probar para msvc-usuarios con GET http://172.18.2013.250:31320/actuator luego http://172.18.2013.250:31320/actuator/info y luego http://172.18.2013.250:31320/actuator/health y luego http://172.18.2013.250:31320/actuator/env (hasta aqui muestra informacion genérica al agregar el spring actuators que hubiera aparecido sin escribir la configuracion de kubernetes) y luego con http://172.18.2013.250:31320/actuator/health/readiness y luego http://172.18.2013.250:31320/actuator/health/liveness (aqui si se requiere la configuracion de kubernetes)
 
-Kubernetes permite personalizar la asignacion de recursos a nuestros containers (si no pernosalizamos igual esto se realiza por defecto), como memoria ram y/o cpu. Esto al igual q los 2 temas anteriores tambien se setea en las variables de entorno del archivo deployment (en nuestro caso deployment-usuarios-seccion-spring). Naturalmente los limits van a depender de la disponibilidad de recursos q tengamos en nuestro worker node o machine en el proveedor (aws, por ejemplo).
+Kubernetes permite personalizar la asignacion de recursos a nuestros containers (si no pernosalizamos igual esto se realiza por defecto), como memoria ram (en megabytes) y/o cpu (en milicores). Esto al igual q los 2 temas anteriores tambien se setea en las variables de entorno del archivo deployment (en nuestro caso deployment-usuarios-seccion-spring). Naturalmente los limits van a depender de la disponibilidad de recursos q tengamos en nuestro worker node o machine en el proveedor (aws, por ejemplo). Mencionó la integracion de kubernetes con herramientas exteras como Grafana, Prometheus para monitorear consumo de recursos.
  Solo para msvc-usuarios realizó lo siguiente:
 1. Agregó requests y limits en deployment-usuarios-seccion-spring
 2. Borró y ejecutó (comandos apply y delete) deployment-usuarios-seccion-spring. Se demora al levantar!!
@@ -153,13 +159,13 @@ Gateway es un servidor de enrutamiento dinamico compuesto por filtros de funcion
 Existen dos implementaciones: Zuul de Netflix y Spring Cloud Gateway (con comunicacion asincrona).
 El gateway es el punto de entrada al ecosistema de microservicios desde el exterior (internet) y sera el encargado de enrutar cada uno de estos servicios con url individuales a una url base. 
 
-1. Creó el proyecto msvc-gateaway como modulo hijo de curso-kubernetes. Luego agregó dos de las dependencias de Kubernetes.
+1. Creó el proyecto msvc-gateaway como modulo hijo de curso-kubernetes con la dependencia spring-cloud-gateway-starter. Luego agregó dos de las dependencias de Kubernetes (las de client). Cuidado con las versiones!
 2. Creó el archivo application.yaml en resources del proyecto msvc-gateaway, para enrutar msvc-cursos y msvc-usuarios individualmente a esta configuracion centralizada que es el gateway; ademas en este archivo hay que indicar que vamos a proveer loadbalancer (de spring cloud en nuestro caso). La configuraciones de este archivo application.yaml tambien se podrian haber hecho en el application.properties nornal con la configuracion que sale en el curso
 3. Se creó un dockerfile para msvc-gateaway, construyó la imagen, le puso un tag (siempre le puso un tag en todos los casos anteriores, por si acaso) y la subió a  dockerhub. 
 4. Creó el archivo gateway.yaml, donde colocó juntos el deployment (con la imagen del dockerfile q creó en el paso anterior) y el servicio del gateway. No lo tengo como archivo, porque me dio lata ya q es repetir lo hecho para msvc-cursos o msvc-usuarios, pero se puede descargar de los archivos del curso.
 5. Verificó el deployment (con kubectl get pods) y el servicio (con kubectl get services). En el servicio cachó que tiene asignado el puerto 8090:30074/TCP para gateway (el 30074 asignado automaticamente por minikube).
 6. Con comando minikube service msvc-gateaway --url cachó la ruta http://172.29.201.32:30074 para probar en postman
-7. En postman probó con GET http://172.29.201.32:30074/api/usuarios (recordar q /api/usuarios fue la ruta q se le dió a msvc-usuarios en archivo application.yaml). Notar que es el loadbalancer de spring cloud el q esta en uso, no el de kubernetes, ya que aunque tiene el connection en los headers, le funciona impeca.
+7. En postman probó con GET http://172.29.201.32:30074/api/usuarios (recordar q /api/usuarios y /api/cursos fue la ruta q se le dió a msvc-usuarios en archivo application.yaml). Notar que es el loadbalancer de spring cloud el q esta en uso, no el de kubernetes, ya que aunque tiene el connection en los headers, le funciona impeca.
 
 
 EKS de AWS
@@ -193,8 +199,9 @@ Volvemos a la pantalla de creacion de nodos, seleccionamos el rol q acabamos de 
 Luego en el paso 2 ("Establecer la configuracion de informatica y de escalado", donde debemos especificar las propiedades de la maquina), seleccionar las propiedades adecuadas (ver pantallazos).
 En paso 3 debemos especificar las redes. Por defecto ya dieran mostrarse seleccionadas las subnets que se generaron en el cluster. Lo dejamos tal cual.
 En paso 4 revisamos y damos click en "crear". Entonces en la pantalla de "Grupos de nodos" va a aparecer "creando". Hay que estar actualizando hasta q ya haya sido creada y en la pantalla del cluster aparezcan los nodos (se demora!).Cuando ya este listo en el panel de EC2 van a aparecer dos instancias en ejecucion (creamos 2), pero si bien estan creadas hay q seguir esperando hasta q se inicializen (hay q ir actualizando la pagina).
-5. Crear un sistema de almacenamiento con EFS (elastic file sistem) para guardar nuestas bbdd de postgress y mysql. Usaremos persistent volumes mediante el driver csi o Container Storage Interface ( a diferencia del local donde ocupamos hostPath). 
-CSI es una interfaz q provee kubernetes para q los proveedores (en este caso aws) lo puedan implementar, en donde el sistema de almacenamiento esta 100% fuera de cualquier worker node. La implementacion de csi para el caso particular de aws es EFS, que por debajo es un NFS (net file system, o sea en la red). Para ello:
+5. Crear un sistema de almacenamiento con EFS (elastic file sistem) para guardar nuestas bbdd de postgress y mysql. Usaremos persistent volumes mediante el driver csi o Container Storage Interface ( a diferencia del local donde ocupamos hostPath que servía solo para una máquina, lo que estaba perfecto para minikube donde siempre se trabaja con una maquina o nodo). 
+CSI es una interfaz q provee kubernetes para q los proveedores (en este caso aws) lo puedan implementar, en donde el sistema de almacenamiento esta 100% fuera de cualquier worker node. La implementacion de csi para el caso particular de aws es EFS, que por debajo es un NFS (net file system, o sea en la red). 
+Para generar el sistema de almacenamiento en EFS:
 En buscador de aws escribimos efs y click en "crear sistema de archivos". Damos un nombre (para mysql en este caso), cambiamos el VPC al que creamos en pasos anteriores y click en "Personalizar".
 El paso 1 lo dejamos tal cual. En paso 2 ("acceso a la red") Nos va a pedir grupos de seguridad, por lo q nos vamos a grupos de seguridad y creamos uno nuevo.
 Para ello le damos un nombre al grupo, descripcion, seleccionamos el vpc de nuestro cluster. En "reglas de entrada" seleccionamos NFS en "tipo" y en origen debemos pegar el IPv4 de nuestro VPC. Luego click en "crear grupos de seguridad".
@@ -210,7 +217,7 @@ Copiar comando desde github (esta en los archivos adjuntos del curso, ver pantal
 
 SPRING SECURITY
 
-1. Creó el proyecto msvc-auth en spring inizialzr con las dependencias spring security, spring web y spring reactive web, esta ultima dijo q era una alternativa a feignclient q es lo q se ocupa en los otros proyectos. En el pom del proyecto recien creado sin embargo, no le aparece una dependencia spring reactive web propiamente tal, sino spring-boot-starter-webflux
+1. Creó el proyecto msvc-auth en spring inizialzr con las dependencias spring security, spring web y spring reactive web, esta ultima dijo q era una alternativa a feignclient q es lo q se ocupa en los otros proyectos aqui (cursos y usuarios). En el pom del proyecto recien creado sin embargo, no le aparece una dependencia spring reactive web propiamente tal, sino spring-boot-starter-webflux
 Agregó ademas las dependencias de kubernetes, agregó la version de spring cloud en el pom y lo dejó como modulo del proyecto parent curso-kubernetes. En la clase principal agregó @EnableDiscoveryClient.
 
 
@@ -218,24 +225,24 @@ Agregó ademas las dependencias de kubernetes, agregó la version de spring clou
 Spring Authorization Server (documentacion) "SAS is a framework that provides implementation of the OAuth 2.1 and OpenIDConnect 1.0 specifications and other related specifications. It is built on top of
 Spring Security to provide a secure, light-weight and customizable foundation for building OpenID Connect 1.0 Identity Providers and OAuth2 Authorization Server products. SAS can be used anywhere you already use Spring Security (o sea en el proyecto que acabamos de crear)" Es relativamente nuevo.
 2.1.Agregó librería de oauth en el pom de msvc-auth, para q msvc-auth se convierta en un servidor de autorizacion para login
-2.2.Copió y pegó directamente de la documentacion la clase SecurityConfig, q es la clase de configuracion de spring security (tuve algunos problemillas con letras rojas, por lo que mejor llegué y copié del codigo fuente del curso).
+2.2.Copió y pegó directamente de la documentacion la clase SecurityConfig, q es la clase de configuracion de spring security (en el video explica para qué es cada uno de los Beans de esta clase) (tuve algunos problemillas con letras rojas, por lo que mejor llegué y copié del codigo fuente del curso).
 
 3. Habilitó nuestro servicio msvc-usuarios como cliente para el servidor de autorizacion msvc-auth, para poder hacer login (lo configuró para local/minikube primero, despues lo cambiará para kubernetes/aws). Para ello:
  3.1. Agregó la libreria de oauth2-client en el pom de msvc-usuarios.
  3.2. Creó un application.yml en msvc-usuarios y dentro configuró el cliente con la ruta de autorizacion
  3.3. En UsuarioController creó el metodo authorized para manejar la ruta dada en el paso 2, lo q devolverá clave-valor de codigo de autorizacion.
- 3.4. Creó SecurityConfig en msvc-usuarios, que es la clase de configuracion de Spring Security para el cliente. En este caso msvc-usuarios es un cliente en el ambito de spring security
+ 3.4. Creó SecurityConfig en msvc-usuarios, que es la clase de configuracion de Spring Security para el cliente, conteniendo el metodo securityFilterChain que devuelve un SecurityFilterChain o sea un filtro de seguridad. Este metodo contiene la configuracion de autorizacion , que en nuestro caso un estado 'stateless' para que podamos usar tokens y la ruta de la pagina de login.  
 
 
-4. Configuró el servidor de recursos en msvc-usuarios, que es para proteger nuestras rutas. Para ello:
+4. Configuró el servidor de recursos en msvc-usuarios, para que se pueda conectar con el servidor de autorizacion y asi proteger nuestras rutas. Para ello:
  1. Agregó libreria en el pom de msvc-usuarios
- 2. Agregó configuracion en el application.yml
- 3. En clase SecurityConfig de msvc-usuarios agregó antmatchers para dar permisos a las rutas
+ 2. Agregó  en el application.yml la configuracion para el servidor de recursos, que deberá contener la ruta issuer-uri (distribuidor de uri) para jwt
+ 3. En clase SecurityConfig de msvc-usuarios agregó en metodo securityFilterChain() loa antmatchers para dar permisos a las rutas de los verbos de REST (GET, POST, PUT, DELETE) con hasAuthority() y a la ruta "/authorized" que es cuando aun no tenemos el token y lo queremos obtener por medio del codigo de autorizacion. De esta forma si escribe estas rutas en la barra de direcciones no podrá hacerlo si no esta autenticado.
  
-5.Configuró varibles de entorno en msvc-usuarios, para poder acceder desde el cliente (o sea msvc-usuarios) a los recursos del servidor de recuros en minikube. Para ello:
+5.Configuró varibles de ambiente (credenciales) para en msvc-usuarios, para poder acceder desde el cliente (o sea msvc-usuarios) a los recursos del servidor de recuros en minikube. Para ello:
   5.1. Agregó variables de ambiente en application.yml ( ${LB_AUTH_ISSUER_URI:http://127.0.0.1:9000}). Ojo, que Andrés Guzman le llama loadBalancer a la IP.
-  5.2. Agregó variables de ambiente Configmap
-  5.3. Agregó variables de ambiente en deployment-usuarios
+  5.2. Agregó variables de ambiente Configmap. Agregó las del servidor de autorizacion (la de 5.2) y la del cliente LB_USUARIOS_URI:http://127.0.0.1:9000 que hace referencia al valor que esta en deployment-usuarios.
+  5.3. Agregó variables de ambiente en deployment-usuarios (o sea en el cliente). Name y value.
   5.4. Ya q anteriormente habia agregado librerias, volvio a construir la imagen para msvc-usuarios, darle un tag y subirla a dockerhub.
   
 6.Configuro varibles de entorno en msvc-auth, para ello:

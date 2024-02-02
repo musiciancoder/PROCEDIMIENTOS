@@ -1,0 +1,4 @@
+Ambas se usan cuando usamos ORM con mongo DB.
+@Document se usa a nivel de clase
+@Field se usa a nivel de campo
+

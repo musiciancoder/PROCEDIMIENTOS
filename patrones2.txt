@@ -59,16 +59,19 @@ Cuando tenemos demasiados atributos y deseamos evitar demasiada sobrecarga de co
 
 
 *PATRONES ESTRUCTURALES
-Son patrones de diseño basados en herencia.
+Son patrones de diseño basados en herencia y composicion.
 Consiste en generar clases complejas y/o objetos complejos pertenecientes a estas clases a partir de módulos mas simples mediante herencia, con el objetivo de cumplir con principios SOLID. 
 Muchas veces cuando recien comenzamos a desarrollar un proyecto, no se tiene claridad acerca de propiedades y atributos finales que irán en una clase en particular. 
 Por ello en el medio del desarrollo, cuando ya existe cierta claridad sobre ello se le pide al desarrollador ir agregando estas propiedades, lo que obliga a modificar clases; el código del comienzo al agregarsele estos atributos la mayoria de las veces viola principios SOLID.
 Si trabajamos en cambio con patrones estructurales desde el comienzo, una petición de modificación de ciertas variables o atributos no nos va a afectar ya que estamos cumpliendo principios SOLID desde el principio. 
+
+¿Qué es composicion en Java? es usar una clase que que hemos constuido nosotros como instance variable (campo de clase) para definir atributos de otra clase.
   
 
-ADAPTER
+ADAPTER "Allows objects with incompatible interfaces to colaborate with one another"
 Consiste en que una clase implemente los métodos de una interfaz, pero no directamente, sino a traves de una clase adaptadora, que en su interior convierte los métodos de la clase a adaptar a los métodos de la interfaz
-¿Cuando usar? Cuando deseamos que una clase cualquiera ya hecha implemente una interfaz pero sin tener que modificar la clase ni la interfaz, dejándolas completamente independientes la una de la otra
+¿Cuando usar? Cuando deseamos que una clase cualquiera ya hecha implemente una interfaz pero sin tener que modificar la clase ni la interfaz, dejándolas completamente independientes la una de la otra. Esto a menudo ocurre porque deseamos por ejemplo que una o varias de nuestras clases implementen una interfaz de una dependencia externa, con los metodos a implementar ya listos. Si nuestra clase implementara directamente esta interfaz violaria el principio de 
+single responsability y se veria muy rebuscado sobreescribiendo los metodos de esta interfaz que no tienen mayor relacion con nuestra clase.
 
 BRIDGE
 Consiste en crear una clase que sirva como puente entre dos interfaces (ejemplo del catalan) o entre una interfaz y una clase abstracta (ejemplo del gringo en https://www.youtube.com/watch?v=9jIgSsIfh_8&t=182s ), 
@@ -76,8 +79,11 @@ ya sea  que estos tengan métodos en común o no para que la abstraccion y la im
 ¿Cuando usar? Cuando una interfaz (VendedorOnline) ya desarrollada nos percatamos posteriormente que debe ser subdividida (VendedorOnLineEmpresas) y no deseamos mofificar la interfaz original 
 Ver ejemplo del catalán, queda mas claro.
 
-COMPOSITE
-Consiste en crear una estructura de arbol de estructuras, para que cada una de estas estructuras funcione de forma independiente. 
+COMPOSITE 
+
+Consiste en crear jerarquias mediante composicion. La idea es crear clases concretas (por ejemplo varios tipos de productos como shampoo, jabon, etc) que extiendan una interfaz en comun. El composite contiene una lista o un array de
+estas clases concretas, por lo que la composicion no se da en el sentido clasico de usar una clase que creamos nosotros como atributo de otra clase, sino mas bien en que varias clases que creamos nosotros (las clases concretas) son agrupadas em otra clase (en el composite) con metodos en esta para agregar o quitar clases concretas.  
+En vez de revisar lo del gringo, mejor revisar el ejemplo de Baeldung, donde se explica en forma mas simple este patron (https://www.baeldung.com/java-composite-pattern) 
 El árbol de estructuras se crea en una clase de tipo Composite (CompositeBox en el ejemplo que esta en el IDE) y cada una de las estructuras individuales se denominan Leaf (videogame, books en el ejemplo que esta en el IDE). 
 Cada una de estos Leaf son factibles de modificación en forma separada, lo que constituye una gran ventaja, ya que no tocamos el resto del código. Ver ejemplo del gringo https://www.youtube.com/watch?v=oo9AsGqnisk
 

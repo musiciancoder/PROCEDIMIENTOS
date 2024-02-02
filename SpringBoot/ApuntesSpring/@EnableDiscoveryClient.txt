@@ -1,0 +1,1 @@
+Permite, junto con las dependencias de spring-cloud-kubernetes-starter, activar spring cloud kubernetes.

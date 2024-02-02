@@ -46,7 +46,13 @@ kubectl get pv: ver persistent volume
 kubectl get pvc: ver persistent volume claim
 kubectl apply -f .\configmap.yaml : ejecutar deployments del configmap
 kubectl get secret: ver archivo secret
-kubectl create clusterrolebinding admin --clusterrole=cluster-admin --serviceaccount=default:default : para crear privilegio de administrador de cluster a este rol
+
+EKS
+kubectl create clusterrolebinding admin --clusterrole=cluster-admin --serviceaccount=default:default : para crear privilegio de administrador de cluster a este rol en el cluster de EKS (el cluster debe estar previamente creado, lo mismo que los roles de IAM)
 kubectl create clusterrolebinding admin --clusterrole=cluster-admin --serviceaccount=default:default  : crear un role binding para comunicar spring cloud con el cluster de kubernetes
 kubectl apply -f .\deployment-mysql.yaml (con replicas:0): borrar los pods
+
+En este punto tengo dos preguntas:
+1. ¿Los cuatro pods que estan siendo creados (dos de cuatro hasta esta clase) estan en el mismo workernode en minicube o estan en workernodes distintos? Por lo visto (favor corregirme si estoy mal) los workernodes son irrelevantes para la comunicacion y solo vale el IP o hostname de los servicios.
+2. Los cuatro servicios creados son del tipo "ClusterIP" y tienen IP diferente, sin embargo fue explicado que el Cluster es la red que envuelve todos los workernodes y por ello el IP del Cluster debiera ser uno solo. ¿No debería haber un solo IP del cluster entonces y no cuatro?
 

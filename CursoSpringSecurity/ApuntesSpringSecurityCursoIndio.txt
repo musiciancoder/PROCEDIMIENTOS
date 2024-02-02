@@ -1,0 +1,62 @@
+Autentication-->User, Password
+Authorization-->Role
+Confidentiality-->Process where the app ensures a hacker is not allowed, even if he stoles one's username and password, because he will nor have the private key to decrypt the info thst the server is sending to him.
+Token Integrity-->The AuthorizationServer generates a token and the ResourseServer uses this token to send to the client whatever resourse he needs by having the right signature. Again private key is needed to decrypt token's signature so if the hacker tries to modify the token he will not be able to because its encrypted.
+CSRF Cross Site Request Forging and CORS cross origin resource sharing.
+CSRF  will prevent any other website or application to submit data on our behalf on the browser by default. In order to do so you will need to configure CORS on your server side if you are developing your front end using angular or react
+
+Key Security Concepts (all of these are java interfaces or clases)
+
+Authentication Filter                          is not authenticated        Autentication Manager             Authentication Provider (customizable or we can use it as a template) <---------->UserDetailsService(Contains data to be checked, its customizable or we can use it as a template)
+(checks if the user is already authenticated) --------------------->                              <---------> (Authenticates the user)<------------------------------------------------------->PasswordEncoder(Encodes)
+        |
+		| is authenticated
+        v
+AuthenticationSuccessHandler------->SecurityContext (store user data for the future).
+
+Proyecto "first_app"
+1. Creó el proyecto que esta en mi carpeta de desarrollo (fui escribiendo el codigo y guardando en github en musiciancoder).
+2. Agregó dependencias de spring web y spring security, agregó un controlador de prueba y corrió la app. Se fue a postman e hizo una prueba con el GET localhost:8080/hello y cachó q le salia 401 "unauthorized".
+En los logs de spring hay un password, lo copió, se fue a "Authorization" en postman, seleccionó "Basic Auth" (viene por defecto con la libreria de Spring Security), en User escribió "user" y en password pegó el password. Entonces probó y le dio un estado 200.
+3.Mencionó que con Basic Auth en el primer request q acabamos de hacer se genera una cookie llamada JSESSIONID (se puede ver esta cookie en el postman) que se almacena en el SecurityContext por lo q a partir del segundo request no se piden credenciales
+sino simplemente se ocupa esta cookie. De hecho cambió el password en postman e igual le dio un 200 (a mi me dio 401, ver preguntas de esta seccion de como solucionarlo).
+4.Mencionó q antes de Spring Boot 3.0 para configurar Spring Security la clase de configuracion (marcada con @Configuration) tenia que extender WebSecurityConfigureAdapter y sobrescribir los metodos configure(). Despues de Spring Boot 3.0 la clase de configuracion se marca con @Configuration y se anotan los metodos q devuelven el tipo SecurityFilterChain.
+5.Hasta el momento hemos usado la seguridad por defecto que viene en Security Provider. La idea ahora es customizarlo. Para ello creó la clase MySecurityConfig y por ahora lo dejo con Basic Auth.
+6.En MySecurityConfig creo los metodos userDetailsService() para customizar el UserDetailsService y creo un usuario enduro con pasword y permisos, y passwordEncoder() para encriptar el usuario (no funciona sin encriptar). 
+Corrió la app y noto q en los logs ya no tiene un password, porque el UserDetailsService esta ahora personalizado. Luego probó en postman con las credenciales del usuario generado enduro y le funcionó.
+7.Customizó el AuthenticationProvider con las credenciales enduro ahora acá, para prescindir de userDetailsService() y de password encoder en MySecurityConfig. Probó en postman y le funcionó igual.
+8.Usó formLogin en vez de Basic Auth. En el browser escribio la url, escribió las credenciales y vio que le funcionaba.
+9.Creó el método "bye" en el controlador. Se logueó en el browser y luego vio que si podia ingresar a la url localhost:8080/bye ,Luego en metodo filterChain() de MySecurityConfig agregó la linea  http.authorizeHttpRequests().requestMatchers("/hello").authenticated() para q solo pudiera ingresar a esta url el usuario logueado. Se logueó de nuevo y vio q no pudo ingresar a localhost:8080/bye.
+10.Customizacion de Authentication Filter.  Creó la clase MySecurityFilter con metodo doFilter(). En filterChain() agregó la linea  http.addFilterBefore(new MySecurityFilter(), BasicAuthenticationFilter.class); Probó en postman un logueo con Tom Cruise y le funcionó, notando en los logs que aparece los SOUT que puso en el metodo doFilter
+
+Proyecto "couponservice"
+1.Creó en mysql workbench las tablas product y coupon. Yo tambien las creé exitosamente.
+2.Creó el proyecto couponservice con las dependencias de mysl, spring web y spring jpa (ademas de la de junit que viene por defecto).
+3.Creó la entidad Coupon y el repositorio CouponRepo.
+4.Creó el controlador (sin un servicio!!) con el metodo findByCode q va a devolver un cupon al pasarle un code.
+5.Probó en postman creando un cupon con con POST http://localhost:8080/couponapi/coupons y buscandolo con GET http://localhost:8080/couponapi/coupons/MICODE
+6.Del mismo modo creó el proyecto "productservice" y lo probó en postman
+7.En productservice creó en el paquete dto la clase Coupon para recibir la data del otro servicio. Además en el metódo create del controlador agregó una linea para guardar los datos del cupon cada vez que guardemos un producto. En la entidad de producto agregó un @Transient en el campo de clase Cupon. Ademas el restTemplate (viene en la dependencia srping web) fue creado como bean en la clase principal.
+
+8.Probó en postman con ambos servicios levantados guardando un producto con codigo de cupon en el servicio de producto, con body {
+    "id": 2,
+    "name": "Mac",
+    "description": "Cool",
+    "price": 4998.000,
+    "couponCode": "MICODE"
+}
+En seccion Secure Rest API
+1.Creó las tablas User, Role y User_Role en mysl workbench, con usuarios con distinto rol.
+2. Agregó la libreria spring-boot-starter-securit en el pom de couponservice y creó las entidades para User y Role.
+3.Definió las relaciones entre tablas en las entidades User y Roles con @ManyToMany. Notar que por tener la tabla intermedia user_role debemos escribir anotaciones extras acá en las entidades con @JoinTable.
+4.Creó los repositorios con Jpa para Role y User.
+5.Creó la clase de configuracion de Spring Security. Ojo que aqui hay tres versiones de código:
+1. La que él dijo que ya no se usaba, que es el código q esta en la clase UserDetailsServiceImpl.
+2. La que él dijo que era la nueva, que es el código q esta en la clase WebSecurityConfig en la version de commit "test security, pero no funciona por metodos deprecados en WebSecurityConfig"
+3. La que apareció por arte de magia en la clase "test"  que es el código q esta en la clase WebSecurityConfig q extiende a WebSecurityConfigurerAdapter. Esta clase la copié y pegué desde github (ya estaba con regular expressions), en vista y considerando que apareció por arte de magia en la clase llamada "Test".
+   Apartir de este punto el código me dejó de funcionar, por lo que solo sirve como apoyo para ver apuntes. Esta clase define qué roles tienen permiso para acceder a qué urls. En este caso definió q para leer un cupon (con la peticion GET) cualquier rol puede hacerlo, pero para crear un cupon (peticion POST) tiene que tener rol "ADMIN".
+4.Probó en postman con un usuario "ADMIN" y otro usuario "USER"
+
+En seccion Secure Web App
+1.Agregó dependencia de Thymeleaf (vamos a probar con un frontend personalizado en esta seccion).
+2.Agregó 5 archivos html al proyecto y el controlador CouponController.java.

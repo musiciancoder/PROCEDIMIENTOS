@@ -1,0 +1,1 @@
+La anotación @Transient se utiliza para indicarle a JPA que un atributo de una Entidad no debe de ser persistente, de esta manera, JPA pasa por alto el atributo y no es tomado en cuenta a la hora de persistir el atributo/campo de clase.
