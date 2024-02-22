@@ -1,0 +1,2 @@
+@WithMockUser(roles= {"USER"}) y @AutoConfigureMockMvc nos permiten mockear toda la arquitectura del cuadro de mas arriba excepro SpringContext.
+@WithUserDetails y @AutoConfigureMockMvc nos permite obtener usuarios reales desde UserDetails.

@@ -1,0 +1,1 @@
+@JoinTable is used in the entity class to create a join table between this and some other enttity. It is used with @ManyToMany or @ManytoOne which establishes the kind of relationship we want)

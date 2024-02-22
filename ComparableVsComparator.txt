@@ -1,5 +1,5 @@
 Compare con su método compareTo (q debe ser sobrescrito) va a permitir ordenar los objetos de la clase eligiendo un atributo como criterio por medio de Collections.sort(list);
-Comparator con su método compare (q debe ser sobrescrito) va a permitir comparar dos objetos eligiendo un atributo como criterio. Si el anterior es inferior va a ser un -1, si el anterior es superior va a ser +1 y si son iguales va a ser 0.
+Comparator con su método compare (q debe ser sobrescrito y que igual usa compareTo a las finales) va a permitir comparar dos objetos eligiendo un atributo como criterio. Si el anterior es inferior va a ser un -1, si el anterior es superior va a ser +1 y si son iguales va a ser 0.
 // A Java program to demonstrate use of Comparable
 import java.io.*;
 import java.util.*;
