@@ -1,0 +1,5 @@
+@Secured({"ROLE_ADMIN","ROLE_USER"})
+@GetMapping("clients/{id}")
+public ResponseEntity() nombreMetodo(){}
+
+Se usa en el controlador a nivel de metodos para dar autorizacion a los endpoints segun roles. Es una anotacion de spring security, no de OAUTH.

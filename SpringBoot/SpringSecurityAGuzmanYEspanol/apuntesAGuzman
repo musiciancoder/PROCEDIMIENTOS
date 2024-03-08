@@ -1,5 +1,8 @@
+
+IMPORTANTE
 Con respecto al proyecto de springsecurity del español (crudBack), este proyecto ocupa OAUTH2, cosa que no hace el español. 
 Con respecto al proyecto de springsecurity de Barath, ocupa GranType password y el español ocupa GranType Authorization code. Ambos usan OAUTH2.
+Si deseamos tener un modelo para futuros proyectos a desarrollar, el mas completo y actualizado de los tres es el proyecto de barath.
 
 Un JWT nuevo se crea cada vez que un usuario se loguea exitosamente, y estará vigente mientras dure la sesión se usuario. En cada petición http el usuario deberá pedir el recurso requerido junto con el JWT al servidor.
 El Header contiene el tipo de algoritmo, el payload contiene la data del usuario. sub=nombre de usuario en la aplicacion (musiciancoder), name=nombre real, iat=data adicional como por ejemplo fecha de registro, email, etc. Se puede naturalmente ir agregando mas campos en este json sin ningun problema; 
@@ -55,3 +58,5 @@ La frase anterior lleva a pensar que el codigo del curso del Indio en la clase W
 La clase de configuracion del servidor AuthorizationServerConfig que extiende AuthorizationServerConfigurerAdapter (esta ultima estoy casi seguro q esta deprecada tambien) esta completamente diferente a la de barath (o sea la clase AuthorizationServerConfiguration). Mucho mas confiable la de Bharath, sobretodo para versiones posteriores a Spring 3.0.
 En la seccion "añadiendo configuracion de las autorizaciones..." explicó que el GranType que usa no es Authorization Code (lo menciona brevemente), sino que es de tipo Password y Refresh-Token, con lo q infiero q el logueo se hace en Angular y no en el Authorization Server.
 Ocupa SSH para generar las llaves publica y privada, en cambio barath ocupa keytool.
+La clase ResourceServerConfig Guzman la extiende de ResourceServerConfigAdapter, que esta derogada tambien en versiones posteriores.
+Para solventar lo de los CORS en vez de ocupar @CrossOrigin en el controlador como barath, escribió todo el codigo del punto 14 q es super verboso.
