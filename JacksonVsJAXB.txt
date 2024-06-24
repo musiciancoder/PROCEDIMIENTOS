@@ -1,0 +1,3 @@
+They are both java dependencies.
+Jackson allows converting java objects into JSON format and viceversa. It also suports XML format.
+JAXB allows converting java files into XML files and viceversa.

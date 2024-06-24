@@ -31,8 +31,9 @@ Naturalmente los objetos generados por prototype tendrán distinto hashcode.
 
 
 3.FACTORY
-Simple factory Idiom: Consiste en liberar a una clase X del código de creación de objetos según parametros, y para eso nos creamos un FACTORY.
-Actual factory: Consiste en liberar al factory de la creación de objetos según parametros. Para ello nos creamos unca clase abstracta en la clase X (Restaurant), cuyo método abstracto debe ser sobrescrito en las clases que hereden de esta (BeefBurgerRestaurant por ejemplo).
+Mirar ejemplo de Mito primero.  No va a coincidir exactamente con el diagrama UML, pero es lo q mas se ocupa en programación real.
+Simple factory Idiom: Consiste en liberar a una clase X del código de creación de objetos según parametros, y para eso nos creamos un FACTORY. En Simple Factory Idiom (ejemplos de mito y hackerrank) la factory actúa como Creator y ConcreteCreator al mismo tiempo y tiene condicionales en el método para ver qué ConcreteProduct devuelve. Esto es lo mas común en programación del día a día.
+Actual factory: Consiste en liberar al factory de la creación de objetos según parametros. Para ello nos creamos unca clase abstracta en la clase X (Restaurant), cuyo método abstracto debe ser sobrescrito en las clases que hereden de esta (BeefBurgerRestaurant por ejemplo). 
 ¿Cuando usar este patrón? Cuando en un principio no estamos seguros de los tipos exactos a usar.
 
 
@@ -49,11 +50,12 @@ Generalmente se parte de un FACTORY ya q si mas adelante se agregan mas producto
 
 
 5.BUILDER
+Mirar ejemplo de builderclaseinterna primero. No va a coincidir exactamente con el diagrama UML, pero es lo q mas se ocupa en programación real.
 Consiste en separar la construccion de un objeto de su representación en la clase, o sea la finalidad es la misma que en factory, pero por medios diferentes.
 Se debe crear una clase builder que contiene los mismos campos de clase que el objeto que queremos generar. En ella se agregan varios métodos setters individuales y se llama al método builder().
 Opcionalmente se puede contar o no con una clase director para agrupar atributos similares.
 ¿Cuando usar este patron?
-Cuando tenemos demasiados atributos y deseamos evitar demasiada sobrecarga de constructores y a la vez separar la construccion de un objeto de su representación en la clase.
+Cuando tenemos demasiados atributos para una clase inmutable, con algunos atributos requeridos y otros opcionales, y deseamos evitar demasiada sobrecarga de constructores sin tener que ocupar atributos=null al instanciar y a la vez separar la construccion de un objeto de su representación en la clase.
 
 
 
@@ -64,6 +66,8 @@ Consiste en generar clases complejas y/o objetos complejos pertenecientes a esta
 Muchas veces cuando recien comenzamos a desarrollar un proyecto, no se tiene claridad acerca de propiedades y atributos finales que irán en una clase en particular. 
 Por ello en el medio del desarrollo, cuando ya existe cierta claridad sobre ello se le pide al desarrollador ir agregando estas propiedades, lo que obliga a modificar clases; el código del comienzo al agregarsele estos atributos la mayoria de las veces viola principios SOLID.
 Si trabajamos en cambio con patrones estructurales desde el comienzo, una petición de modificación de ciertas variables o atributos no nos va a afectar ya que estamos cumpliendo principios SOLID desde el principio. 
+"Structural patterns deal with how classes and objects are arranged or composed (..usando composición y herencia, claro esta)"
+
 
 ¿Qué es composicion en Java? es usar una clase que que hemos constuido nosotros como instance variable (campo de clase) para definir atributos de otra clase.
   
@@ -78,19 +82,20 @@ Consiste en crear una clase que sirva como puente entre dos interfaces (ejemplo 
 ya sea  que estos tengan métodos en común o no para que la abstraccion y la implementacion puedan variar de forma independiente.
 ¿Cuando usar? Cuando una interfaz (VendedorOnline) ya desarrollada nos percatamos posteriormente que debe ser subdividida (VendedorOnLineEmpresas) y no deseamos mofificar la interfaz original 
 Ver ejemplo del catalán, queda mas claro.
+En el curso de Udemy se explica q es necesario porque "We separate the abstraction (used by client) from the actual implementation of that functionality so they can change independently". Esto se logra por composición, ya que una instancia del implementor va en la abstracción. Es parecido al adapter, pero
+
 
 COMPOSITE 
 
-Consiste en crear jerarquias mediante composicion. La idea es crear clases concretas (por ejemplo varios tipos de productos como shampoo, jabon, etc) que extiendan una interfaz en comun. El composite contiene una lista o un array de
-estas clases concretas, por lo que la composicion no se da en el sentido clasico de usar una clase que creamos nosotros como atributo de otra clase, sino mas bien en que varias clases que creamos nosotros (las clases concretas) son agrupadas em otra clase (en el composite) con metodos en esta para agregar o quitar clases concretas.  
-En vez de revisar lo del gringo, mejor revisar el ejemplo de Baeldung, donde se explica en forma mas simple este patron (https://www.baeldung.com/java-composite-pattern) 
-El árbol de estructuras se crea en una clase de tipo Composite (CompositeBox en el ejemplo que esta en el IDE) y cada una de las estructuras individuales se denominan Leaf (videogame, books en el ejemplo que esta en el IDE). 
-Cada una de estos Leaf son factibles de modificación en forma separada, lo que constituye una gran ventaja, ya que no tocamos el resto del código. Ver ejemplo del gringo https://www.youtube.com/watch?v=oo9AsGqnisk
+En vez de revisar lo del pelado de YouTube (no el gringo del curso de Udemy, eso sí va y de hecho en el código esta la comparación entre Baeldung y curso udemy), mejor revisar el ejemplo de Baeldung, donde se explica en forma mas simple este patron (https://www.baeldung.com/java-composite-pattern).
+El árbol de estructuras se crea en una clase de tipo Composite (CompositeBox en el ejemplo que esta en el IDE) y cada una de las estructuras individuales se denominan Leaf Node(videogame, books en el ejemplo que esta en el IDE)
+Cada una de estos Leaf son factibles de modificación en forma separada, lo que constituye una gran ventaja, ya que no tocamos el resto del código. Ver ejemplo del gringo https://www.youtube.com/watch?v=oo9AsGqnisk.
+Si se quiere ver el arbol que se genera, aquí se explica muy bien con este otro ejemplo: https://www.youtube.com/watch?v=wAyVJYVKgek
 
 DECORATOR
 Consiste en emplear el concepto de wrappers (wrappers = decorators) que consiste en q un objeto envuelve a un segundo objeto y el segundo envuelve al tercero y asi sucesivamente; de esta forma agregamos funcionalidad en forma sucesiva a cada objeto sin tener que recurrir a herencia convencional, sino que ocupamos la composicion.
 La clase del ultimo objeto a envolver (o sea el q no envuelve a nadie) es llamada wrapped (Notifier) y en ella van los atributos y metodos mas generales. Los decorators o wrappers envuelven a este wrapped y se envuelven entre si sucesivamente añadiendo funcionalidad.
-Si se requiere una funcionalidad nueva no presupuestada inicialmente simplemente se crea un decorador nuevo, cumpliendo con el concepto de open-closed.
+Si se requiere una muy pequeña funcionalidad nueva (para funcionalidades mayores ocupar herencia convencional) no presupuestada inicialmente en un objeto que ya esta siendo ocupado en nuestro código, simplemente se crea un decorador nuevo, cumpliendo con el concepto de open-closed.
 
 FACADE
 Se usa para evitar que un cliente llame directamente a una clase de servicio, ya que entonces estariamos rompiendo con el principio de open-close
@@ -106,7 +111,8 @@ FLYWEIGHT
 Consiste en que cuando dos objetos o mas tienen muchos atributos en comun entre ellos, podemos separar las clases en clases que contengan los atributos en comun y otras que contengan los atributos exclusivos. Esto permite que quepan mas objetos en la memoria RAM, por lo que estaremos optimizando recursos.
 ¿Cuando usar? Cuando debemos accesar o renderizar desde una fuente externa (bbdd, servicio, etc.) demasiados objetos, cada uno de ellos conteniendo demasiados atributos, por lo que es factible que una maquina con pocos recursos se quede sin memoria.
 
-DAO (patron estructural, pero de arquitectura, no de diseño??? Sera verdad esto)
+DAO (patron estructural, pero de arquitectura, no de diseño??? Sera verdad esto).
+Segun https://stackoverflow.com/questions/4037251/dao-vs-ormhibernate-pattern ORM es una forma de implementar un patron DAO, pero no la única. Es mas, se puede perfectamente implementar un patron DAO sin usar ORM, solo con JDBC.
 DAO data access object
 Video de mitocode para patrones de diseño DAO
 Es un patrón de diseño para accesar bases de datos. Generalmente se prueba primero su funciomamiento con datos "enduro" en la misma clase.
@@ -118,6 +124,7 @@ Es un patrón de diseño para accesar bases de datos. Generalmente se prueba pri
 
 *PATRONES CONDUCTUALES
 Son patrones de diseño basados en distinto comportamiento de un modulo segun destintos contextos.
+Behavioral patterns describe how classes and objects interact & comunícate with each other
 
 CHAIN OF RESPONSABILITY
 Consiste en dividir comportamientos o funcionalidades de un todo, asignando cada una de estos comportamientos a objetos individuales llamados Handlers. 
@@ -125,8 +132,18 @@ Al recibir un request, cada uno de estos handlers puede decidir si procesar el r
 Al separar funcionalidad en los handlers cumplimos a cabalidad con single responsability.
 
 COMMAND
-Consiste en separar todo tipo de acciones a ejecutar (switchedLights()) tanto de clases padres como hijas. 
-¿Cuando usar? Cuando deseamos que el cliente tenga el control directo sobre las acciones a ejecutar.
+No pescar ni un curso para este patrón porque esta enredado. Mejor ver el ejemplo de https://www.geeksforgeeks.org/command-pattern/ donde se explica en forma super simple y que de hecho es el ejemplo que tengo en el paquete "patrones" con comentarios super útiles míos. La idea general es tratar un request entre una clase sender y una clase receiver como un objeto y tener el sender totamente desacoplado del o los receivers  
+¿Cuándo usar?
+Decoupling is Needed:
+Use the Command Pattern when you want to decouple the sender (requester) of a request from the object that performs the request.
+This helps in making your code more flexible and extensible.
+Undo/Redo Functionality is Required:
+If you need to support undo and redo operations in your application, the Command Pattern is a good fit.
+Each command can encapsulate an operation and its inverse, making it easy to undo or redo actions.
+Support for Queues and Logging:
+If you want to maintain a history of commands, log them, or even put them in a queue for execution, the Command Pattern provides a structured way to achieve this.
+Dynamic Configuration:
+When you need the ability to dynamically configure and assemble commands at runtime, the Command Pattern allows for flexible composition of commands.
 
 ITERATOR.
 Es el clasico Iterator explicado por Juan Pildoras que sirve para iterar una colección.
@@ -142,8 +159,8 @@ Obtenemos fotos instantáneas del estado de un objeto y las vamos almacenando, d
 
 
 STATE
-Permite cambiar el comportamiento de un objeto según el estado interno en el que se se encuentre en ese momento.
-¿Cuando usar? Cuando tenemos un número finito y pequeño de cambios de comportamiento en un objeto, de esta forma evitamos bloques if() o switch() en el objeto mismo.  
+Permite cambiar el comportamiento de un objeto según el estado interno en el que se encuentre en ese momento.
+¿Cuando usar? Cuando tenemos un número finito y pequeño de cambios de comportamiento en un objeto , de esta forma evitamos bloques if() o switch() en el objeto mismo.  
 
 STRATEGY
 Tiene la misma estructura que state, es decir tiene un context, una interfaz strategy que es igual a la interfaz state, clases concretas y un cliente y las relaciones entre ellos son las mismas. Ambas se basan en composicion y poliformismo.

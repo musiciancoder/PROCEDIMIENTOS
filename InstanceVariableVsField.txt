@@ -1,0 +1,18 @@
+  +----------------------------------------------------+
+  |                                                    |
+  |                      Field                         |
+  |                                                    |
+  +----------------------------------------------------+
+               |                         |
+               |                         |
+               |                         |
+  static       |                         |non-static (dynamic)
+  +------------v------------+    +-------v-------------------+
+  |                         |    |                           |
+  |     class variable      |    |     instance variable     |
+  |                         |    |                           |
+  +-------------------------+    +---------------------------+
+
+
+Un campo de clase puede ser una variable de clase (estatica) o una variable de instancia (no-estatica). 
+Los atributos corresponden a variables de constructores

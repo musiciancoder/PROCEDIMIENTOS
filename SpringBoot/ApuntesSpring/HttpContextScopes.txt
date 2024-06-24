@@ -1,0 +1,7 @@
+ HTTP context scopes --> request session and global. 
+
+Request scope is where a new bean instance will be created for every HTTP request coming in.
+
+Session scope is where there will be only one bean instance used across the session, that is, will have multiple HTTP requests and responses happening within a given session, for all those requests and responses, the same bean instance will be used.
+
+The global or global session makes sense only if we are using Portlets within our application and this scope applies across portlets It's like a global session which we can have across portlets and the same bean will be used across this global session or Portlets.

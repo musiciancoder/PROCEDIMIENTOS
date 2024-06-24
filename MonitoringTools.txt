@@ -1,0 +1,41 @@
+How do you monitor the health of your microservice applications?
+
+Laundering The health of microservices includes gathering the data, storing their data from your
+
+microservice applications, analyzing it, and then reporting it to develop insights for the future.
+
+When we use Spring Boot, we can use the spring boot actuator, which is super simple to configure to
+
+know the health details of our microservice.
+
+But when it comes to multiple microservices, we need tools like prometheus, ELK stack and
+
+more.
+
+Prometheus is a monitoring tool for application level monitoring.
+
+It is used to record actions over time.
+
+As the actions happen within our application, we log that data. Grafana is used along with prometheus
+
+to provide a dashboard to visualize that data.
+
+ELK stack comprises of three tools.
+
+E stands for Elasticsearch, L stands for Log Stash, and K stands for Kibana.
+
+Elasticsearch allows us to store the logs, log stash helps us to ship and process the logs and then
+
+store that data, and kibana allows us to visualize that data.
+
+Kibana is a visualization tool.
+
+Elk provides centralized logging, which is useful when attempting to identify the problems within our
+
+applications and servers.
+
+Nagios, on the other hand, helps us to monitor the infrastructure when it comes to routers, servers,
+
+etc. We can use NagIOS within our infrastructure to monitor the entire infrastructure as we automate
+
+it.

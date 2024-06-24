@@ -1,0 +1,39 @@
+How can we implement versioning in RESTful APIs?
+
+1. We can implement versioning using separate URL for each version of the restful endpoint.
+
+Within the URL, we'll specify the version the client wants to access and on the server side will map
+
+the URL to the appropriate version we can.
+
+http://myserver/v1/products
+
+http://myserver/v2/products
+
+2. Have a URL parameter wherein at the end of it we'll have a query param which will mention the version, whether it is version one, two, etc. 
+
+http://myserver/products?version=v1
+
+http://myserver/products?version=v2
+
+3. And we can also use custom HTTP headers which will read on the server side or will filter on the server side and we'll pass it to the appropriate restful version.
+
+version=v2
+
+----------------------------------------------
+
+How can we implement versioning in RESTful APIs?
+
+
+We implement sorting by passing in the field by which we want to sort as a query parameter.
+
+The restful API should support sort based on various fields, depending on the field that the client paths
+
+in in the URL as query parameter, it needs to sort it and send the data back.
+
+http://myserver/products?sort=price
+
+
+Optionally, the client can also specify the order in which he wants to sort it, whether it is ascending.
+
+http://myserver/products?sort=price,asc

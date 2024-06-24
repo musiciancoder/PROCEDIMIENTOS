@@ -1,25 +1,36 @@
 Autentication-->User, Password
 Authorization-->Role
-Confidentiality-->Process where the app ensures a hacker is not allowed, even if he stoles one's username and password, because he will nor have the private key to decrypt the info thst the server is sending to him.
+Confidentiality-->Process where the app ensures a hacker is not allowed, even if he stoles one's username and password, because he will not have the private key to decrypt the info that the server is sending to him.
 Token Integrity-->The AuthorizationServer generates a token and the ResourseServer uses this token to send to the client whatever resourse he needs by having the right signature. Again private key is needed to decrypt token's signature so if the hacker tries to modify the token he will not be able to because its encrypted.
 CSRF Cross Site Request Forging and CORS cross origin resource sharing.
-CSRF  will prevent any other website or application to submit data on our behalf on the browser by default. In order to do so you will need to configure CORS on your server side if you are developing your front end using angular or react
+CSRF  will prevent any other website or application to submit data on our behalf on the browser by default. In order to do so you will need to configure CORS on your server side if you are developing your frontend using angular or react
 
-Key Security Concepts (all of these are java interfaces or clases)
+Key Security Concepts (Authentication Filter is the only class, all of the rest are interfaces) -->ver primera slide del curso (las slides ya estan descargadas!) para ver la arquitectura de Spring Security (sin JWT ni OAUTH), aqui mas abajo se explican c/U de sus componentes.
+Todos los siguientes componentes se pueden usar asi como estan o bien customizarlos segun nuestras necesidades.
+Authentication Filter: This is a servlet filter. It receives all http requests, deciding if the user is authenticated or not. If user is not authenticated, it sends http request to the Autentication Manager.
+Authentication Manager: If the username and password are valid, the authentication manager in turn send credentials to Authentication Provided. Posee el metodo Authenticate (Authentication authentication). Esto lo menciona despues cuando escribe código -->It goes through all of the possible providers (que segun https://www.youtube.com/watch?v=qiPh0yrDNas pueden ser LDAP, OAUTH, etc) that support "basic authentication" (porq en el codigo usa "basic authentication" pero creo que deberia ser para otros tipos de autenticacion tambien )selects the first that is available and passes on
+Autentication Provider: this is where the login logic or the authentication logic is defined, so is this component that compares between incoming credentials and credentials form the database. Tambien posee el metodo Authenticate (Authentication authentication).
+User Details Service: The authentication provider will not fetch the user details from the database or from L dap or in memory. It will use user details service for that purpose. Es el componente que mas frecuentemente se customiza, y q tenia el metodo loadByUserName() en versiones anteriores. Actualmente (a partir de la version 3.0) si se quiere customizar UserDetailService, solo se inyecta UserDetailService  como dependencia en la clase donde se escribe el código (clase que normalmente es llamada WebSecurityService)
+Password Encoder: Autentication Provider also uses a password Encoder because we don't store passwords in plain text so the passwords will be encoded on the database.
+Once the authentication provider checks if the authentication details, the username, password, etc, are correct, then it will send the appropriate response (o sea el autenticacion object segun https://www.youtube.com/watch?v=qiPh0yrDNas )back to the authentication manager.
+Authentication manager hands it back to the authentication filter if the user details are OK.
+Security Context: If the authentication succeeded. The authentication filter will use a authentication success handler and stores that authentication information the user entity itself in a security context, in an instance of security context holder. If the authentication failed, it will use the authentication failure hanler to send the appropiate response to the client.
+
+handler to send the appropriate response back to the client.
 
 Authentication Filter                          is not authenticated        Autentication Manager             Authentication Provider (customizable or we can use it as a template) <---------->UserDetailsService(Contains data to be checked, its customizable or we can use it as a template)
-(checks if the user is already authenticated) --------------------->                              <---------> (Authenticates the user)<------------------------------------------------------->PasswordEncoder(Encodes)
+(checks if the user is already authenticated) --------------------->                              <--------- (Authenticates the user)<------------------------------------------------------->PasswordEncoder(Encodes)
         |
 		| is authenticated
         v
 AuthenticationSuccessHandler------->SecurityContext (store user data for the future).
 
-Proyecto "first_app"
+Proyecto "first_app" -->solo spring security, sin oauth2 ni token ni JWT, para ver autenticacion no se necesitan!!
 1. Creó el proyecto que esta en mi carpeta de desarrollo (fui escribiendo el codigo y guardando en github en musiciancoder).
-2. Agregó dependencias de spring web y spring security, agregó un controlador de prueba y corrió la app. Se fue a postman e hizo una prueba con el GET localhost:8080/hello y cachó q le salia 401 "unauthorized".
+2. Agregó dependencias de spring web y spring security (q pertenece a springframework, no a springboot), agregó un controlador de prueba y corrió la app. Se fue a postman e hizo una prueba con el GET localhost:8080/hello y cachó q le salia 401 "unauthorized".
 En los logs de spring hay un password, lo copió, se fue a "Authorization" en postman, seleccionó "Basic Auth" (viene por defecto con la libreria de Spring Security), en User escribió "user" y en password pegó el password. Entonces probó y le dio un estado 200.
-3.Mencionó que con Basic Auth en el primer request q acabamos de hacer se genera una cookie llamada JSESSIONID (se puede ver esta cookie en el postman en los headers. ) que se almacena en el SecurityContext (this is on the server side which contradicts literature for cookies that stands that cookies are only stored on the client side) por lo q a partir del segundo request no se piden credenciales
-sino simplemente se ocupa esta cookie. De hecho cambió el password en postman e igual le dio un 200 (a mi me dio 401, ver preguntas de esta seccion de como solucionarlo).
+3.Mencionó que con Basic Auth en el primer request q acabamos de hacer se genera una cookie llamada JSESSIONID (se puede ver esta cookie en el postman en los headers. ) que se almacena en el SecurityContext (q las cookies no eran para el frontend solamente????) por lo q a partir del segundo request 
+no se piden credenciales sino simplemente se ocupa esta cookie. De hecho cambió el password en postman e igual le dio un 200 (a mi me dio 401, ver preguntas de esta seccion de como solucionarlo).
 4.Mencionó q antes de Spring Boot 3.0 para configurar Spring Security la clase de configuracion (marcada con @Configuration) tenia que extender WebSecurityConfigureAdapter y sobrescribir los metodos configure(). Despues de Spring Boot 3.0 la clase de configuracion se marca con @Configuration y se anotan los metodos q devuelven el tipo SecurityFilterChain.
 5.Hasta el momento hemos usado la seguridad por defecto que viene en Security Provider. La idea ahora es customizarlo. Para ello creó la clase MySecurityConfig y por ahora lo dejo con Basic Auth.
 6.En MySecurityConfig creo los metodos userDetailsService() para customizar el UserDetailsService y creo un usuario enduro con pasword y permisos, y passwordEncoder() para encriptar el usuario (no funciona sin encriptar). 
@@ -47,17 +58,19 @@ Proyecto "couponservice"
 }
 En seccion Secure Rest API
 1.Creó las tablas User, Role y User_Role en mysl workbench, con usuarios con distinto rol.
-2. Agregó la libreria spring-boot-starter-securit en el pom de couponservice y creó las entidades para User y Role.
+2. Agregó la libreria spring-boot-starter-security (perteneciente a org.springframework.boot) en el pom de couponservice y creó las entidades para User y Role.
 3.Definió las relaciones entre tablas en las entidades User y Roles con @ManyToMany. Notar que por tener la tabla intermedia user_role debemos escribir anotaciones extras acá en las entidades con @JoinTable.
 4.Creó los repositorios con Jpa para Role y User.
 5.Creó la clase de configuracion de Spring Security. Ojo que aqui hay tres versiones de código:
 1. La que él dijo que ya no se usaba, que es el código q esta en la clase UserDetailsServiceImpl.
-2. La que él dijo que era la nueva, que es el código q esta en la clase WebSecurityConfig en la version de commit "test security y en WebSecurityConfig2, pero no funciona por metodos deprecados en WebSecurityConfig"
+2. La que él dijo que era la nueva, que es el código q esta en la clase WebSecurityConfig en la version de commit "test security y en WebSecurityConfig2 (esta es la buena y se recomienda usar esta como modelo de la version 3.0 en adelante), pero no funciona por metodos deprecados en WebSecurityConfig"
 3. La que apareció por arte de magia en la clase "test"  que es el código q esta en la clase WebSecurityConfig q extiende a WebSecurityConfigurerAdapter. Esta clase la copié y pegué desde github (ya estaba con regular expressions), en vista y considerando que apareció por arte de magia en la clase llamada "Test".
    Apartir de este punto el código me dejó de funcionar, por lo que solo sirve como apoyo para ver apuntes. Esta clase define qué roles tienen permiso para acceder a qué urls. En este caso definió q para leer un cupon (con la peticion GET) cualquier rol puede hacerlo, pero para crear un cupon (peticion POST) tiene que tener rol "ADMIN".
-4.Probó en postman con un usuario "ADMIN" y otro usuario "USER"
+6.Probó en postman con un usuario "ADMIN" y otro usuario "USER". Importante notar que ya sea si usamos WebSecurityConfig o WebSecurityConfig2 es aqui donde va la lógica para configurar la autorizacion (roles), pero esta clase ademas contiene lógica para autenticar que junto con la lógica de UserDetails logra la autenticacion, aunque si usamos 
+custom login para autenticarnos debemos crear un servicio aparte (SecurityServiceImpl en nuestro caso).
 
-En seccion Secure Web App
+En seccion Secure Web App-->en esta seccion se implementa un custom login, para añadir una capa extra de seguridad con respecto a la seccion anterior (de default login mediante basic auth), ya que junto con archivos .html dentro del proyecto (usa Thymeleaf) tiene un token
+de registro (login token, que no es JWT) mediante una clase java (UsernamePasswordAuthenticationToken) que se pasa mediante código al Authentication Manager y al SecurityContext. El token es entonces pasado tras bambalinas automaticamente (el usuario no hace nada!) en el formulario de registro
 1.Agregó dependencia de Thymeleaf (vamos a probar con un frontend personalizado en esta seccion).
 2.Agregó 5 archivos html al proyecto y el controlador CouponController.java q contiene las rutas para estos html.
 3.Dio permisos selectivamente segun roles para cada url en metodo configure() de la clase WebSecurityConfig2 (o sea volvió al codigo de la version2) y probó crear un cupon desde el navegador con las rutas a los los html q ya tenia en el proyecto. Le resultó ok.
@@ -67,7 +80,7 @@ En seccion Secure Web App
 7. Des´pues en "steps to save context" el weon empezó a weviar con las versiones de nuevo ver los cambios en login() para versiones anteriores y posteriores a 3.2
 8. Desdijo todo lo que hizo en el paso siete!!. Escribió codigo para salvar en el repositorio de security context para q haya un registro de peticiones y respuestas de seguridad pa usar a futuro. Para ello mofificó el método login() del SecurityServiceImpl y en filterChain() tambien hizo mofificaciones. 
 Además introfujo los argumentos HttpServletRequest request, HttpServletResponse response en metodo login() del controlador.
-9. Probó el custom login. Notar q en el postman NO pasó ningun token en esta prueba aunque el token solo esta en la clase SecurityServiceImpl().  En el navegador se logueó con usuario y administrador y con el administrador solamente pudo crear un cupon. En realidad la prueba es exactamente igual que antes, el cambio a custom login solo es en el código.
+9. Probó el custom login. Notar q en el postman NO pasó ningun token en esta prueba, aunque el token sí esta en la clase SecurityServiceImpl().  En el navegador se logueó con usuario y administrador y con el administrador solamente pudo crear un cupon. En realidad la prueba es exactamente igual que antes, el cambio a custom login solo es en el código.
 10. En UserController generó métodos para registro de usuario. En los html agregó un formulario de registro. En filterChain() de clase WebSecirityConfig dio permisos para q cualquiera pueda registrarse. Luego se registró exitosamente (verificó en la bbdd la creacion del usuaro nuevo, notar q en la bbdd el password queda encriptado)y la app lo redirigio a la pagina de logueo para q se pudiera loguear con las credenciales dadas en el registro.
 
  En seccion CSRF 
@@ -113,6 +126,9 @@ Además introfujo los argumentos HttpServletRequest request, HttpServletResponse
  4. Agregó la linea @EnableGlobalMethodSecurity(prePostEnabled=true, jsr250Enabled = true, securedEnabled = true) Esto es para usar en el controlador @ROLESALLOWED y @SECURITY respectivamente, q se usaba en versiones anteriores. Al final comentó esta misma linea.
  
  OAUTH
+ Ojo que cuando el indio habla de oauth en realidad se refiere a oauth2, ya que agrega la libreria de oauth2 (para el servidor de recursos y para el servidor de autorizacion) al proyecto de esta seccion. 
+ Importante! en OAUTH nunca se comparten credenciales de usuario desde authorization server o resource server a la aplicacion cliente, ya que las credenciales estan encriptadas en el token que es lo que se pasa. Además los token nunca se comparten al usuario final, sino entre del authorization server a la aplicacion cliente y desde esta al resource server.
+ Ver video https://www.youtube.com/watch?v=ZV5yTm4pT8g&t=192s para entender mejor el flujo con Authorization Code.
  Oauth is an open authentication and authorization framework, it allows one application to gain access to users data within an other application without the user sharing directly his user id and password with this application.
  For example, let's say we are using a tax filing website to file our tax returns. This tax filLing website, instead of asking us to register and create a user login, it can ask us to login through Facebook using our Facebook user id and email.
  Once we log in, the tax filing website will be able to access just the profile information from Facebook, not our pictures, not the videos. This entire flow is possible through the Oauth standard or Oauth framework.
@@ -129,21 +145,22 @@ GrantTypes Importante-->Descargar los workflows en las diapositivas para entende
 4.Token Refresh. En los tres casos anteriores el token no se comparte al usuario, es siempre entre aplicaciones. Por ello el cuarto caso es complementario y permite setear vencimiento de tokens.
 Todo lo anterior es OAUTH y hasta ahora hemos ocupado string based tokens (con basicAuth, lofinForm, etc). ¿entonces para qué sirve JWT? JWT es un token que elimina el paso de verificacion entre Resource Server y Authorization Server en cada peticion, ya que en el JWT ya van encriptado los datos de logeo y las autorizaciones de rol de usuario en el payload.
 Ademas contiene un Header donde va el algoritmo de cifrado ademas de la firma, que con la llave adecuada permite desencriptar y tener acceso a la informacion. Con la firma el Resource Server sabe que es un token válido Si utilizamos claves asimétricas, el servidor de autorización generará claves públicas y privadas.
-El servidor de autorización utilizará la clave privada para firmar el token y, a continuación, el servidor de recursos dispondrá de la clave pública. El servidor de autorización compartirá la clave pública con todos los servidores de recursos.
-Los servidores de recursos utilizarán el público para verificar la firma que viene en ese token. Así que no necesita hacer esta llamada de red adicional al servidor de autorización para obtener los detalles del usuario,
+El servidor de autorización utilizará la clave privada para firmar el token. El servidor de autorización compartirá la clave pública con todos los servidores de recursos.
+Los servidores de recursos utilizarán esta clave publica para verificar la firma que viene en el token en cada petición que le llegue desde el exterior y entonces sabrá que es la firma que el servidor de autorizacion había firmado. Una vez que sepa que el token es valido (debido a la explicacion anterior), no necesita hacer esta llamada de red adicional al servidor de autorización para obtener los detalles del usuario (username, direccion, etc., pero nunca password ya que este no esta en el payload y por ello la aplicacion cliente nunca tiene acceso al password ), porque estos ya vienen en el payload del token.
 En claves simetricas solo se ocupan private keys que son compartidas al servidor de recursos (en asimetricas se genera publica + privada en el servidor de autorizacion pero solo se comparte la clave publica)
 The Java keytool that comes with the JDK installation allows us to generate a pair of private and public keys that we can use for encryption, decryption as well as signatures. When you generate a pair of public and private keys, the very first file that will be created is a keystore file.
 This is where our private and public keys are stored. This file is password protected, that is, when we create these key stores, the public and private keys will provide a password using which this key store will be protected.
 And also for each private key we give alias, which is like a username and also a password. These public keys can be exported using the key tool into a certificate, and then we can distribute that certificate across our client applications so that they can use the public key and do the encryption in case of signatures. They will use the public key to verify if the signature is really from the expected user.
 Cuadro de arquitectura de mas arriba (Key Security Concepts) --> spring security en general, pero se ve mejor cuando un usuario quiere ingresar directamente a la aplicacion de spring protegida con springsecurity por medio de thymeleaf por ejemplo. Proyecto couponservice es un ejemplo de esto.
                                                        OAUTH --> usar el cuadro de arquitectura user, client app, resourceserver, authorizationserver. Es para logueo y comunicacion entre aplicaciones por medio de credenciales de usuario.
-													     JWT -->complementario a OAUTH. Elimina el paso de verificacion de token desde resourceserver a authorizationserver en cada peticion.
+													     JWT -->complementario a OAUTH. Elimina el paso de verificacion de token desde resourceserver a authorizationserver en cada peticion. Antiguamente se podía usar jwt sin oauth con la librería spring-security-jwt, pero ahora se obliga a usar con oauth2.
 													 
 1.Generó una publicKey (que no es otra cosa q un string super largo) con linea de comando de keytool (ver video). a todas las variables de credenciales les puso jwtiscool en este comando, por si acaso.
 2.Pasó los proyectos de authserverlatest y resourceserverlatest para importarlos (estan bajo la carpeta "todo", a mi no me los agarró como proyecto maven pero segui adelante sin calentarme la cabeza). 
-Oicdebugger nos permitirá obtener un authorization code (vamos a usar este grant type) cuando nos loguiemos (directamente en authorization server no en una appcliente, ya q estamos usando authorization code) desde el navegador.
+Oidcdebugger nos permitirá obtener un authorization code (vamos a usar este grant type) cuando nos loguiemos (directamente en authorization server no en una appcliente, ya q estamos usando authorization code) desde el navegador.
 El proyecto couponclient no sera usado como app cliente para probar, aunque sí hizo todo .
-Notar que estos dos proyectos combinados son muy parecidos al proyecto anterior llamado "couponservice", pero separó todo lo del cupon en el proyecto resourceserverlatest y todo lo de usuarios y roles en el proyecto authserverlatest. Ademas no tenemos la clase WebSecurityConfig, ya q al parecer cuando se usa Oauth no se ocupa.
+Notar que estos dos proyectos combinados son muy parecidos al proyecto anterior llamado "couponservice", pero separó todo lo del cupon en el proyecto resourceserverlatest y todo lo de usuarios y roles en el proyecto authserverlatest. 
+Notar que ahora no tenemos la clase WebSecurityConfig, ya q al parecer cuando se usa Oauth no se ocupa, sin embargo los beans de configuracion que van en esta clase igual estan repartidos entre AuthorizationServerConfiguration y DefaultSecurityConfig y ResourceServerConfig.
 3.Creó AuthorizationServerConfiguration para tener una custom configuration para el authorization server.
 4.Creó el metodo privado  buildJWKSet() en clase AuthorizationServerConfiguration, que setea el keystore (q es donde almacenamos las llaves) a JWT.
 5. Agregó los métodos jwtSource() y jwtDecoder() que es para usar la llave publica y privada (no explicó si era para generar las llaves o para usarlas, yo creo q debiera ser para usarlas ya q las llaves se generan por keytool).
@@ -152,14 +169,16 @@ Notar que estos dos proyectos combinados son muy parecidos al proyecto anterior 
 8. Registrar la aplicacion cliente mediante metodo registeredClientRepository().
 9. Para codificar el secret del cliente creó el bean bcryptPasswordEncoder() y lo inyectó en el método registeredClientRepository() y lo usó para encodificar y decodificar el secret del cliente. Con esto ademas se logra encodificar y decodificar toda la informacion de credenciales de usuario que viene desde UserDetails.
 10. Obtuvo el Authorization code. Para ello corrió authserverlatest, y en el sitio de oicdebugger.com en el input Authorize URI (provided) escribió http://localhost:8080/oauth2/authorize ; input ClientID es couponclientapp. checkbox ResponseType marcar "code". Response mde marcar "form_post". Al hacer click en el boton de enviar nos redirige a pagina de logueo localhost:8080/login, esto es gracias a la configuracion que hicimos en clase DefaultSecurityConfig. 
-Acá nos estamos logueando como usuario en el authorization server del proyecto authenticationserverlatest (como si nos loguearamos como usuario en el authorization server de facebook, por ejemplo ), no en couponservice que es la applicacion cliente (de hecho ni siquiera corre couponservice en los pasos posteriores 10 y 11). Nos logueamos exitosamente y entonces se nos redirige a una url que contiene nuestro authorization code ya escrito.
+Acá nos estamos logueando como usuario en el authorization server del proyecto authenticationserverlatest (como si nos loguearamos como usuario en el authorization server de facebook, por ejemplo ), no en la applicacion cliente. Nos logueamos exitosamente y entonces se nos redirige a una url que contiene nuestro authorization code ya escrito.
 11. Intercambió el Authorization code por el token. Para ello en postman mando un POST a localhost:8080/oauth2/token, y en el Body seleccionó "form-data" y seteó los siguientes key-values que ya habia seteado en el codigo fuente en el metodo registeredClientRepository() :
 grant-type:authorization_code
 client_id:couponclientapp
 client_secret:9999
 code:el que sale en el punto 10 aca mismo
 redirect_uri: https://oicdebugger.com/debug
-Entonces en el body de la respuesta tenremos un access_token (q es el token) , un refresh_token, un scope:"read" y un "expires_in" 290 segundos (luego creó el bean tokenSettings() en clase AuthorizationServerConfiguration para aumentar la duracion del token):
+Concluyo de lo anterior que el authorization code se obtiene en el momento en que nos logueamos como usuario en nuestra aplicacion que contiene el authorization server y nuestro resource server (Facebook, por ejemplo, NO la aplicacion cliente).
+Concluyo tambien que en el momento que intercambiamos nuestro authorization code por el token en postman en el paso 11 estamos ingresando desde la aplicacion cliente a nuestra aplicación (Facebook).
+Entonces en el body de la respuesta tendremos un access_token (q es el token) , un refresh_token, un scope:"read" y un "expires_in" 290 segundos (luego creó el bean tokenSettings() en clase AuthorizationServerConfiguration para aumentar la duracion del token):
 En el navegador buscar algun decodificador de token JWT (calab.net, por ejemplo) y luego pegar el access_token. Veremos que estan los datos del usuario logueado en el payload (no muestra el password, naturalmente, ni tampoco la firma). Notó que no tiene info sobre roles como debiera  ya que authorizationserverlatest es un proyecto personalizado.
 Para remediar esto, generó el metodo jwtEncodingContext() en clase AuthorizationServerConfiguration, repitió los pasos 10 y 11 y entonces en el payload si venia "roles":["ROLE_ADMIN"]
 Hasta este punto, pese a tener configurado el client app, no ha corrido nada del proyecto couponservice (y de hecho mas adelante tampoco lo corre).

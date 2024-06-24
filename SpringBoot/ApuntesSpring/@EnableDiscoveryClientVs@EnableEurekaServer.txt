@@ -1,0 +1,18 @@
+Todas estas anotaciones pertenecen a spring cloud.
+
+@EnableEurekaServer-->para conectar los microservicios mediante servidor de registro eureka usando spring cloud. Esta la en clase principal del proyecto de registro de Eureka, q en el caso del peruano es RegistryServiceApplication.
+@EnableEurekaClient-->para conectar cada microservicio (incluyendo el api gateway) como cliente al servidor de registro eureka usando spring cloud, pero a partir de la version 2023 esta desactualizada, por lo q segun el peruano se usa ahora @EnableDiscoveryClient.
+@EnableDiscoveryClient-->es lo mas recomendable, ya que tanto el peruano como Guzman lo usan para conectar cada microservicio (aunq a diferencia del peruano, Guzman no usa Eureka Server ni un servidor de registro centralizado al cual conectar los microservicios, simplemente los conecta usando EnableDiscoveryClient junto con las dependencias de spring-cloud-kubernetes-starter (esto es para comunicar con kubernetes, porque antes de la seccion de kubernetes habia hecho una comuncacion simple mediante FeignClient entre los dos microservicios)).
+@EnableConfigServer-->para servidor de configuracion solamente.    
+@EnableFeignClient-->para usar libreria FeignClient en vez de RestTemplate
+
+
+
+
+@EnableDiscoveryClient permite conectar los microservicios entre ellos mediante spring-cloud, ya sea media
+
+, junto con las dependencias de spring-cloud-kubernetes-starter, activar spring cloud kubernetes, para
+
+In terms of its practicality and simplicity, if the registered center is eureka, then @EnableEurekaClient is recommended. If it is another registration center (such as Kubernetes), @EnableDiscoveryClient is recommended.
+
+@EnableDiscoveryClient lives in spring-cloud-commons and picks the implementation on the classpath. @EnableEurekaClient lives in spring-cloud-netflix and only works for eureka. If eureka is on your classpath, they are effectively the same.

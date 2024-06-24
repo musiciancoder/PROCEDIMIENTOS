@@ -1,0 +1,26 @@
+What are the Web service standards in Java?
+
+We have two service standards, one for the soap based Web services and one for the rest based Web services
+
+For the soap web services the Java ee standard is Jax W.S., which stands for Java API, for xml based Web services.
+
+For the rest Web services it is the JAX RS, which stands for Java API, for xml, based rest services.
+
+Although it says XML, it supports various data formats in rest. Like any other Java EE specification or standard it comes with that specification and that API.
+
+The specification is for the Web service providers or frameworks like Apache, cxf , Apache axis in case of soap and for the RESTful World it is Apache cxf again.
+
+And then we have frameworks like Jersey.
+
+These frameworks implement these web service standards, and this API is for us, the developers.
+
+Once we learn the API, we can use any of these frameworks and our code and our application will not change.
+
+The same API will work across these frameworks that implement these standards.
+
+REST--> Very simple to implement and use thanks to their architectural guidelines, they perform well. When it comes to the messages themselves, the messages are very lightweight.
+They are stateless (this does not mean they dont have state, instead the state is shared accross client and server instead of being stored on one side only (client sessions, for instance)), so the applications can be easily scaled as the load increases. It supports multiple data formats, not just XML, which is the case.
+
+SOAP-->It is slowly becoming legacy because it is a little hard to implement. It has the message overload where we have to use some predefined soap headers, the soap envelope and all that when it comes to messaging. It only supports the XML data format.
+Soap is still being used where we need a very strict wsdl contract where the non-functional requirements like encryption, decryption at the message level and also reliability of the messages is required.
+Soap is still being used for internal applications within the organization where these requirements are of high value. Otherwise rest is the preferred way to go.

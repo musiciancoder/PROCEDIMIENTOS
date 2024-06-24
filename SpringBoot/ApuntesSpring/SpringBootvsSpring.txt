@@ -6,6 +6,6 @@ TransactionManager: Is created and injected automatically.
 2)Se simplifica la compatibilidad de versiones, ya que las dependencias cuyas versiones solian causar problemas en spring,
 en springboot estan compatibilizadas y contenidas transitivamente en las dependencias starter (spring-boot-starter-parent, spring-bot-starter-beb, spring-boot-starter-data-jpa).
 La version de estos starters no se pone en la dependencia misma, sino que se obtiene del parent spring-boot-starter-parent que va en el mismo pom, lo que a su vez soluciona el hecho de q en spring se tenian problemas de compatibilidad  de versiones entre las librería de jpa, mvc, etc.
-3)SpringBoot tiene servidores embebidos (Tomcat por defecto, pero tambien Jetty y Undertow)
-4)SpringBoot contiene Actuators (autoconfig, mapping, info, health, metrics) que permiten monitorear nuestra app en distintos ambientes. Esto se logra agregando la dependencia spring-boot-starter-actuator y viendolo en los ambientes con 
+3)Se simplifican los despliegues a ambientes de prueba y en produccion, ya q SpringBoot tiene servidores embebidos (Tomcat por defecto, pero tambien Jetty y Undertow)
+4)Se facilita el monitoreo de aplicaciones, springBoot contiene Actuators (autoconfig, mapping, info, health, metrics) que permiten monitorear nuestra app en distintos ambientes. Esto se logra agregando la dependencia spring-boot-starter-actuator y viendolo en los ambientes con 
 /health, /beans, /info, etc. en los endpoints. En local por ejemplo seria localhost:8080/health

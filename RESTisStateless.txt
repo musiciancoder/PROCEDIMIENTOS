@@ -1,0 +1,9 @@
+Are rest Web services stateless? yes, statelessness is one of the key principles of rest Web services,
+
+that is, we shouldn't be maintaining any state in our application or the server on which the application is running.
+
+That doesn't mean there is no state at all.
+
+When the clients send the request, they should include all those details that are required to perform a certain business logic or operation.
+
+That is, the state will be transferred across the client and the server instead of maintaining it in one location on the server, like a session, etc..

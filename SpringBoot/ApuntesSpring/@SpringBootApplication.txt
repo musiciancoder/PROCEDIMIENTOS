@@ -9,6 +9,6 @@ Inside it, they are the @SpringBootConfiguration @EnableAutoConfiguration and @C
 @ComponentScan tells Spring boot that it should scan throughnall the sub packages of the current package.
 Wherever this class lives, which is marked with the @ComponentScan annotation indirectly through
 the Spring boot application, it should scan that package and all the sub packages for the spring beans
-that are marked with @Component, @Sservice, @Repository, etc. and use them for dependency injection
+that are marked with @Component, @Service, @Repository, etc. and use them for dependency injection
 at runtime.
 
