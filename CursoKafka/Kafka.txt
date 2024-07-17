@@ -103,7 +103,11 @@ A continuacion inició un proyecto de spring para poder recibir y enviar en los 
 		
 AWS
 
-NOTA: En esta seccion seccion solo tomé nota, pero no ejecuté nada en AWS
+NOTA: En esta seccion seccion solo tomé nota, pero no ejecuté nada en AWS.
+IMPORTANTE:  En esta seccion, a diferencia de la seccion siguiente, no se escribe una linea de código java, simplemente crea un cluster en MKS y con dos maquina de EC2 empieza a mandar topics y ver si se reciben e la otra
+máquina, por lo que intuyo que el cluster de MKS es para cosas pequeñas directamente creadas en AWS y que no involucran proyectos reales con Spring y Java. Para proyectos reales con Spring y Java intuyo que es mejor crear  un cluster de ElasticSearch,
+como se explica en la siguiente seccion.
+
 
 En AWS ocupamos el servicio MKS (Managed Streaming for Kafka) que permite crear en la nube un cluster de Kafka con varios nodos y varias réplicas.
 1. Creó un grupo de seguridad en EC2 para el cluster de kafka. Un grupo de seguridad es un firewall virtual (firewall es un sistema diseñado para proteger las redes privadas del acceso no autorizado y no verificado en una conexión a Internet) para que la instancia (maquina virtual) controle el trafico de entrada y salida.
@@ -126,7 +130,8 @@ Luego creó un consumer (mismo comando en local, pero con el del Plaintext que s
 
 EJEMPLO PRACTICO
 
-El ejemplo practico va orientado a poder persistir y manipular (con postman) registros con atributos pertenecientes a una clase modelo de nuestro proyecto spring (clase Devs4jTransaction, como se verá. Notar que en el proyecto anterior no habia ninguna clase modelo, simplemente habia consumer y producer que era lo que necesitabamos). Para ello deberemos desplegar el proyecto en EC2, luego crear un dominio en Elastic Search de AWS y probar con postman..
+El ejemplo practico va orientado a poder persistir y manipular (con postman) registros con atributos pertenecientes a una clase modelo de nuestro proyecto spring (clase Devs4jTransaction, como se verá. Notar que en el proyecto anterior no habia ninguna clase modelo, simplemente habia consumer y producer que era lo que necesitabamos). 
+Para ello deberemos desplegar el proyecto en EC2, luego crear un dominio en Elastic Search de AWS y probar con postman..
 1. Creó el proyecto llamado devs4j-transactionscon librerias spring-kafka y javafaker.
 2. Configuró kafka en clase de configuracion KafkaConfiguration (igual q en el proyecto con spring curso_kafka_spring).
 3. Seteó el cluster de AWS en el metodo consumerProps() del consumer. Esto significa que el proyecto NO podremos correrlo, porque en la sección de AWS solo fui un espectado pasivo. De todas maneras el proyecto se fue guardando paso a paso en github.

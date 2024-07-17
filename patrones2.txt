@@ -57,6 +57,11 @@ Opcionalmente se puede contar o no con una clase director para agrupar atributos
 ¿Cuando usar este patron?
 Cuando tenemos demasiados atributos para una clase inmutable, con algunos atributos requeridos y otros opcionales, y deseamos evitar demasiada sobrecarga de constructores sin tener que ocupar atributos=null al instanciar y a la vez separar la construccion de un objeto de su representación en la clase.
 
+6.Object Pool
+Es para crear de antemano un grupo (pool) de objetos (inmutables o mutables) de nuestra clase (la clase debe ser customizada por nosotros, tipo Persona, por ejemplo) dejándolos cacheados en memoria, con el objeto de reusar estos objetos una y otra vez asignándoles diferentes estados, para no tener que estar creando nuevos objetos cada vez, con el consecuente ahorro de memoria y aumento de performance (ojo que esto solo es efectivo cuando los objetos del object pool son utilizados por tiempos muy cortos, el numero de ellos es grande y la creación de estos objetos por medios normales es costos en recursos). Cuando los objetos son del tipo "limited external resources" como imágenes por ejemplo ahí sí conviene.
+El thead pool de Executor Service usa este patrón de diseño.
+Ver el ejemplo del curso de Udemy q esta en el paquete patrones2 con comentarios y todo.
+
 
 
 
@@ -66,7 +71,7 @@ Consiste en generar clases complejas y/o objetos complejos pertenecientes a esta
 Muchas veces cuando recien comenzamos a desarrollar un proyecto, no se tiene claridad acerca de propiedades y atributos finales que irán en una clase en particular. 
 Por ello en el medio del desarrollo, cuando ya existe cierta claridad sobre ello se le pide al desarrollador ir agregando estas propiedades, lo que obliga a modificar clases; el código del comienzo al agregarsele estos atributos la mayoria de las veces viola principios SOLID.
 Si trabajamos en cambio con patrones estructurales desde el comienzo, una petición de modificación de ciertas variables o atributos no nos va a afectar ya que estamos cumpliendo principios SOLID desde el principio. 
-"Structural patterns deal with how classes and objects are arranged or composed (..usando composición y herencia, claro esta)"
+"Structural patterns deal with how classes and objects are arranged or composed (..usando composición y herencia, claro esta)".
 
 
 ¿Qué es composicion en Java? es usar una clase que que hemos constuido nosotros como instance variable (campo de clase) para definir atributos de otra clase.
@@ -107,9 +112,10 @@ Además maneja el ciclo de vida del servicio, y el proxy funcionará incluso si 
 La clase Proxy debe implementar alguna interfaz que tambien sea implementada por la clase de servicio original
 Se pueden introducir nuevos proxies segun requerimientos de funcionalidad (filtros, seguridad o caché por ejemplo) sin necesidad de modificar el servicio o el cliente, por lo q se cumple el principio Open-Closed.
  
-FLYWEIGHT
-Consiste en que cuando dos objetos o mas tienen muchos atributos en comun entre ellos, podemos separar las clases en clases que contengan los atributos en comun y otras que contengan los atributos exclusivos. Esto permite que quepan mas objetos en la memoria RAM, por lo que estaremos optimizando recursos.
+FLYWEIGHT (Peso mosca)
+Consiste en que cuando dos o mas objetos tienen muchos atributos en comun entre ellos, podemos separar las clases en clases (siempre inmutables) que contengan los atributos en comun y otras clases (no necesariamente inmutables) que contengan los atributos exclusivos. Esto permite que quepan mas objetos en la memoria RAM, por lo que estaremos optimizando recursos y a la vez mejorando el performance.
 ¿Cuando usar? Cuando debemos accesar o renderizar desde una fuente externa (bbdd, servicio, etc.) demasiados objetos, cada uno de ellos conteniendo demasiados atributos, por lo que es factible que una maquina con pocos recursos se quede sin memoria.
+Ver el ejemplo de GeekForGeeks que está con comentarios en el IDE. https://www.geeksforgeeks.org/flyweight-design-pattern/
 
 DAO (patron estructural, pero de arquitectura, no de diseño??? Sera verdad esto).
 Segun https://stackoverflow.com/questions/4037251/dao-vs-ormhibernate-pattern ORM es una forma de implementar un patron DAO, pero no la única. Es mas, se puede perfectamente implementar un patron DAO sin usar ORM, solo con JDBC.
@@ -145,6 +151,19 @@ If you want to maintain a history of commands, log them, or even put them in a q
 Dynamic Configuration:
 When you need the ability to dynamically configure and assemble commands at runtime, the Command Pattern allows for flexible composition of commands.
 
+OBSERVER
+Ver el ejemplo de geekforgeeks q esta en el paquete patrones.
+When not to use the Command Design Pattern 
+Simple Operations:
+For very simple operations or one-off tasks, introducing the Command Pattern might be overkill.
+It’s beneficial when you expect your operations to become more complex or when you need to support undo/redo.
+Tight Coupling is Acceptable:
+If the sender and receiver of a request are tightly coupled and changes in one do not affect the other, using the Command Pattern might introduce unnecessary complexity.
+Overhead is a Concern:
+In scenarios where performance and low overhead are critical factors, introducing the Command Pattern might add some level of indirection and, in turn, impact performance.
+Limited Use of Undo/Redo:
+If your application does not require undo/redo functionality and you do not anticipate needing to support such features in the future, the Command Pattern might be unnecessary complexity.
+
 ITERATOR.
 Es el clasico Iterator explicado por Juan Pildoras que sirve para iterar una colección.
 ¿Cuando usar? Cuando no queremos exponer toda una coleccion al cliente (en una pantalla por ejemplo), solo queremos pasarle uno por uno cuando haga click en siguiente o anterior.
@@ -154,7 +173,7 @@ Actúa a modo de intermediario entre varias clases concretas (componentes de swi
 ¿Cuando usar? Siempre que tengamos lógica perteneciente a una clase concreta (como getters o setters) en métodos de otra clase concreta (esto se debe evitar).
 
 MEMENTO
-Obtenemos fotos instantáneas del estado de un objeto y las vamos almacenando, de manera de poder volver atrás si un estado es requerido. En el IDE ver el ejemplo de tutorialpoint, queda mejor explicado.
+Obtenemos fotos instantáneas del estado de un objeto y las vamos almacenando, de manera de poder volver atrás si un estado es requerido. En el IDE ver el ejemplo de geek4geeks (https://www.geeksforgeeks.org/memento-design-pattern/), queda mejor explicado.
 ¿Cuando usar? Typically, the Memento Design Pattern will be used in situations where some actions are undoable, therefore requiring to rollback to a previous state. However, if the state of the Originator is heavy, using the Memento Design Pattern can lead to an expensive creation process and increased use of memory. 
 
 
