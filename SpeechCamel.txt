@@ -2,4 +2,4 @@
 2. El archivo .CSV se integraba en primer lugar mediante un servicio Camel (desplegado en Tomcat) con un cliente http que era una aplicación tipo servlet (credit cards file) tambien desplegada en Tomcat y en donde los deudores podían ver sus deudas.
 Se usaba patrón de integración split.
 3.El archivo .CSV se integraba en segundo lugar mediante otro servicio de camel (desplegado también en Tomcat) con ActiveMQ (desplegado en Tomcat tambien) usando patrón de integración pipeline.
-4.En ActiveMQ se enviaba por colas a un FTP donde se almacenaba (combinado con otros datos) y de ahi otros Batch de salida (no era resorte de nuestro equipo) sacaban la info
+4.En ActiveMQ se enviaba por colas a un FTP donde se almacenaba en archivos de otro tipo (combinado con otros datos) y de ahi otros Batch de salida (no era resorte de nuestro equipo) sacaban la info.

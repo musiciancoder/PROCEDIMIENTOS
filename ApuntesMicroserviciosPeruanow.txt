@@ -1,0 +1,203 @@
+Seccion 2: Desarrollo de Microservicios.
+Creó tres microservicios: Usuarios (bbdd en mysql, puerto 8081), Hoteles (bbdd en postgres, puerto 8082) y Calificaciones (bbdd en mongoDB, puerto 8083). El atributo UsuarioId de Usuarios y HotelId de Hoteles lo creó con UUID.randomUUID en el servicio en vez de con strategy=GeneratedValue en la entidad y ambos son a la vez atributos del servicio de Calificaciones.
+El resto es mas o menos igual que siempre, la configuracion para la bbdd la hace en application.yml en vez de application.properties, pero es casi lo mismo
+Usuario tiene los atributos: usuarioId, nombre,email, informaciones y calificaciones (esta última no la escribe inmediatamente sino en la seccion 4, y es una lista transiente , o sea no se guardará en la bbdd de usuarios sino que se obtiene del microservicio de calificaciones para que pueda aparecer en la respuesta rest de postman para getUusario()).
+Probó en postman individualmente creando usuarios, hoteles y calificaciones.
+
+Seccion 3:Eureka
+Creó un servidor de Eureka para comunicar los microservicios. Esto lo logró creando un proyecto de spring con dependencias de Eureka Server, Spring Web y Spring Bootstrap. 
+En el aplication.yml va lo siguiente
+port: 8761
+eureka
+ instance
+  hostname: localhost
+ client
+  register-with-eureka:false         //solo se registran los servicios con true, no el servidor mismo
+  fetch-registry:false
+  
+  En la clase principal escibió la anotacion @EnableEurekaServer
+  Lo levantó en localhost:8761 y en pantalla del navegador le aparecio la consola de Eureka.
+  
+Luego en cada uno de los 3 microservicios agregó en el pom la dependencia spring-cloud-starter-netflix-eureka-client de org.springframework.cloud y luego agrega un <dependencyManagement> para configurar las dependencias de spring cloud con <scope>import (ver video).
+En la clase principal de cada microservicio agregó la anotacion @EnableEurekaClient y en cada application.yml escribió:
+
+application:
+  name:USUARIO-SERVICE //o CALIFICACION-SERVICE o HOTEL-SERVICE
+  
+eureka:
+  instance:
+   prefer-ip-address:true
+  client:
+     register-with-eureka:true         
+     fetch-registry:true
+	 service-url:
+		default-zone: http://localhost:8761/eureka
+
+Corremos los microservicios y en eureka debieramos ver todos los clientes registrados.
+En el ejecutor de USUARIO-SERVICE en el IDE marcó "allow multiple instances" y sin detener el servidor cambió el puerto a 8004 y volvió a correr. Recargó el navegador y ahora vió dos instancias de USUARIO-SERVICE.
+Tambien se puede asignar puertos aleatorios agregando otra configuracion en el yaml (ver video). Al final dejó un solo puerto para cada microservicio (8001,8002 y 8003 respectivamente).
+  
+Seccion 4: comunicacion de microservicios con Rest Template y Openfeign
+En USUARIO-SERVICE creó la carpeta Config con la clase MyConfig que contiene el bean de RestTemplate
+En el metodo getUsuario() de UsuarioServiceImpl en USUARIO-SERVICE  hizo la lógica para obtener un arraydecalificaciones con 
+ArrayList<Calificacion>calificacionesDelUsuario=restTemplate.getForObject(url de CALIFICACION-SERVICE)  (previamente solo en USUARIO-SERVICE creó la clase Calificacion)
+logger.info("{}", calificacionesDelUsuario);
+usuario.setCalifiaciones(calificacionesDelUsuario);
+Entonces corrió todos los microservicios y probó en postman para USUARIO-SERVICE y ahora obtendrá el usuario con sus calificaciones.
+Agregó el hotel a la lista de calificaciones de getUsuario() Para ello solo en USUARIO-SERVICE creó la clase Hotel. (ver código, porq es harto). 
+Luego agregó el load balancer de Spring Cloud. Para ello agregó la dependencia de load balancer (perteneciente a spring cloud al igual q las dependencias de cliente feign y eureka), cambió en el código de java donde aparece localhost:puerto (en restTemplate.getForObject restTemplate.getForEntity) por los respectivos nombres de los microservicios. Levantó y los microservicios se deben comunicar correctamente como antes
+Agregó la librería de OpenFeign(tb de spring cloud) , agregó la anotacion @EnableFeignClients en la clase principal de USUARIO-SERVICE. Creó la interfaz HotelService y la ocupó en getUsuario() en vez de el RestClient que tenía.  
+
+Seccion 5
+Implementó un apigateway en un proyecto aparte en puerto 8084. Ver el aplication.yml donde a cada microservicio le asigna una ruta (path). Levanta el registry, luego el api gateway y luego los microservicios individuales (en ese orden). 
+Luego en postman prueba con http://localhost:8084/calificaciones para obtener todas las calificaciones ("calificaciones" fue la ruta que asignó a CALIFICACION-SERVICE) y con http://localhost:8084/calificaciones/insertarAquiUnaCalificacionId para obtener una calificacion en particular. Análogamente a esto prueba para USUARIO-SERVICE y CALIFICACION-SERVICE.
+
+Seccion 6
+Creó un config server en un nuevo proyecto, donde pondrá toda la configuracion centralizada para todos los proyectos anteriores y de esta forma prescindir de application.properties o de application.yml en c/u de los proyectos.
+El config server debe estar en un repositorio de control de versiones como github por ejemplo.
+Para ello creó un nuevo proyecto llamado "config-server" con dependencias de confif-server y eureka-discovery-client. En la clase principal agregó @EnableConfigServer.
+Luego en github creó otro proyecto distinto llamado "microservicios" con tres archivos: application-dev.yml, application-prod.yml y application.yml (este ultimo es el default). En c/u de ellos configuró eureka.
+En el application.yml de "config-server" llama a la url de github donde esta "microservicios". Por ultimo lo levanta y lo prueba en postman con http://localhost:8085/application/default , http://localhost:8085/application/dev y http://localhost:8085/application/prod. Notar que las propiedades que dimos en la configuracion estan saliendo en el body de la respuesta.
+uego en cada uno de los miscroservicios agregó la dependencia de spring-cloud-starter-config.El proyecto api gateway lo dejó tal cual, no agregó nada.
+En el application.yml de USUARIO-SERVICE agregó una configuracion para que le tome el config-server en el puerto 8085 (ver video, pero al final, porque hace muchos cambios en el application.yml). Lo mismo hizo para los otros dos microservicios.
+
+Seccion7
+El Circuit Breaker es un patron de diseño para tolerancia de fallos. Luego de establecer el maximo numero de fallos tolerable en la comunicacion de dos componentes (dos miscroservicios por ejemplo), el circuit breaker (que esta entre client y supplier) determina que el circuito esta abierto (ya que no hay comunicacion entre cliente y supplier), o sea no deja
+pasar mas llamadas. Luego de un tiempo (configurable tambien) sin embargo, pasa a half-open y deja pasar algunas peticiones al supplier solo para verificar si sigue sin comunicacion (en cuyo caso abre el circuito) o si ya hay comunicacion exitosa (en cuyo caso cierra el circuito) 
+Agregó las dependencias de spring-boot-starter-actuator, spring-boot-starter-aop y spring-cloud-starter-circuit-breaker a USUARIO-SERVICE.
+Agregó el método ratingHotelFallback (esta en el codigo del final de esta seccion, guardado como Proyecto01 en mis archivos) en UsuarioController, con un usuario hardcodeado en este metodo y un logger en caso de fallor. Luego en obtenerUsuario (en el mismo controlador) escribió @CircuitBreaker(name = "ratingHotelBreaker, fallBackMethod= "ratingHotelFallback")
+El metodo obtenerUsuario es el único q se comunica con los otros microservicios, es por ello q acá se implementa el circuitBreaker.
+En el application.yml de USUARIO-SERVICE configuró la tolerancia de fallos (fault tolerance) mediante resilience4j (ver documentacion en sitio web de resilience4j, en los videos el peruano no lo explica bien).
+En esta sección no se trabajará con el config-server en el proyecto CALIFICACION-SERVICE (por qué, no sé, solo lo mencionó el peruano). 
+Luego levantó solo USUARIO-SERVICE, probó en postman y en el body le apareció "El respaldo se ejecuta porque el servicio esta inactivo : ", q es lo que había seteado en el codigo del circuit breaker.
+Posteriormente, en obtenerUsuario() comentó la anotación @CircuitBreaker y escribió @Retry (ver el codigo en el proyecto). Configuró retry en el application.yml con numero maximo de intentos=2  y volvió a levantar. La verdad no caché que era lo que quiso hacer
+
+Seccion8
+Esta seccion de Spring Security me la salté por desición propia (preferi repasar los de Spring Security del indio ).
+
+Seccion9 Poniendo en practica ...
+
+Creó el proyecto "microservicios-spring-boot" como parent y dentro del él el módulo "producto-service", con las dependencias 		
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+		y
+	    <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+En el proyecto producto-service creó las clases con las clases ProductRepository (extendiendo MongoRepository), ProductService, ProductController y las clases dto ProductResponse y ProductRequest.
+Creó la base de datos "producto-service" en mongoDB y dentro de ella la coleccion "producto", lo conectó en el application.properties.  Corrió "producto-service" y probó en postman en puerto 8080 creando algunos productos.
+Creó "order-service", con las dependencias spring-web, sping-datajpa, mysql como módulo de "microservicios-spring-boot". Creó las clases de entidad Order y OrderLineItems. 
+Creó OrderRepository. Creó el dto OrderRequest, OrderLineItemsDto y OrderService. Creó la bbdd order_service en mysql, lo conectó en el applicaton.properties. Corrió "order-service" en puerto 8081, enviando un json con OrderLineItems en el body. (Aun no puede probar pedidos (correspondientes a la clase Order), porque todavia no se conecta con el microservicio de producto-service).
+Creó "inventario-service" con dependencias de jpa y web (ambas de springboot) conectado a mysql y como modulo de "microservicios-spring-boot". Contiene entdad Inventario, InventarioService e InventarioRepository. Corrió en puerto 8082 y probó en postman.
+Comunicará order-service e inventario-service mediante WebClient. WebClient--> definido como @Bean es un client no-bloqueante (a diferencia de restTemplate q es bloqueante ,o sea  bloquea todas las peticiones hasta q termine la peticion actual), reactivo y su función aquí es hacer peticiones HTTP a nuestro servidor reactivo el cual usa Netty por default. 
+Para ello creó las clases dto en inventario-service y en order-service agregó la dependencia de starter-webflux (perteneciente a sring boot).
+A continucacion creó el paquete config en order-service y en el creó la clase WebClientConfig. En ella, analogamente a como se creaba un bean para restTemplate debemos crear un bean para webClient. Este bean lo inyectó en OrderService para obtener un array de inventarios.
+Finalmente en postman hizo dos pedidos con POST http://localhost/api/order , uno con "codigoSku":"iphone_12" que sabia que tenia cantidad>0 en la bbdd de inventario-service. Le dio una respuesta exitosa. El otro pedido lo hizo con "codigoSku":"iphone_12_blue" (tenia cantidad=cero de este codigoSku en la bbdd de inventario-service) y le dio un error, y de esta manera comprobó la comunicacion entre order-service y inventario-service.
+Implementó servidor eureka creando el proyecto "discovery-server" con las dependencia de eureka-server (perteneciente a spring cloud), como módulo de microservicios-spring-boot. En los demas proyectos pegó la libreria de eureka-client (perteneciente a spring cloud) junto con el dependencyManagement y el properties con la version de spring-cloud. Luego en la clase principal de cada proyecto agregó el @EnableEurekaClient.
+Luego ejecutó el proyecto discovery-server, luego el producto-service, luego el inventario-service y luego el order-service. En localhost:8761 en el navegador vio el servidor de eureka con los microservicios en él.
+Agregó multiples instancias. Para ello agregó la anotacion @LoadBalancer en el bean de WebClientConfig de order-service, y aqui mismo agregó el builder. En el runner de order-service en el ide setió "allow multiple instances". Luego en el application.properties de order-service setió el numero de instancias random con eureka.instance.instanceId
+Corrió todos los microservicios (incluido discovery-server) y vio en la pagina de eureka server que el numero de instancias para order-service era 4.
+Luego creó el proyecto api-gateway como módulo de microservicios-spring-boot. En el application.properties de este microservicio configuró las rutas para los demas. El puerto del api-gateway lo seteó en 8083 para tener los demas microservicios centralizados en este puerto, por ello en postman llamó a localhost:8083 en vez de localhost:8080, localhost:8081, localhost:8082 respectivamente para cada microservicio
+Luego ejecutó todo.
+
+
+Seccion10
+
+Keycloak-->Open Source Identity and Access Management. Add authentication to applications and secure services with minimum effort.No need to deal with storing users or authenticating users. It provides user federation, strong authentication, user management, fine-grained authorization, and more.
+El peruano basicamente usa Keycloak para obtener obtener un servidor de recursos de oauth2 mediante una url externa (dada por keycloak corriendo en un contenedor docker) en vez de código, y de esta manera obtener un token jwt proporcionada por esta url externa sin código (el peruano dice que usar keycloak es "mas facil q hacerlo con jwt", pero yo creo que se refiere a que es mas facil que escribir el codigo de jwt, porque 
+claramente sí usa jwt ya que esta en la linea que se agrega en el application.properties para configurar keycloak en el proyecto). Para ello:
+1. Corre la imagen de keycloak desde dockerhub (ver comando en el curso). Con esto levanta un contenedor docker que contiene los recursos de keycloak. 
+2. Ingresa al navegador en localhost:puertoExternoDelContainerDocker para tener accesos a los recursos de keycloak. 
+3. El el proyecto de api-gateway configura la seguridad, agregando las dependencias de spring-boot-starter-oauth2-resource-server y spring-boot-starter-security (perteneciantes a springboot) y
+configurando la autorizacion en la clase SecurityConfig mediante el bean SecurityWebFilterChain.
+4. Con la linea spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8080/realms/spring-boot-microservices-realm en el application.properties (del proyecto api-gateway) se conecta al servidor de recursos externo que ya esta corriendo en el contenedor docker.
+5. Corrió todos los proyectos. En el postman trató de mandar un GET http:localhost:8083/api/producto para obtener la lista de productos, pero no pudo, ya que ahora esta agregado spring-security en el api-gateway.
+6. En el postman click en Authorization, seleccionó OAuth2 en "type" y en "configuration options" apareceran varios inputs. En el navegador de keycloak hay varios enlaces (ver video) que se copian en estos inputs.
+7. En postman, al final de los inputs le sale "get new access token", le da click y obtiene el token, ahi mismo le aparece la opcion para correr la lista ahora con el token, le da click y ya sí le envia la lista de productos.
+
+Implementó login en el servidor de eureka. Para ello:
+1. En proyecto discovery server (que es nuestro servidor eureka) agregó la libreria de spring-security, creó la clase SecurityConfig  extendiendo WebSecurityConfigurerAdapter
+sobrescribiendo los respectivos métodos configure.
+2. Escribió en el application.properties de discovery-server las credenciales de username y password que manda llamar en la clase SecurityConfig.
+3. En los proyectos individuales agregó la linea eureka.client.serviceUrl.defaultZone=http://eureka:password@localhost:8761/eureka en application.properties. Con esto nos aseguramos de que cada proyecto individual reconozca las credenciales centralizadas que vamos a pasar en el servidor de eureka.
+4. Corrió los proyectos y en el navegador se fue al servidor de eureka (en la url localhost:8761) y ahora ve que le pide credenciales para ingresar, . Las escribe y entra.
+
+
+Seccion 11 Poniendo en practica lo aprendido parte 2
+Ojo, que la primera parte del video "Implementacion tolerancia de fallos part 1"  esta repetido y la parte que sigue no se sabe dónde empezó por lo que faltaría información para poder continuar
+Implementó la tolerancia de fallos al agregar la configuracion dn el application.properties de order_service.
+
+Trazabilidad distribuida (distributed tracing) -->permite detectar problemas y latencias en las peticiones dentro de sistemas distribuidos. Spring Cloud Sleuth es una dependencia de spring que permite implementar trazabilidad distribuida.
+Span-->identificador de la unidad de trabajo de llamada a un solo microservicio.
+Trace-->Un conjunto de spans, identificador asociado a la peticion que viaja entre los microservicios.
+Latencia: tiempo total que se demora desde que se emite la peticion al servidor hasta q recibe la respuesta.
+En los logs (no se necesita Sleuth ni Zipkin (interfaz visual) para los logs de spring) aparece: INFO[NOMBRE SEL SERVICIO, ID DEL TRACE, ID DEL SPAN, FALSE (NO QUEREMOS EXPORTAR LA PRAZABILIDAD) ].
+ Zipkin vamos a tener un acceso a trazabilidad en forma mucho mas amigable q en los logs -->visual tool
+1.Agregó las dependencias de >spring-cloud-starter-sleuth y spring-cloud-starter-zipkin (ambas de springclous) en todos los proyectos individuales.
+2.Instaló Zipkin como imagen docker (ver comando docker en el video).
+Agregó en el application.properties de todos los proyectos las lineas  spring.zipkin.base-url=http://localhost:9411
+spring.sleuth.sampler.probability=1.0
+3. En clase OrderService implementó la lógica para trazabilidad. Lo hizo en este miscroservicio porque es order-service quien llama a los demas servicios.
+4. Entró a zipkin en localhost:9471/zipkin y se autenticó en keycloak (igual q antes).
+5. Levantó todo y trató de enviar un post en postman para un pedido de un producto con http://localhost:8083/api/order (recordar q los productos van en el body, incluyó tambien lo del token en la peticion).
+6. Envió un postman para productos tambien con GET con http://localhost:8083/api/producto (para poder analizar trazabilidad). Hizo un clear a todos los logs (para poder visualizar mejor) e hizo otra llamada. En los logs vió que tenía un nuevo INFO para inventario-service, con traza y span, y en los logs de api-gateway tenía un TRACE.
+7.Se fue en el navegador a Zipkin y en el buscador escribió serviceName=order-service y entonces obtuvo la llamada; pudo visualizar todo el flujo de la peticion al hacer click en "dependencias".
+8. Tambien podemos copiar el id de la traza en los logs y pegarlos en el input "Search by trace ID" en Zipkin.
+
+Seccion 12 Kafka -->No fiarse demasiado de lo que esta abajo, porque es lo q dijo el peruano, que no es muy creíble !!
+Cluster-->red de kafka donde se encuentra todo el resto de la arquitectura de kafa (brokers, topics, etc)
+Broker-->es un servidor de mensajeria. Puede haber uno o varios brokers trabajando simultaneamente.
+Topic-->los mensajes se agrupan segun su tipo (mensajes de error, transacciones, etc. me imagino que esto es customizable) y los del mismo tipo se agrupan en topics
+Partition-->los topics se subdividen en particiones y cada particion va a un nodo diferente
+Producer-->en el contexto de microservicios es el microservicio que envía mensajes.
+Consumer-->el microservicio que recibe un topic. Segun el peruano podemos elegir qué tipo de mensajes queremos recibir en cada consumer.
+Zookeeper-->permite gestionar los brokers. Permite notificar a producers y consumers sobre la disponbilidad de brokers en el cluster.
+0.En el proyecto principal microservicios-spring-boot creó un docker compose, cortó desde la web el docker-compose para kafka y lo pegó.
+el docker-compose contiene los contenedores para zookeeper y un broker corriendo en los puertos 9092:9092.
+1.Agregó la dependencia spring-kafka perteneciente a org.springframework.kafka.
+2.Agregó la linea spring.kafka.bootstrap-servers=localhost:8092 en el application.properties de order-service.
+3.Inyectó KafkaTemplate en clase OrderService y lo ocupó mas abajo para enviar un topic llamado notificationTopic (este va a ser el consumer). Para ello debemos disponer de un evento.
+4.Para disponer del evento creó la clase OrderPlacedEvent.
+5.Creó el proyecto notification-service, con las dependencias de kafka, lombok, spring-web y eureka-discovery-client y lo agregó al parent microservicios-spring-boot.
+6.Agregó la linea spring.kafka.template.default-topic=notificationTopic () , spring.kafka.producer.key-serializer=org.apache.serialization.StringSerializer (para serializar las claves de los mensajes), spring.kafka.producer.value-serialize (para serializar los valores de los mensajes), spring.kafka.producer..properties.spring.json.type.mapping (para especificar el tipo de los mensajes (q sean de tipo json)).
+7.Los que dicen "producer" en la linea de arriba es el productor, mientras que notification-service va a ser el consumidor.
+8.En la clase NotificationServiceApplication agregó @KafkaListener(topics = "notificationTopic") , o sea esta seteando el nombre del topic del que esta interesado en recibir mensajes. Anotó en esta clase un log tambien.
+9.En el application.properties de order-service (que funcionará como producer) agregó las lineas para kafka.
+10. En el docker-compose agregó los containers de keycloak-mysql y keycloak
+11. Corrió con con el comando docker compose up -d y luego levantó cada microservicio. 
+12. En el postman corrió un GET http://localhost:8083/api/order (obviamente obtuvo un token primero y lo pegó), enviando en el body
+       {
+	      "orderLineItemsDtoList" : [
+		  {
+		     "codigoSku":"iphone_12",
+			 "precio":1200,
+			 "cantidad":1
+			 }
+		}
+13.En los logs del IDE de order-service y notification-service vió el mensaje enviado correctamente. 
+Ojo q el mensaje en los logs de notification-service es tipo "Notificacion recibida desde Order - numeroIdDelPedido porque asi lo seteó en la clase OrderPlacedEvent de notification-service.
+
+Seccion Prometheus y Grafana
+Prometheus-->permite recopilar métricas
+Grafana->permite visualizarlas
+1. Agregó a todos los proyectos las dependencias de micrometer-registry-prometheus (de io.micrometer) y spring-boot-starter-actuator (de org.springframework.boot).
+2. En el application.properties de cada proyecto agregó management.endpoints.web.exposure.include=prometheus
+3. En el docker-compose agregó el container (la imagen) para prometheus, con seteo de volúmenes y el container de grafana.
+4. Creó la carpeta prometheus y dentro de ella creó el archivo prometheus.yml setiando cada uno de los microservicios con host y puerto.
+5. Ejecutó los contenedores con comando docker compose run
+
+Seccion RabbitMQ
+Arquitectura RabbitMQ-->leer articulo, donde queda super claro: https://pragma.com.co/academia/lecciones/conozcamos-sobre-rabbitmq-sus-componentes-y-beneficios
+1.Creó el proyecto messaging-service como modulo del proyecto microservicios-spring-boot, agregando la dependencias rabbitmq: spring-boot-starter-amqp q pertenece a springboot.org  (agregó despues tambien las de prometheus, sleuth, y spring-cloud-starter-netflix-eureka-client etc).
+2.Modificó el docker-compose para incluir la imagen de rabbitmq.
+3. Agregó tambien la dependencia de rabbitmq solo en el proyecto order-service, ya q este hará las veces de productor y messaging-service de consumer.
+4.Corrió con docker compose up -d y vio que todo estaba levantado en el docker desktop.
+5.En el application.properties de order-service agregó la configuracion de rabbitmq para la l cola llamada "cola1". Tambien lo agrega en el application.properties de messaging-service.
+6.Creó el paquete rabbitmq en order-service, con la clase Producer, con @EnableRabbit e inyectando la clase RabbitTemplate q se ocupa en el metodo send() (ver codigo)
+7.Creó la clase ProducerConfig, donde rescata en nombre de la cola q habia seteado en el paso 5.
+8. En clase OrderService inyecta este Producer y en el metodo "enviarMensajeConRabbitMQ" setea el log y envía. Además en el metodo placeOrder() tambien setea una linea para rabbitmq.
+9. En clase MessageServiceApplication de messaging-service con @RabbitListener setió el nombre de la cola y en el metodo recibirMensajeConRabbitMQ() setió un log para recibir el mensaje.
+10. Levantó todos los proyectos en orden y probó en postman (con el token, por supuesto) y envió el mismo mensaje que en el paso 12 de la seccion anterior. Le apareció el mensaje en el body de la respuesta y en los logs respectivos de order-service y messaging-service.

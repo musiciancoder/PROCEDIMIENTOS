@@ -1,0 +1,1 @@
+dir C:\ /s /b | findstr /i "sqlldr.exe"

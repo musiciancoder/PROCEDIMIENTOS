@@ -1,0 +1,5 @@
+Naming Server (como Eureka) solo : permite autoregistro y autodescubrimiento mediante el nombre del microservicio que es constante (DNS name) y un endpoint que si podria cambiar.
+Para comunicarse con este microservicio en este caso seria con http://nombremicroservicio/endpoint tanto internamente (otro microservicio) como desde afuera.
+API Gateway solo: ademas de permitir load balancing y filtros de seguridad en la puerta de enlace proporciona routing para los endpoint (/endpoint constante).  
+Para comunicarse con este microservicio en este caso seria con http://puertaenlace/nombremicroservicio/endpoint tanto internamente (otro microservicio) como desde afuera y nombremicroservicio puede variar a menos q lo configure manualmente para q sea estatico.
+Naming Server (como Eureka) + API Gateway --> tendremos http://puertaenlace/nombremicroservicio/endpoint  siempre estatico

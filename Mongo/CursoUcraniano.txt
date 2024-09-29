@@ -108,7 +108,7 @@ db.collectionName.find()-->muestra los documentos de esa coleccion. Se ocupa lue
 db.collectionName.remove({})-->elimina los documentos de una coleccion.
 "_id" es único para una coleccion, pero puede tener duplicados en colecciones distintas en una bbdd.
 db.getCollection('first').insertOne({
-"string":"Hello World",
+"string":"Hello World", //me da toda la impresion que en este objeto "string", "boolean", "number", "numberInt", etc  son nombres de variables (deben serlo!!), no tipos (aunque coinciden con nombres de tipos)
 "boolean":true,
 "number":10, //esto va a guardar un decimal 10.0
 "numberInt":"numberInt(100),

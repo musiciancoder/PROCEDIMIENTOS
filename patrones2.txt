@@ -109,8 +109,8 @@ En general no se recomienda llamar directamente a otro paquete de servicio (thir
 PROXY
 El patron proxy permite tener mayor control sobre el objeto de una clase, al realizar alguna accion antes o despues que la petición alcance ese objeto, de la misma forma que un dispositivo como gateway o un proxy server actuarían para realizar alguna accion antes o despues de que una peticion (http normalmente) llegue a nuestra maquina
 Además maneja el ciclo de vida del servicio, y el proxy funcionará incluso si el objeto del servicio no se encuentra disponible
-La clase Proxy debe implementar alguna interfaz que tambien sea implementada por la clase de servicio original
-Se pueden introducir nuevos proxies segun requerimientos de funcionalidad (filtros, seguridad o caché por ejemplo) sin necesidad de modificar el servicio o el cliente, por lo q se cumple el principio Open-Closed.
+La clase Proxy debe implementar alguna interfaz que tambien sea implementada por la clase de servicio original.
+Se pueden introducir nuevos proxies segun requerimientos de funcionalidad (lazy loading, control de acceso, caching, loading and monitoring por ejemplo) sin necesidad de modificar el servicio o el cliente, por lo q se cumple el principio Open-Closed. Todos los ejemplos del IDE son similares, pero yo me quedo con el de geek4geeks
  
 FLYWEIGHT (Peso mosca)
 Consiste en que cuando dos o mas objetos tienen muchos atributos en comun entre ellos, podemos separar las clases en clases (siempre inmutables) que contengan los atributos en comun y otras clases (no necesariamente inmutables) que contengan los atributos exclusivos. Esto permite que quepan mas objetos en la memoria RAM, por lo que estaremos optimizando recursos y a la vez mejorando el performance.

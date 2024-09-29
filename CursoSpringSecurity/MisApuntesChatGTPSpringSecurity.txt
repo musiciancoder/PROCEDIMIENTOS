@@ -1,0 +1,226 @@
+When to use Cookies such as JSESSIONID?
+
+When our application is stateful (session-based), meanning we ourseves manage the session data within the project. It is more prefferable for monolithical applications that follow the MVC pattern with thymeleaf/JSP where frontend and backend live in the same place.
+If we wanted a distributed system to use this it is still possible by centralizing the sessions of the various components into a cache by using something like reddis.
+The arquitecture flow is the following:
+1. Login Request
+The user submits their credentials (usually a username and password) via an HTML form.
+The form makes a POST request to the server, sending the credentials.
+2. Authentication Filter
+Spring Security intercepts the login request through a filter (e.g., UsernamePasswordAuthenticationFilter).
+The credentials are passed to an AuthenticationManager to verify the user’s identity.
+3. AuthenticationManager & Provider
+The AuthenticationManager delegates the authentication process to an AuthenticationProvider (often DaoAuthenticationProvider).
+This provider uses a UserDetailsService to load user details (such as username, password, roles) from a data source (e.g., database).
+The credentials are checked (password comparison) using a PasswordEncoder.
+If the authentication is successful, a UsernamePasswordAuthenticationToken (esto es basicamente el Authentication object, NO un token a compartir al cliente) is created and marked as authenticated.
+4. Session Creation
+Once authenticated, Spring Security stores the user’s authentication details (principally the Authentication object which contains username and password but not a session ID) in an HTTP session (which does contain session ID).
+A session ID is generated and sent to the client in a cookie (JSESSIONID by default).
+The Authentication object is stored in the SecurityContext.
+5. Subsequent Requests
+On each subsequent request, the browser automatically sends the session cookie (JSESSIONID).
+Spring Security extracts the session ID from the cookie and retrieves the associated Authentication object from the server’s session store.
+The session ID is used to link the HTTP session with the user's authentication state stored in the session, but it is not explicitly stored within the Authentication object.
+The user remains authenticated as long as the session is active (until logout or session expiration).
+6. Access Control
+Each time the user makes a request to a secured resource, Spring Security checks the user's Authentication object.
+It determines if the user has the required roles or authorities to access the resource (using annotations like @PreAuthorize, @Secured, or URL patterns in configuration).
+7. Logout
+When the user logs out, Spring Security invalidates the session, removing the session data (including the Authentication object) from the server.
+The JSESSIONID cookie is also cleared from the client side.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+When to Use a Token (e.g., JWT)
+
+1. Stateless Applications (REST APIs, Microservices):
+Use JWT when your application is stateless and follows a microservices or RESTful architecture.
+In a stateless architecture, the server does not store any session information. Instead, the client is responsible for maintaining authentication state by sending the JWT with each request.
+JWT contains all necessary information (claims) about the user, such as identity and roles, meaning the server does not need to look up the user in a database on each request.
+Why?: JWT is self-contained, and it fits well with distributed systems because there’s no dependency on centralized session storage.
+
+2. Scalability Across Multiple Servers (Horizontal Scaling):
+Use JWT when your application needs to scale horizontally across multiple servers.
+Since JWTs are self-contained and carry user information directly in the token, there is no need for server-side session storage. This means that any server in a cluster can handle a request as long as the token is valid.
+Why?: There's no need to manage sticky sessions or centralized session stores (like Redis) across multiple servers.
+
+3. Mobile or Single-Page Applications (SPAs):
+Use JWT for mobile applications, single-page applications (SPAs), and frontend-heavy applications where the frontend interacts with a backend via an API.
+Mobile apps and SPAs typically make stateless API requests, and JWTs are better suited because they can be stored and managed on the client side without needing the server to maintain state.
+Why?: JWTs fit well with the client-server architecture of APIs since they can be stored in localStorage or sessionStorage and sent with each request.
+
+4. Cross-Domain Authentication (CORS):
+Use JWT when you need to support cross-domain authentication (e.g., a frontend hosted on one domain and an API on another).
+Cookies (like JSESSIONID) are tied to specific domains, making them more challenging to use across multiple domains, especially with cross-origin requests (CORS). JWTs, on the other hand, can be sent in the Authorization header of any request, making them more flexible.
+Why?: JWT works well across different domains, without the limitations of same-origin policies associated with cookies.
+
+Here is the architecture flow for token creation using JWT + Spring security:
+
+0. User Login Request
+The client (e.g., a web app (frontend) or mobile app) sends a POST request to the server’s login endpoint (e.g., /login) with the user's credentials (typically username and password). 
+In a JWT-based authentication system, the client application needs to previously be aware of the secret key or public key to validate and decode the incoming JWT, but how this is handled depends on the type of signing algorithm used for the JWT:
+
+1. Filter
+JwtAuthenticationFilter: This filter (which replaces AuthenticationFilter -does not inherit from it) in JWT based- extracts username and password directly from the body and passes it on to the Authentication Manager.
+
+2. Authentication Manager 
+Spring Security's AuthenticationManager is responsible for authenticating the user’s credentials.
+This involves the following steps:
+The credentials are wrapped in an Authentication object, such as UsernamePasswordAuthenticationToken, which is the Authentication object previous comparing to the user in the database.
+Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+Then, the AuthenticationManager uses configured AuthenticationProvider implementations (e.g., DaoAuthenticationProvider) to validate the user's credentials against a data source (like a database). If valid, it returns an Authentication object after comparing to the user in the database, that represents the authenticated user.
+Authentication authentication = authenticationManager.authenticate(authenticationToken);
+
+3.JwtTokenProvider
+Once the user is successfully authenticated, the JwtTokenProvider is invoked to create a JWT token. It typically does this by calling a method in the JwtTokenProvider that generates the token using the authenticated user's information, such as the username and roles.
+String token = jwtTokenProvider.createToken(authentication.getName(), /* roles or claims */);
+The JwtTokenProvider contains logic to construct the JWT, sign it with a secret key, and set its expiration and claims. The JwtAuthenticationFilter serves aswell as the glue between these components, orchestrating the authentication process and using the JwtTokenProvider to issue tokens upon successful authentication.
+In a stateless JWT-based authentication system, the Authentication object is not persistently stored on the server after the initial authentication (no se guarda en SecurityContext a diferencia de JSESSIONID).
+
+
+4.JWT to the client
+This JWT is returned to the client in the response body or as a header (e.g., Authorization: Bearer <JWT>).
+The client (typically a front-end application like a web app or mobile app) stores the JWT, usually in local storage or cookies (with the HttpOnly flag for security). 
+Within JWY payload we got the user info (namely username), but NEVER the user password. The idea of JWT (on this flow and the next one with OAUTH) is to grant the client app resources with no password involve. 
+
+Here is the architecture flow for subsequent  calls using JWT + Spring security once the user is already authenticated:
+
+5. Authenticated Requests (JWT Token Validation)
+Request with JWT: For each subsequent request to a protected endpoint, the client includes the JWT in the Authorization header (Authorization: Bearer <JWT>).
+JWT Filter: A JwtAuthenticationFilter or similar Spring Security filter intercepts each request and extracts the JWT from the header.
+Token Validation: The filter validates the token by checking:
+The token's signature (to ensure it’s not tampered with).
+The expiration date (to ensure it’s still valid).
+The issuer and audience fields (optional, but recommended for added security).
+6. Token Parsing and Authentication
+Extracting User Details: If the token is valid, the filter extracts the user details (e.g., username, roles) embedded in the JWT.
+Setting Security Context: These details are used to create a UsernamePasswordAuthenticationToken object, which is then set in the SecurityContextHolder (se elimina despues de procesar el request, no persiste). This object is what Spring Security uses to track the user's identity and roles for the current request.
+From JwtAuthenticationFilter:
+@Override
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
+    
+    String token = jwtTokenProvider.resolveToken(request); // Extract JWT from header
+    if (token != null && jwtTokenProvider.validateToken(token)) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        
+        // Load user details and create Authentication object
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username); //fetches username
+        UsernamePasswordAuthenticationToken authentication =
+            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        
+        // Set the Authentication object in SecurityContext
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    filterChain.doFilter(request, response);
+}
+
+Proceeding with Request: The request is passed along the filter chain with the user's authentication and roles, allowing access to protected resources based on authorization rules (e.g., @PreAuthorize, role-based access control).
+7. Accessing Protected Resources
+Controller Access: Once the authentication is validated, the request reaches the controller or service layer, and the user is granted access based on their roles and authorities.
+Stateless Behavior: The server does not store any session information; every request must include a valid JWT for the user to be authenticated.
+8. Token Expiration and Refreshing
+Token Expiration: JWTs usually have an expiration time (exp claim) for security purposes. Once the token expires, the client must re-authenticate (usually by submitting credentials again or using a refresh token mechanism).
+Token Refreshing (optional): Some systems implement a token refreshing mechanism where a separate refresh token is issued with a longer expiration time. The refresh token can be used to get a new JWT without needing to log in again.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+When to Use a OAUTH + JWT ?
+For federated authentication and delegated authorization
+https://www.youtube.com/watch?v=ZV5yTm4pT8g&t=192s
+
+Flow: OAuth2 Authorization Code Flow with JWT
+
+Client ID - viene siendo como el username de la client app (no del usuario q se esta logueando obviamente).
+Definition: The client ID is a unique identifier assigned to the application (client) that is requesting access to the resource owner’s data.
+Usage: It is used to identify the application during the authorization process. The client ID is included in the authorization requests to the authorization server.
+Security: It is not secret and can be safely included in URLs and public repositories.
+Client Secret - viene siendo como el password de la client app (no del usuario q se esta logueando obviamente).
+Definition: The client secret is a confidential string generated by the authorization server and shared with the server-side of the client app (not the frontend-side).
+Usage: It is used to authenticate the client when making requests to the authorization server, particularly when exchanging the authorization code for an access token.
+Security: This should be kept confidential and not exposed in client frontend-side code, as it is used to verify the identity of the client application.
+Public Key
+Definition: The public key is part of a public/private key pair used for asymmetric encryption. It can be distributed widely to client app and resource server and is used to verify signatures or encrypt data that only the corresponding private key can decrypt.
+Usage: In the context of JWTs, the public key is used to validate (which is not the same as decode) the signature of the JWT to ensure its integrity and authenticity.  The authorization server signs the JWT with its private key, and clients can verify the signature using the public key.
+The client app only decodes the JWT from the first response, for subsequent calls it only decodes. On the resource server verification is mandatory, while decodification is optional and used mainly to read claims.
+Security: It is meant to be shared and can be safely exposed to anyone who needs to validate tokens.
+
+
+OAuth 2.0 Flow with JWT and Authorization Code.
+
+1.User Initiates Login
+The user tries to access a resource on the Client Application (e.g., a web app or mobile app).
+The client redirects the user to the Authorization Server for authentication.
+
+2.Authorization Request
+
+The Client Application sends an authorization request to the Authorization Server:
+GET /authorize?
+    response_type=code&
+    client_id=CLIENT_ID&
+    redirect_uri=REDIRECT_URI&
+    scope=SCOPE&
+    state=STATE
+Parameters:
+response_type=code: Indicates that the client is requesting an authorization code.
+client_id: The unique identifier for the client application.
+redirect_uri: The URL to redirect the user after authorization.
+scope: The permissions requested by the client.
+state: A unique value to maintain state between the request and callback.
+
+
+3.User Authentication
+The Authorization Server prompts the user to log in (if not already authenticated).
+The user enters their credentials (e.g., username and password).
+
+4.Authorization Grant
+Upon successful authentication, the Authorization Server prompts the user for consent to grant permissions to the client application.
+The user agrees to grant the requested scopes.
+
+5.Authorization Code Issuance
+The Authorization Server redirects the user back to the Client Application using the redirect_uri provided in the authorization request:
+HTTP/1.1 302 Found
+Location: REDIRECT_URI?code=AUTHORIZATION_CODE&state=STATE
+
+6.Token Exchange
+The Client Application receives the authorization code and sends a request to the Authorization Server to exchange the authorization code for an access token and a refresh token:
+
+POST /token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&
+code=AUTHORIZATION_CODE&
+redirect_uri=REDIRECT_URI&
+client_id=CLIENT_ID&
+client_secret=CLIENT_SECRET
+
+7.Access Token Response
+The Authorization Server validates the authorization code and, if valid, responds with an access token (JWT) and a refresh token:
+{
+  "access_token": "JWT_ACCESS_TOKEN",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "refresh_token": "JWT_REFRESH_TOKEN"
+}
+
+8.Accessing Protected Resources
+The Client Application uses the access token to access protected resources on the Resource Server
+GET /resource
+Authorization: Bearer JWT_ACCESS_TOKEN
+
+9.Token Verification
+The Resource Server verifies the access token using the public key from the Authorization Server to ensure the token is valid and not tampered with.
+If valid, the resource server responds with the requested resource.
+
+10.Token Expiration and Refresh
+When the access token expires, the Client Application can use the refresh token to request a new access token without requiring user interaction:
+POST /token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&
+refresh_token=JWT_REFRESH_TOKEN&
+client_id=CLIENT_ID&
+client_secret=CLIENT_SECRET
+
+11.New Access Token Response
+The Authorization Server responds with a new access token (JWT) and potentially a new refresh token.

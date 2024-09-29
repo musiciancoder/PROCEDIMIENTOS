@@ -109,7 +109,7 @@ máquina, por lo que intuyo que el cluster de MKS es para cosas pequeñas direct
 como se explica en la siguiente seccion.
 
 
-En AWS ocupamos el servicio MKS (Managed Streaming for Kafka) que permite crear en la nube un cluster de Kafka con varios nodos y varias réplicas.
+En AWS ocupamos el servicio MSK (Managed Streaming for Kafka) que permite crear en la nube un cluster de Kafka con varios nodos y varias réplicas.
 1. Creó un grupo de seguridad en EC2 para el cluster de kafka. Un grupo de seguridad es un firewall virtual (firewall es un sistema diseñado para proteger las redes privadas del acceso no autorizado y no verificado en una conexión a Internet) para que la instancia (maquina virtual) controle el trafico de entrada y salida.
 Al crear el grupo, por defecto las reglas de entrada (configuración de Tipo, Protocolo, Puertos y Origen hacia nuestra instancia en Amazon) estan cerradas y las salidas (configuración de Tipo,Protocolo, Puertos y Origen desde nuestra app en Amazon) abiertas. El creó regla de entrada de tipo TCP personalizado,con intervalo de puertos 9092 (q es el puesto de kafka), lo demas lo dejó por defecto y creó el grupo de seguridad.
 2. Creó un grupo de seguridad en EC2 para un cliente, con regla de entrada tipo SSH,con int. de puertos 22 y origen cualquier lugar.
