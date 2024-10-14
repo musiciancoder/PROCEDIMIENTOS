@@ -1,0 +1,78 @@
+Symmetric: One secret key (que segun copilot es exactamente lo mismo que el secret que viene en el signature de JWT) signs and verifies. Aca no hay public key ni private key !!!
+
+Asymmetric: Private key signs; public key verifies. Aca no hay secret key secret key (o lo q es lo mismo no hay secret en el signature del JWT).
+
+Tanto secret 
+
+
+give me a JWT example for symmetric
+Copilot
+Alright, here's a simple example of a JWT using symmetric encryption (HMAC SHA-256):
+
+Header: This typically includes the algorithm and token type.
+
+
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+Payload: This is where you put the claims (e.g., user info, permissions).
+
+
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+Secret: This is your secret key used for signing the JWT. For example:
+
+
+my-very-secret-key
+JWT Signature: This is created by encoding the header and payload, then signing with the secret key. The resulting JWT might look like this:
+
+plaintext
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+That's it! Each part is base64Url encoded and then concatenated with periods (.) to form the token. Does this help you get started?
+
+
+
+
+Usted
+give me a JWT example for asymmetric
+Copilot
+Sure thing! Here's a simple example of a JWT using asymmetric encryption (RSA SHA-256):
+
+Header: Indicates the type of token and the algorithm used.
+
+
+{
+  "alg": "RS256",
+  "typ": "JWT"
+}
+Payload: This is where your claims go, just like in the symmetric example.
+
+
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+Private Key: Used to sign the JWT. It remains confidential.
+
+
+-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASC...
+-----END PRIVATE KEY-----
+Public Key: Used to verify the JWT. It can be shared openly.
+
+
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQ...
+-----END PUBLIC KEY-----
+JWT Signature: The signature is created using the private key. The resulting JWT might look something like this:
+
+
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.cC4hiUPoH1r5c0BAUVlfv...
+This JWT combines the header, payload, and signature, ensuring security through the use of asymmetric keys. Ready to roll with this setup? 🎶
