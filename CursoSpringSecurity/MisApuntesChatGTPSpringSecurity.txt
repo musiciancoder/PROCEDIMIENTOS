@@ -275,3 +275,18 @@ le aparece un formulario de logueo. Se loguea con username admin y password 1234
 - Manda un get pata obtener la lista de usuarios (igual q antes), pero esta vez junto con el token (en Authorization Bearer token) y ahora sí puede verla. Cada vez q nos logueamos con admin y 12345 obtenemos otro token distinto q dura 5 minutos. En este punto los csrs estan activados.
 13.Encripta el password con Bcrypt. Para ello crea el bean passwordEncoder en clase SecurityConfig de msvc-usuarios, que devuelve un PasswordEncoder y lo inyecta en UsuarioController en crear() y editar() con la linea usuario.setPassword(passwordEncoder.encode.usuario.getPassword()));
 Luego edita un par de password de algunos usuarios q tenia creados en secciones anteriores con PUT rutaDeMsvcUsuarios/1o2o3, pasando en el body el password a corregir y en Authorization el bearer token (obtenido en paso 12). En el body de la respuesta verá que el password no esta como lo mandó en la peticion, sino q ahora esta encriptado.
+14.Implementa BCryptPasswordEncoder en el servidor de autorizacion. Para ello:
+comentó el metodo userDetailsService() de SecurityConfig en el servidor de autorizacion (q tenia harcodeado username=admin y password=12345).
+Lo reemplaza por:
+@Autowired
+protected void configure (AuthenticationManagerBuilder auth) throws Exception {
+auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());} (aun tiene que escribir el UserDetailsService que lo tiene inyectado mas arriba).
+Ademas encripta el clientSecret de registeredClientRepositorty() con la linea clientSecret(passwordEncoder().encode("12345")).
+15.Creó la clse UsuarioService que implementa UserDetailsService que era la clase q estabamos inyectando en el paso anterior. Ademas en el controlador creo el metodo loginByEmail(), ya q la idea es loguerse ahora por email de usuario.
+Las tres clases siguientes no las pesque porq es algo relacionado con programacion reactiva.
+Luego viene propagar el token a msvc-cursos. Para ello en interfaz UsuarioClienRest de msvc-cursos en el metodo
+obtenerAlumnosPorCurso agregamos al lado de donde va el @RequestParam un @RequestHeader(value="Authorization", required=true) String token;
+Luego se fue a CursoController  y en el metodo detalle pegó lo mismo y le pasó el token como parametro al servicio en este mismo metodo.
+A su vez modifico el servicio (implementacion y clase concreta)  para pasar el token (q viene del controlador) como parametro en los metodos q contengan obtenerAlumnosPorCurso.
+Probo en postman generando un token nuevo (igual q siempre ) y pasandolo en GET obtenerAlumnosPorCurso/4 (4 es para obtener alumnos para el curso 4) en viñeta Authorizartion, Type Bearer Token en postman.
+El resto de los metodos de UsuarioClienRest naturalmente tb necesitan del token (me dio paja hacerlo, ya q el concepto ya se entendio)
