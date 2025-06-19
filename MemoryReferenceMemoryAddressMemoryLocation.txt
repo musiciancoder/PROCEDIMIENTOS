@@ -1,0 +1,84 @@
+NOTA: ESTO ES PARA VER SI UN OBJETO SIGUE SIENDO O NO EL MISMO EN MEMORIA. NO TIENE NADA QUE VER CON MUTABILIDAD!!!
+
+
+is memory reference same as memory address?
+Not exactly! While memory reference and memory address are related, they are not the same concept.
+
+Key Differences
+                  Memory Address	                            Memory Reference
+Definition	The exact physical location of an object in memory	A variable or pointer that allows access to an object in memory
+Visibility in Java	Not directly accessible	                    Used to interact with objects in heap memory
+Changes?	Can change due to Garbage Collection (GC)	        Stays valid even if the object is relocated
+Example	0x7ffebc123456 (low-level memory address)	            obj in MyObject obj = new MyObject(); -->en realidad obj no es memory reference sino Memory Reference Variable, que contiene la Actual Memory Reference
+
+How Java Handles This
+Java does not expose raw memory addresses like C/C++.
+Instead, Java uses references to access objects in heap memory.
+The Garbage Collector (GC) may move objects, but references remain valid.
+
+
+is memory address same as memory location?
+Not exactly! While memory address and memory location are closely related, they have distinct meanings in computing.
+
+Key Differences
+Feature	                Memory Address	                                      Memory Location
+Definition	A unique identifier assigned to a storage unit in memory	The actual place in memory where data is stored
+Representation	Typically a hexadecimal value (e.g., 0x7ffebc123456)	A physical or logical storage unit within RAM
+Usage	Used to reference and access stored data	                    Holds the actual data or instructions
+Example	int x = 10; → &x gives the memory address	The variable x is stored at a specific memory location
+How They Work Together
+A memory location is a physical or logical unit where data is stored.
+A memory address is the identifier used to access that location.
+
+
+
+give me a java example where memory reference, memory address and memory location are involved
+Sure! Here’s a Java example that demonstrates memory reference, memory address, and memory location using an object and Java Object Layout (JOL) for memory inspection.
+
+Example: Memory Concepts in Java
+java
+import org.openjdk.jol.vm.VM;
+import java.util.Arrays;
+
+class Example {
+    int value;
+
+    Example(int value) {
+        this.value = value;
+    }
+}
+
+public class MemoryDemo {
+    public static void main(String[] args) {
+        Example obj = new Example(42); // Memory reference created
+
+        // Printing reference variable
+        System.out.println("Reference variable: " + obj); -->memory reference no cambia en el tiempo para el mismo objeto.
+
+        // Getting identity hash code (not the actual memory address, but a simulated one). El identity hash code es un identificador para q el desarrollador pueda ver si el objeto es el mismo o no, pero no es un pointer a diferencia de la reference in memory.
+        System.out.println("Identity Hash Code: " + System.identityHashCode(obj)); -->no cambia en el tiempo para el mismo objeto.
+
+        // Using JOL to get actual memory address
+        System.out.println("Memory Address (JOL): " + VM.current().addressOf(obj)); -->cambia en el tiempo para el mismo objeto (la JVM lo mueve para optimizar recursos)
+
+        // Showing memory location (heap storage example)
+        System.out.println("Heap Location (Object Field): " + obj.value); -->cambia en el tiempo para el mismo objeto (la JVM lo mueve para optimizar recursos)
+    }
+}
+Key Concepts Explained
+Memory Reference (obj) → The variable obj holds a reference to the object in heap memory.
+
+Memory Address (VM.current().addressOf(obj)) → Retrieves an approximation of the actual memory address in RAM.
+
+Memory Location (obj.value) → Shows how object fields reside in heap memory. En realidad esto no tiene sentido, porque no tenemos como ver el lugar fisico donde se esta guardando el objeto en la RAM.
+
+Simulate Ouput.
+Sure! here it is:
+Reference variable: Example@5e2de80c
+Identity Hash Code: 15780914
+Memory Address (JOL): 651237487676
+Heap Location (Object Field): 42
+
+
+
+

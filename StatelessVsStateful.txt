@@ -1,0 +1,21 @@
+you previously mentioned stateless and stateful. whithin this context what do those mean?
+Great question! In the context of cloud computing and containers, "stateless" and "stateful" refer to how the application's data is managed and stored. Here's a breakdown of each:
+
+Stateless
+Definition: Stateless applications do not retain any data or state between different interactions or requests. Each request from the client is independent and does not rely on any previous requests.
+
+Examples: Web servers serving static content, RESTful APIs, and microservices that process requests without needing to remember previous interactions.
+
+Benefits: Stateless applications are easier to scale horizontally, as each instance can handle any request without the need for shared state. They are also generally simpler to maintain and more resilient to failures.
+
+Stateful
+Definition: Stateful applications retain data or state across multiple interactions or requests. This means that the application needs to remember previous interactions and maintain a session for each user or client.
+
+Examples: Databases, applications with user sessions (e.g., shopping carts in e-commerce sites), and applications requiring persistent storage of data.
+
+Benefits: Stateful applications can provide a more personalized and consistent experience for users, as they can maintain session information and user-specific data. However, they are more challenging to scale and require strategies to manage state across multiple instances.
+
+In Summary
+Stateless: No data is retained between requests. Easier to scale and manage.
+
+Stateful: Data is retained between requests. More complex to scale, but necessary for applications needing persistent data.

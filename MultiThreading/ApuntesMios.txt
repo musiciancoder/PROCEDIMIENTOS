@@ -3,9 +3,11 @@
 *A process is an instance of a software that is executed by the CPU.
 *Los hilos de un mismo proceso siempre comparten memoria heap; cada hilo en cambio tiene siempre su propia y exclusiva memoria stack y su propio y exclusivo pointer.
 *Dos o mas hilos corriendo en un solo nucleo pueden 'simular' multithreading; Dos hilos corriendo en dos nucleos (multicore, multiprocesador) en forma separada pueden en cambio ejecutar un 'real' multithreading
-*Cada vez que se inicializa la ejecucion de un segundo hilo la CPU debe detener antes la ejecucion del primera hilo (este primer hilo vuelve a correr milesimas de segundo despues que el segundo hilo ya esta en ejecucion). Este es el principal precio a pagar debido a la concurrencia y es conocido como Context Switch.
+*Cada vez que se inicializa la ejecucion de un segundo hilo la CPU debe detener antes la ejecucion del primer hilo (este primer hilo vuelve a correr milesimas de segundo despues que el segundo hilo ya esta en ejecucion). Este es 
+el principal precio a pagar debido a la concurrencia y es conocido como Context Switch.
 *Un context switch de dos hilos de un mismo proceso es menos costoso que un context switch de dos hilos pertenecientes a dos procesos distintos.
-*Solo si dos tareas (tareas segun stackoverflow es un grupo de instrucciones que serán cargadas en memoria, o sea segun yo un pedazo de codigo que al ejecutarse realiza algo) de un proceso tienen mucha data en comun o si la seguridad es una prioridad, se aconseja ocupar programacion concurrente.
+*Solo si dos tareas (tareas segun stackoverflow es un grupo de instrucciones que serán cargadas en memoria, o sea segun yo un pedazo de codigo que al ejecutarse realiza algo) de un proceso tienen mucha data en comun 
+o si la seguridad es una prioridad, se aconseja ocupar programacion concurrente.
 *The CPU maintains a dynamic priority for each thread to prioritize interactive threads and to avoid starvation for any particular thread in the system. La elección de hilos por parte del CPU no es aleatoria!!
 *Threads are not ran, they are started and they can only be started once.
 *Podemos crear threads de dos formas: 
@@ -36,9 +38,12 @@ Thrughput: cantidad de tareas (o hilos) independientes terminadas/unidad de tiem
 Dependiendo de la tarea, a veces podemos subdividir la tarea grande en varias subtareas mas pequeñas corriendo en paralelo y de esta forma disminuir el tiempo que le tomaría a la tarea grande en completarse, es decir podemos disminuir la latencia, aunque esto no siempre es posible.
 Supongamos que tenemos una Tarea grande. Sin multithreading, la latencia seria simplemente el tiempo que demora esta tarea en terminar.
 Ahora supongamos que la tarea global la subdividimos en N subtareas y que cada una de ellas corren en paralelo; la latencia teorica seria: L=(tiempo1+tiempo2+...tiempoN)/N
-Raramente esta latencia teorica es alcanzada, sin embargo debemos apuntar a ello determinando un N apropiado. El N óptimo es cuando el numero de subtareas (o hilos) es igual al numero de cores fisicos disponibles de la CPU (lamentablemente nosotros no sabemos esto, solo podemos intuirlo).
-Si el numero de threads sobrepasa el de los cores de la cpu entonces se vuelve contraproducente al producir una latencia levemente mayor debido al context switch. Este contraefecto se vuelve levemente mas pronunciado ala sobrepasar la cantidad de cores virtuales (8 por ejemplo) que al sobrepasar la cantidad de cores fisicos (4 por ejemplo).
-Por regla general dividir tareas pequeñas en subtasks resulta contraproducente. Solo en tareas de cierta complejidad conviene subdividirlas para usar multithreading y asi dismimuir latencia, aunque por lo general (aunque hay excepciones) una tarea solo será subdividible en forma parcial, debiendo obligatoriamente correr una parte de esta en forma secuencial. 
+Raramente esta latencia teorica es alcanzada, sin embargo debemos apuntar a ello determinando un N apropiado. El N óptimo es cuando el numero de subtareas (o hilos) es igual al numero de cores fisicos disponibles de la CPU (lamentablemente 
+nosotros no sabemos esto, solo podemos intuirlo).
+Si el numero de threads sobrepasa el de los cores de la cpu entonces se vuelve contraproducente al producir una latencia levemente mayor debido al context switch. Este contraefecto se vuelve levemente mas pronunciado ala sobrepasar la cantidad de cores virtuales (8 por ejemplo) 
+que al sobrepasar la cantidad de cores fisicos (4 por ejemplo).
+Por regla general dividir tareas pequeñas en subtasks resulta contraproducente. Solo en tareas de cierta complejidad conviene subdividirlas para usar multithreading y asi dismimuir latencia, aunque por lo 
+general (aunque hay excepciones) una tarea solo será subdividible en forma parcial, debiendo obligatoriamente correr una parte de esta en forma secuencial. 
 
 
 ¿Como medir latencia?
@@ -54,7 +59,8 @@ System.out.print(String.valueOf(duration));
 Cuando corremos varias subtareas independientes que no apuntan a un resultado global entre todas ellas, el parametro ideal para medir rendimiento es el througput.
 Se define como el numero de tareas por segundo.
 Supongamos que tenemos varias peticiones http a un servidor. El thrugput es entonces en este caso (numero de peticiones)/segundo. 
-La principal técnica para aumentar el througput es crear un Thread Pool, que como su nombre lo dice contiene varios hilos por los que va pasando una fila de tareas, las que son tomadas por cada uno de estos hilos una a una. Los hilos no se destruyen en memoria, sino que se reutilizan, con el consiguiente aumento en rendimiento.
+La principal técnica para aumentar el througput es crear un Thread Pool, que como su nombre lo dice contiene varios hilos por los que va pasando una fila de tareas, las que son tomadas por cada uno de estos hilos una a una. 
+Los hilos no se destruyen en memoria, sino que se reutilizan, con el consiguiente aumento en rendimiento.
 Existen varios modos de implementar un Thread Pools que ya vienen en el JDK, siendo el mas comun el Fixed Thread Pool.
 Thread Pool Executor:
 int numberOfThreads = 4;

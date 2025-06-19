@@ -1,0 +1,225 @@
+DE CHAT GTP
+
+1. SUPER POM
+Todos los POM heredan de este.
+Nunca cambia para una version en especifico, es siempre constante.
+No tiene dependencias, pero sí define repositorios (maven central) y pluggins por defecto.
+Ejemplo:
+<project>
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+  </repositories>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>   -->Notar que es el  unico plugin de maven que lidia con <source> y <target>, por eso segun chatgtp va explicitamente en el super pom y los otros plugin no.
+        <version>3.8.1</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+
+
+2. PARENT POM
+
+2.1. CUSTOM PARENT POM
+Creamos nosotros mismos explicitamente un Parent Pom.
+Can a Custom Parent POM have dependencies ?
+ChatGPT dijo:
+Yes, a custom parent POM can absolutely have <dependencies>, but it's important to understand what that means in practice.
+Yes, it can.
+However:
+❗ Dependencies declared in a parent POM are not inherited automatically by child POMs. This rule applies to all kinds of dependencies, not just starters.
+
+
+
+🔍 What's Inherited from a Parent POM?
+Element	Inherited by Child?
+<dependencyManagement>	✅ Yes
+<properties>	✅ Yes
+<build> (plugins, etc.)	✅ Yes
+<dependencies>	❌ No
+<repositories>	✅ Yes
+<pluginManagement>	✅ Yes
+
+So if you define dependencies like this in a custom parent:
+
+<dependencies>
+  <dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>3.12.0</version>
+  </dependency>
+</dependencies>
+Child modules will not get this dependency automatically unless they also declare it explicitly in their own <dependencies> block.
+
+✅ Best Practice for Parent POMs
+Instead of putting dependencies directly, put them inside a <dependencyManagement> section:
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.12.0</version>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+
+Then, child POMs can declare the dependency without a version:
+<dependencies>
+  <dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+  </dependency>
+</dependencies>
+This way, you manage the version centrally in the parent.
+
+2.2. NOT CUSTOM PARENT POM
+Se usa para prescindir de las versiones en los starters, ya que las obtendran del parent. Aca no necesitamos por ello <dependencyManagement>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>spring-boot-app</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>spring-boot-app</name>
+    <description>A simple Spring Boot app with official parent POM</description>
+
+    <!-- ✅ Using Spring Boot's official parent POM -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+        <relativePath/> <!-- lookup from Maven Central -->
+    </parent>
+
+    <dependencies>
+        <!-- ✅ No need to specify versions -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot plugin is auto-managed -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+
+What You Get with the Official Parent
+-Auto-managed versions of all Spring Boot dependencies
+-Managed build plugins (like spring-boot-maven-plugin)
+-Sensible defaults for Java version, compiler plugin, encoding, etc.
+-You don’t need <dependencyManagement>
+
+2.3. SIN PARENT POM.
+Necesitamos obligatoriamente de <dependencyManagement> para obtener compatibilidad entre las dependencias starter que estamos declarando.
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>spring-boot-app</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>spring-boot-app</name>
+    <description>A Spring Boot app without using a parent POM</description>
+
+    <!-- ❗ No parent -->
+
+    <!-- ✅ Properties -->
+    <properties>
+        <java.version>17</java.version>
+        <spring-boot.version>3.2.5</spring-boot.version>
+    </properties>
+
+    <!-- ✅ Manually import the Spring Boot BOM -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ✅ Dependencies (version auto-managed by BOM) -->
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- ✅ Plugins must be declared explicitly -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+3.Effective POM
+Es el Super Pom mas el pom combinados.
+mvn help:effective-pom -->para verlo
+mvn dependency:tree -Dverbose --> muestra dependencias declaradas y transitivas explicitamente (super util)
+
+
+
+
+
+
+
+
+

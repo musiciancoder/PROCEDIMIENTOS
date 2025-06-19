@@ -7,5 +7,47 @@ Esto se logra definiendo una clase de excepción con dos constructores. Luego se
 if (condicion para que se caiga) {throw new NombreExcepcion("Mensaje de la razon por la cual se esta cayendo")}.
 *La arquitectura de Spring sugiere crear un paquete de excepciones customizadas, con un clase controlador de excepciones (ExceptionHandler) en este mismo paquete, que gestiona las excepciones individuales customizadas para cada tipo de respuesta (400, 401, 500, etc.).).
 *Ejemplos de handled or checked exceptions:IOException,SQLException,MalformedURLException (Heredan directamente de Exception)
-*Ejemplus de unhandled or unchecked exceptions:NullPointerException,NumberFormatExceptios,ClassCastException,IndexOutOfBoundsException (Heredan de RunTimeException, que a su vez hereda de Excepption)
+*Ejemplus de unhandled or unchecked exceptions:NullPointerException,NumberFormatExceptios,ClassCastException,IndexOutOfBoundsException (Heredan de RunTimeException, que a su vez hereda de Exception).
+
+how can we control checked exceptions?
+In Java, checked exceptions must be either handled or declared, because the compiler enforces their handling. You can control them in the following ways:
+
+1. Handle the Exception Using try-catch
+java
+try {
+    throw new IOException("Something went wrong!");
+} catch (IOException e) {
+    System.out.println("Caught exception: " + e.getMessage());
+}
+✅ This prevents the program from crashing by catching and processing the exception.
+
+2. Declare the Exception Using throws
+java
+public void readFile() throws IOException {
+    // Code that might throw IOException
+    throw new IOException("File not found!");
+}
+✅ The caller must handle or propagate the exception.
+
+3. Use throws and try-catch Together
+java
+public void riskyOperation() throws SQLException {
+    // Code that might throw SQLException
+}
+
+public void safeOperation() {
+    try {
+        riskyOperation();
+    } catch (SQLException e) {
+        System.out.println("Handled database error!");
+    }
+}
+✅ This gives flexibility: the calling method decides how to handle the exception.
+
+Key Takeaways
+Checked exceptions (e.g., IOException, SQLException) must be handled or declared.
+
+Unchecked exceptions (e.g., NullPointerException, ArrayIndexOutOfBoundsException) don’t need explicit handling.
+
+Best practice: Use specific exceptions instead of catching Exception, to avoid masking errors.
 

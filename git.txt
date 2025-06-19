@@ -3,6 +3,9 @@
 
 *+/VOLVER A LA LINEA DE COMANDOS: FLECHA ARRIBA (TECLA ENTRE CTRL Y BLOQ MAYUS Y LETRA "Q" AL MISMO TIEMPO)
 
+git config --global alias.ac '!git add . && git commit -m' -->git add * y git commit -m "nombrecommit" combinados.
+git ac "nombrecommit" para comitear
+
 
 
 Andres@LAPTOP-0JOL34HF ~
@@ -132,7 +135,7 @@ pasar unaRama a la rama master: git merge unaRama  (esto debe hacerse estando pa
 -----------------------
 
 
----------------------github (o bitbucket)------------------
+---------------------github (o bitbucket o gitlab)------------------
 para subir archivos.
 NO HACER NADA EN LOCAL, PRIMERO SE INICIA EL REPOSITORIO EN REMOTO, SIN README.md
 1.crear el repositorio en github con nombrerepositorio sin README.md
@@ -254,4 +257,11 @@ You can also configure Git to use another editor to avoid having to use VI (or i
 
 RESET VS REVERT
 Si tenemos commit1, commit2, commit3, con el head en commit3 y queremos volver a dejar el head en commit2 y damos reset va a volver al commit2 el head borrando el commit3 forever, mientras que con revert no borra el commit3 sino que crea un nuevo commit4 que será igual al commit2 y el head estará en commit4.
+
+GIT REBASE VS GIT MERGE
+
+Supongamos que creamos ramaDesarrollo a partir de la main. Efectuamos uno o mas commits en ramaDesarrollo y luego nos damos cuenta que main tiene commits nuevos también. Acá tenemos dos alternativas: git merge o git rebase, en las dos tendremos que resolver conflictos, pero son diferentes desde el  punto de vista del historial del versionamiento. Primera alternativa (con rebase): al estar en la ramaDesarrollo podemos darle un comando git rebase main, entonces deberemos resolver el conflicto en la ramaDesarrollo, comitear y luego hacer el merge desde la main. Segunda alternativa (sin rebase) hacer un merge normal desde main, en cuyo caso el conflicto lo resolvemos en la main.  
+En la primera  alternativa en el hostorial de commits en ramaDesarrollo simulará como si los cambios de la main que se produjeron despues de empezar a trabajar nosotros en ramaDesarrollo hubieran estado incorporados desde el  comienzo, lo que desde el punto de vista visual cuando se tienen demasiado commit es mas ordenado. Con la segunda alternativa se mantiene el historial exacto de commits.
+
+
 
