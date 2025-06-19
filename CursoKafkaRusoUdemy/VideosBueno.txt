@@ -1,0 +1,4 @@
+Los comandos de las primeras partes antes de producer microservice están en los .pdf del curso, son comandos de Kafka .cli.
+Lo importante es q si se quiere seguir un orden de la secuencia de mensajes (es decir que si se comitea mensaje 1 primero y mensaje 2 después en el producer, se reciba mensaje uno y mensaje 2 despues en el consumer), debe ponerse un
+key (del key value,ya q el mensaje es siempre el value y va a estar presente). Todos los mismos key van a  la misma partición y de esta manera se mantiene la secuencia, de lo contrario Kafka manda los mensajes a distintas particiones y
+como las particiones son leidas por diferentes consumers,  nada asegura que se respete la secuencia).
