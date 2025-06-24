@@ -33,13 +33,34 @@ public class ProductServiceImpl implements ProductService {
 				productRestModel.getQuantity());
 		
 		LOGGER.info("Before publishing a ProductCreatedEvent");
-		
-		SendResult<String, ProductCreatedEvent> result = 
+
+		/*
+		Asincrono
+		CompletableFuture<SendResult<String, ProductCreatedEvent>> future =
+				kafkaTemplate.send("product-created-events-topic", productId, productCreatedEvent);
+		future.whenComplete((result, ex) -> {
+			if (ex != null) {
+				LOGGER.error("Error while sending message to Kafka: " + ex.getMessage());
+			} else {
+				LOGGER.info("Partition: " + result.getRecordMetadata().partition());
+				LOGGER.info("Topic: " + result.getRecordMetadata().topic());
+				LOGGER.info("Offset: " + result.getRecordMetadata().offset());
+			}
+			});
+			//si agregamos future.join() el metodo sí espera y se vuelve sincrono, pero no es lo recomendable pq queda poco claro el codigo.
+		   LOGGER.info("***** Returning product id"); --> notar que este log se se ejecuta antes de la respuesta del completableFuture, lo q evidencia q no espera para devolver un productId al cliente ya q es asincrono.
+		 */
+
+		//Sincrono -->the advantage of sending message synchronously is that we can configure our microservice to wait
+		//for acknowledgement from all Kafka brokers that the message is successfully stored in Kafka topic,
+		SendResult<String, ProductCreatedEvent> result = //Barath no devuelve ningun tipo al ejecutar kafkaTemplate.send, lo deja como void.  Creo q es mas util dejarlo como lo tiene el ruso, ya q permite obtener metadata mas abajo.
 				kafkaTemplate.send("product-created-events-topic",productId, productCreatedEvent).get();
 		
 		LOGGER.info("Partition: " + result.getRecordMetadata().partition());
 		LOGGER.info("Topic: " + result.getRecordMetadata().topic());
 		LOGGER.info("Offset: " + result.getRecordMetadata().offset());
+
+
 		
 		LOGGER.info("***** Returning product id");
 		

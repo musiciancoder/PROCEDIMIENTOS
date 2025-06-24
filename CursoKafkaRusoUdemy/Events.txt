@@ -1,0 +1,13 @@
+Segun copilot y chatgtp:
+Las clases de eventos deben ser creadas dentro del domain core. 
+La mayoría de las veces son las entidades/aggregates (pero no value objects que son inmutables!) quienes raise (invocan) sus respectivos eventos (Order  - OrderConfirmedEvent) ya que al ser mutables, variaran su estado interno dependiendo
+de si el evento ha sido invocado.
+Ejemplo:
+public class Order {
+    public void confirm() {
+        this.status = CONFIRMED;
+        domainEvents.add(new OrderConfirmedEvent(this.id));
+    }
+}
+
+Los domain services generalmente coordinan a los métodos de los aggregates que invocan eventos (muy util cuando algo provoca eventos de multiples aggregates), pero raramente invocan ellos mismos.

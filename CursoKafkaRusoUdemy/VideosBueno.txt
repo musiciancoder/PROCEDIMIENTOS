@@ -1,4 +1,56 @@
+KRAFT
+Zookeeper esta obsoleto, ahora se usa kraft. Principal ventaja:  Kafka brokers now manage metadata internally using a Raft-based consensus protocol (antes la metadata de los topics era gerenciada por zookeeper).
+Se hacen una serie de movimientos en consola para configurar kraft antes de levantar un broker desde carpeta /bin con comando: kafka-server-start.sh (.bat  para windows) config/kraft/server.properties 
+siendo server.properties un archivo q se modifica si queremos tener mas de un broker.
+
+KAFKA CLI
+Se corre  siempre kafka cli desde la carpeta /bin de donde se instalo kafka.
+kafka-topics.sh -->para crear topics
+
+
+KEYS
 Los comandos de las primeras partes antes de producer microservice están en los .pdf del curso, son comandos de Kafka .cli.
 Lo importante es q si se quiere seguir un orden de la secuencia de mensajes (es decir que si se comitea mensaje 1 primero y mensaje 2 después en el producer, se reciba mensaje uno y mensaje 2 despues en el consumer), debe ponerse un
 key (del key value,ya q el mensaje es siempre el value y va a estar presente). Todos los mismos key van a  la misma partición y de esta manera se mantiene la secuencia, de lo contrario Kafka manda los mensajes a distintas particiones y
 como las particiones son leidas por diferentes consumers,  nada asegura que se respete la secuencia).
+
+Llamada  Asincrona
+La idea es mandar un post request desde postman para crear un producto, guardarlo en la bbdd primero, luego mandarlo por kafka a un topic y mandar el response del post de vuelta a kafka con el productID.
+En la sección Kafka Producer, send message Asyncronously, explica que en el servicio en este caso (o donde sea) siempre hay que guardar en bbdd primero antes de instanciar el evento (CreatedProductEvent) en el servicio y de luego mandarlo asíncronamente. 
+Para mandarlo asíncronamente con Spring, es inyectando por dependencia (lo hizo por constructor) el bean KafkaTemplate y luego con método send. Solo con esto basta y sobra para enviar el mensaje por Kafka y podremos mandar el productID al cliente en postman ya mismo 
+por rest http en el controler, pero sin confirmación de si se mandó o no el mensaje. Si queremos confirmación de que se mando o no el mensaje en Kafka (ojo, sigue siendo asíncrono, o sea no espera), debemos crear un completableFuture con Result (éxito) y Exception(fracaso).
+El cliente va a tener su productID en postman generalmente antes de que tengamos la confirmacion de envio exitoso o error (o sea el  completablefuture).
+
+Llamada Sincrono.
+Si queremos confirmacion de que el mensaje fue enviado o que fallo antes de mandar el productID al cliente en postman, debemos hacerlo en forma sincrona agregando .get(). (Ver codigo de ProductsMicroservice en intellij q esta en este mismo directorio). 
+
+Acknoledgement-InSyncReplicas--> Se recomienda ver los .pdf !!!
+Supongamos que tenemos 5 brokers, cada una con una replica de una particion. Si esperamos un acknoledgment de cada uno de los 5 brokers nuestra performance disminuye. Por ello, lo ideal es esperar acknoledgment de
+un numero prudente de replicas (2 o 3), esto se hace con la propiedad --replication.factor=5 --config.min.insync.replicas=2
+Delivery timeout (tiempo total de envio de un mensaje) = Linger (tiempo que esperamos que se acumulen los mensajes en el batch antes de enviarlo al broker) + Request timeout (tiempo desde que enviamos efectivamente el batch).
+Para modificar alguna propiedad (como min.insync.replicas por ejemplo) de un topic ya creado se usa kafka-configs.sh --alter en CLI.
+La prueba q hizo fue la siguiente: Levantó 3 servidores de kraft e hizo correr el proyecto del producer (que en application.properties tiene spring.kafka.producer.acks=all ) . Levantó un consumer con cli. Recordar que en la linea anterior aca
+habia modificado el topic  para insync replicas = 1. Tiró mensajes en postman al proyecto del producer y cuando detuvo dos de los 3 brokers, le dio un error en postman y el consumer ya no recibió nada.
+Posteriormente seteó en application.properties retries=10 (numero de reintentos) y retry.backoff.ms=1000 (tiempo entre reintentos). Cuando probo con un solo broker mostro que probo 10 veces con intervalo de 1 segundo (lo mustra los logs del proyecto)
+Luego hizo la misma prueba agregando delivery.timeout  de 12000 ms en el application.properties. Mostro error durante 2 minutos en los logs (cuando hace varios retries) y luego se detuvo.
+
+Idempotent Producer.
+Si mandamos un mensaje a un broker y el broker efectivamente lo recibe, pero se cae antes de mandar el acknoledgment entonces no sabremos que el mensaje se envió efectivamente y se enviará en un retry, lo que producirá q el mensaje este duplicado en el log.
+Para prevenir esto, el producer de kafka por defecto es idempotene, es decir reconoce si un mensaje ya esta en el log antes de insertarlo. Si esta en el log,  pero falta el acknoledgment solo manda el acknoledgment, pero no inserta nada.
+Segun el ruso esta configuarcion, q por defecto ya viene incluida, es facil desconfigurarla, por lo q es mejor setearla explicitamente en el application.properties (ver video pq me dio lata escribir la configuracion) o con @Bean en el producer.
+
+--TODO CONFIGURATIONS.PROPERTIES FILE
+
+Consumers
+Una particion va a un consumer y un topic va a un consumer group.
+Creó un proyecto para el consumer (EmailNotificationMicroservice) que yo lo tengo en carpeta Section-9-Kafka-Consumer-final-EmailNotificationMicroservice.
+En el application.properties seteó un puerto igual a cero, pa q el proyecto del consumer ocupe un puerto al azar. Ademas, setió spring.kafka.consumer.bootstrap.servers=localhost:9092. Bootstrap server is used for initial connection to Kafka cluster.
+As a bootstrap server I will specify localhost and then the port number 9092, the localhost and then the port number 9092. That is the address of one of my brokers in Kafka cluster. Once this microservice or this Kafka consumer connects to one broker, it will be able to connect and work with all other brokers as well.
+Setió tambien spring.kafka.consumer.group.id:product-created-event. En este caso todos nuestros microservicios formaran un solo consumer group.
+Creó la clase ProductCreatedEventHandler que acuará como Listener (la marcó con @KafkaListener), y que contendrá uno o varios @KafkaHandler, cada uno independiente para un respectivo evento
+Creó el proyecto core (que tiene clases  comunes para los  proyectos del producer y el consumer) agregando ProductCreatedEvent. Con mvn install queda listo para ocuparlo tanto por EmailNotificationMicroservice como por ProductsMicroservice.
+Corre los brokers por comando, corre ProductsMicroservice y EmailNotificationMicroservice. Le pega a ProductsMicroservice por postman mandando un post con un producto y comprueba en los logs de EmailNotificationMicroservice q el producto ha sido recibido por el consumer.
+En este punto ya sabe q el consumer funciona, pero quiso crear igual una clase de configuracion de beans (KafkaConsumerConfiguration) con lo que tiene en el application.properties. La prueba fue igual a la anterior.
+
+Kafka consumers: Errores de deserializacion.
+Se explica esta seccion con lineas de codigo en la clase KafkaConsumerConfiguration.

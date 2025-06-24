@@ -1,0 +1,89 @@
+Give an example of Entities / Aggregates
+
+
+ChatGPT dijo:
+Absolutely! Let's use a realistic domain example: an e-commerce system, where a customer places orders for products.
+
+🛒 Domain Example: Order and OrderItem
+🧱 ENTITY: Order
+An Entity has:
+
+Identity (orderId)
+
+Mutable state (e.g., status, items)
+
+Lifecycle
+
+
+public class Order {
+    private final UUID orderId;
+    private final UUID customerId;
+    private List<OrderItem> items;
+    private OrderStatus status;
+
+    public Order(UUID customerId) {
+        this.orderId = UUID.randomUUID();
+        this.customerId = customerId;
+        this.items = new ArrayList<>();
+        this.status = OrderStatus.CREATED;
+    }
+
+    public void addItem(OrderItem item) {
+        items.add(item);
+    }
+
+    public void confirm() {
+        if (items.isEmpty()) {
+            throw new IllegalStateException("Cannot confirm order with no items.");
+        }
+        this.status = OrderStatus.CONFIRMED;
+
+        // Raise domain event
+        DomainEvents.raise(new OrderConfirmedEvent(orderId));
+    }
+
+    public UUID getId() {
+        return orderId;
+    }
+
+    // equals and hashCode based on orderId
+}
+🧱 VALUE OBJECT: OrderItem
+A Value Object:
+
+No identity of its own
+
+Defined by its values
+
+Immutable
+
+
+public class OrderItem {
+    private final UUID productId;
+    private final int quantity;
+    private final BigDecimal unitPrice;
+
+    public OrderItem(UUID productId, int quantity, BigDecimal unitPrice) {
+        this.productId = productId;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return unitPrice.multiply(BigDecimal.valueOf(quantity));
+    }
+
+    // equals and hashCode based on productId, quantity, and unitPrice
+}
+📦 AGGREGATE ROOT: Order
+Order is an aggregate root.
+
+OrderItems are part of the aggregate, but not accessed outside of Order.
+
+All changes to the aggregate happen through the root (Order).
+
+✅ Summary
+Component	Class	Characteristics
+Entity	Order	Has identity, mutable state, raises domain events
+Value Object	OrderItem	Immutable, defined by value, no ID
+Aggregate	Order	Root of a cluster of related entities and value objects

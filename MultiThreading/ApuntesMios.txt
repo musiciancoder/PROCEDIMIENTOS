@@ -104,7 +104,7 @@ getQueuedThreads()-devuelve lista de hilos esperando a usar el codigo/recurso pr
 getOwner()- devuelve el hilo que esta ocupando el codigo/recurso protegido en este momento.
 isHeldByCurrentThread()- nos dice si el codigo/recurso protegido esta siendo ocupado o no por ese hilo.
 isLocked()- nos dice el codigo/recurso protegido esta siendo ocupado por algun hilo.
-Y ademas cuenta con los siguuientes metodos:
+Y ademas cuenta con los siguientes metodos:
 ReentrantLock(true): permite distribuir equitativamente entre hilos, sin preferencia. Esto trae como desventaja que podria reducirse el throughput.
 -Lock(): cuando un hilo ocupa un bloque de código/recurso, este  bloque de código/recurso queda bloqueado para el resto de los hilos. Cumple la misma funcion que sincronized(lock)
 
@@ -127,11 +127,13 @@ Esta es la gran diferencia comparado con el metodo lock() (que tambien pertenece
 2.ReentrantReadWriteLock
 Para operaciones de lectura deseamos por lo general que los procesos sean concurrentes, es decir que puedan haber varios clientes, servicios, etc. leyendo desde una bddd aunque los hilos compartan recursos entre ellos.
 Si bien esto se puede llevar a cabo con el metodo lock() de la clase ReentrantLock, es mucho mas rapido y eficiente hacerlo con el metodo readLock() de la clase ReentrantReadWriteLock.
-Por otro lado al escribir o borrar de la bbdd generalmente deseamos bloquear el codigo/recurso para el resto de los hilos ya sea de escritura o de lectura. Esto tambien se puede hacer con lock() de la clase ReentrantLock, es mucho mas rapido y eficiente hacerlo con el metodo writeLock() de la clase ReentrantReadWriteLock
+Por otro lado al escribir o borrar de la bbdd generalmente deseamos bloquear el codigo/recurso para el resto de los hilos ya sea de escritura o de lectura. Esto tambien se puede hacer con lock() de la clase ReentrantLock, 
+es mucho mas rapido y eficiente hacerlo con el metodo writeLock() de la clase ReentrantReadWriteLock
 
 
 3.Semaphore.
-Es otra tácnica de bloqueo y coneccion interthreads. A diferencia de los metodos locks que solo permiten un thread a la vez pasando por recurso/codigo protegido, con semaphore podemos setear un numero especifico de varios threads (number of permits) corriendo concurrentemente por ese codigo/recurso.
+Es otra tácnica de bloqueo y coneccion interthreads. A diferencia de los metodos locks que solo permiten un thread a la vez pasando por recurso/codigo protegido, con semaphore podemos setear un numero especifico de 
+varios threads (number of permits) corriendo concurrentemente por ese codigo/recurso.
 int NUMBER_OF_PERMITS=1;
 Semaphore semaphore = new Semaphore(NULL);
 semaphore.acquire()//lock
