@@ -54,3 +54,16 @@ En este punto ya sabe q el consumer funciona, pero quiso crear igual una clase d
 
 Kafka consumers: Errores de deserializacion.
 Se explica esta seccion con lineas de codigo en la clase KafkaConsumerConfiguration.
+
+En seccion Dead Letter Topic se crea un topic llamado Dead Letter Topic desde EmailNotificationMicroservice como producer, con todos los mensajes que han fallado (incluyendo por cierto los de la seccion Kafka consumers: Errores de deserializacion.
+para ello en la clase KafkaConsumerConfiguration creó dos beans para hacer funcionar el producer de deadlettertopic.
+Para probar levantó EmailNotificationMicroservice y ProductsMicroservice. Primero creó un producto exitoso, al igual q antes el  consumer lo leyó bien.
+Se fue a la terminal y mando un producto errado con String en vez de Json, y no le dio error en el consumer (al igual q antes tambien).
+Se fue a la terminal de nuevo y levantó el topic product-created-events-topic.DLT (nomenclatura q se usa por convencion) que sera nuestro dead letter topic y que se creó por codigo en KafkaConsumerConfiguration. Al levantar vio que tenia el mensaje defectuoso con formato string enviado anteriormente.
+
+Exceptions and Retries.  Hasta ahora el mensaje q mandamos a DLT sabiamos q era NO reenviable (retriable) pq era un asunto de formato (string json). Pero q pasa si hay otro tipo de error como q se caiga un microservicio p.ej.
+Lo q hay q hacer entonces es primero preguntarse si el error es retriable o no. Si es retriable hay q configurar wait time y number of times to retry. Si no es retriable lo mandamos a DLT
+Creó dos clases, NotRetryableException y RetryableException, las agregó en el metodo kafkaListenerContainerFactory de la clase de configuracion. A continuacion levantó todo y probó en postman con un post para crear un producto repetido, lo q provocó un NotRetryableException en los logs.
+Luego, en metodo @KafkaHandler handle() escribió mas personalizaciones para arrojar errores mas especificos para RetryableException y NotRetryableException. Uno es quien determina si un error es  retryable o no. La idea en nuestro caso es q despues de 3 intentos cada 5 segundos, el  error se considere NotRetryableException (ver linea de FixedBackOff())
+Abrió Mockservice (pasó el src en el curso) y lo probó en postman. Mockservice simulará distintas respuestas al ser llamado desde EmailNotificationMicroservice mediante RestTemplate.
+A continuacion levantó ProductsMicroservice, EmailNotificationMicroservice, Mockservice y por kafka-cli creó el consumer de DLT por comando. En EmailNotificationMicroservice creó varios breakpoints en metodo @KafkaHandler handle(). En postman mandó un nuevo producto y fue probando caso a caso para RetryableException y NotRetryableException.
