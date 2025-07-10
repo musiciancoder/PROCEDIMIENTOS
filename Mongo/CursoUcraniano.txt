@@ -35,7 +35,8 @@ db.createUser({
     ]
 })
 2.5)Conectarse desde el local a mongodb que esta instalado la instacia de amazon mediante el usuario que creamos en 2.5
-3) On the cloud. Podemos manejar mongo como un servicio en forma similar a ECS en AWS mediante cloud mongoDB (llamado coloquialmente mongodb Atlas). Esto es muy conveniente en produccion. Para ello debemos crearnos un cluster en la consola de atlas y conectarnos mediante mongo shell a este cluster.
+3) On the cloud. Podemos manejar mongo como un servicio en forma similar a ECS en AWS mediante cloud mongoDB (llamado coloquialmente mongodb Atlas). Esto es muy conveniente en produccion. Para ello 
+debemos crearnos un cluster en la consola de atlas y conectarnos mediante mongo shell a este cluster.
 
 Intaló herramientas graficas q se conectan con c/u de los 3 modos anteriores. Estas herramientas graficas son mongo compass y robo 3T.
 
@@ -57,18 +58,10 @@ db.stats()-->muestra capacidad de almacenamiento
 db. y apretamos dos veces tab para mostrar todos los metodos a nuestra discposicion
 
 
-Types Syntax in Mongo shell mode
+Types Syntax in Mongo shell mode -->ver diapositivas
 
-TYPE                          SYNTAX
-String						""
-Object						{}
-Array						[]
-Boolean						NumberInt()
-32-bit Integer				NumberLong()
-64-bit IntegerDouble		0.0
-Date						ISODate()
-ObjectId					ObjectId()
-
+do arrays in mongo support elements of different types?
+Yes, MongoDB arrays do support elements of different types within the same array—it's one of the flexible features of its BSON data model.
 If the number is not specified, it will be stored as Double BSON value
 
 Podemos usar mongoshell para inicializar objetos de javascript y trabajar con ellos
@@ -188,10 +181,12 @@ db.getCollection('shoppingCart')
   {}
   )
 Tambien se puede usar el operador $ en nested documents. Si no ocupamos $elemMatch en la query, los fieldname1:value1, fieldname2:value2  que escribamos pueden pertenecer al mismo elemento del array o a elementos distintos del array. Si usamos $elemMatch en la query, los fieldname1:value 1, fieldname2:value2  que escribamos siempre seran del mismo elemento del array
+replaceOne-->no modifica un campo, sino q reemplaza todo el documento por otro, manteniendose el _id por defecto.
+
 
 Delete Operations
-db.getCollection('collectionName').remove({})-->borra todos los documentos de la coleccion
-db.getCollection('collectionName').remove({query},true)-->borra el documento de la query
+db.getCollection('collectionName').remove({})-->borra todos los documentos de la coleccion -->remove() esta deprecado, es legacy, se usa deleteOne o deleteMany ahora
+db.getCollection('collectionName').remove({query},true)-->borra el documento de la query -->remove() esta deprecado, es legacy, se usa deleteOne o deleteMany ahora
 db.getCollection('collectionName').deleteOne({query})-->borra solo un documento, por lo que normalmente se usa con queries que se refieran al _id o al index
 db.getCollection('collectionName').deleteMany({query})-->borra varios documentos que cumplen con la query, por lo que normalmente no se usa con queries que se refieran al _id o al index
 db.getCollection('collectionName').drop()-->borra la coleccion

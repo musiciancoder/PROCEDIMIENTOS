@@ -97,6 +97,14 @@ ARCHIVO POM
   </dependencies>
 </project>
 
+RELOAD 
+Reloading es descargar librerias q estan en el POM a nuestro .m2
+Recordar que cuando hacemos mvn clean install ni el ciclo de clean ni del build (o sea install) hacen Reload.
+Para el reload hacer click en el boton de reload del IDE (lo mas facil) o bien con comando mvn dependency:resolve -U (esto solo recarga al igual q el boton, no hace nada mas).
+Si queremos recargar solo una libreria en vez de todas las del pom (pq estamos teniendo problemas con esta libreria) es con comando mvn dependency:resolve -DincludeGroupIds=com.example -DincludeArtifactIds=my-library -U
+
+
+
 PLUGGIN
 Un pluggin es un grupo de goals o tareas a ser realizadas, solo que en el caso de los pluggins estos goals pueden pertenecer a dos o mas fases; en cambio los goals asociados a una fase por definicion son siempre los mismos goals. 
 Maven está compuesto de varios pluggin. 

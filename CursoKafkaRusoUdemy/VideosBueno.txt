@@ -67,3 +67,89 @@ Creó dos clases, NotRetryableException y RetryableException, las agregó en el 
 Luego, en metodo @KafkaHandler handle() escribió mas personalizaciones para arrojar errores mas especificos para RetryableException y NotRetryableException. Uno es quien determina si un error es  retryable o no. La idea en nuestro caso es q despues de 3 intentos cada 5 segundos, el  error se considere NotRetryableException (ver linea de FixedBackOff())
 Abrió Mockservice (pasó el src en el curso) y lo probó en postman. Mockservice simulará distintas respuestas al ser llamado desde EmailNotificationMicroservice mediante RestTemplate.
 A continuacion levantó ProductsMicroservice, EmailNotificationMicroservice, Mockservice y por kafka-cli creó el consumer de DLT por comando. En EmailNotificationMicroservice creó varios breakpoints en metodo @KafkaHandler handle(). En postman mandó un nuevo producto y fue probando caso a caso para RetryableException y NotRetryableException.
+
+ConsumerGroups.
+Generalmente (aunque no siempre) se estila que los consumers de un consumer group determinado sean instancias del mismo microservicio. En este curso se estila que consumer=instancia de microservicio de ahora en adelante
+Rebalancing es el proceso en que los consumers se crean o eliminan automaticamente de acuerdo a la demanda. Cada consumer dentro del consumergroup manda un heartbeat al broker para que se sepa cuantos consumers se tienen disponibles en cada  momento.
+Si se crean mas instancias que particiones, dará un sit idle (consumidor ocioso).
+El consumergroup lo setea en el  application.properties y lo llama en consumerFactory() de la clase de configuracion.  Se puede hacer mediante  Bean o directamente en @KafkaListener tambien.
+A continuacion corrio tres instancias distintas de EmailNotificationMicroservice desde la  carpeta del curso con comando: mvn spring-boot:run (con server.port=0 en application.properties los levanta en puertos aleatorios). En el
+mismo log que resulta al correr estas instancias se puede ver la particion a la que ha sido asignada (tiene 3 particiones para 3 consumers). Luego bajó dos instancias y vió que las instancia restante consume las tres particiones.
+Para la prueba volvio a levantar las tres instancias, creó un nuevo producto en postman y vio q solo una instancia recibió el mensaje, no las otras dos.
+
+IdempotentConsumer
+Si en un primer mensaje un consumer recibe un mensaje desde un topic (receives message) y produce actualizacion de una base de datos(process message), pero falla al realizar el acknoledgement al broker, el topic no sabe que
+este mensaje ya ha sido consumido y procesado y el mensaje sigue disponible en la particion, lo q es un problema. Para solucionarlo existen varias alternativas como transactions, idempotent producer y idempotent consumer.
+Con idempotent consumer un consumer pueda recibir un mismo mensaje dos veces sin problema, pero nos aseguramos q solo lo procesará una vez. Primero antes de actualizar la bbdd veremos si la bbdd ya esta actualizada antes (producto del mismo mensaje anterir) y si es asi solo se le enviará la señal
+al broker para q el mensaje no siga disponible. Para ello:
+-Creó un unique identifier para el mensaje (aparte del key) en metodo createProduct() en proyecto ProductsMicroservice.
+-Agregó en EmailNotificationMicroservice en @KafkaHandler handle() lineas para recibir el unique identifier
+-Agregó las dependencias de h2 y spring-boot-starter-data-jpa en el pom.
+-Configuró h2 en applications.properties
+-Creo la JPA Entity class ProcessedEventEntity en EmailNotificationMicroservice
+-Creo la interfaz ProcessedEventRepository como JPARepository en EmailNotificationMicroservice
+-Creó la logica de negocio para guardar en la bbdd en @KafkaHandler handle() en EmailNotificationMicroservice.  Este metodo lo volvió transaccional.
+-Creó la logica de negocio para ver si el mensaje ya estaba guardado en la bbdd desde antes por medio del unique identifier. Esto lo hizo en el  metodo @KafkaHandler handle().
+-Finalmente probó. Para ello puso un breakpoint en @KafkaHandler handle() antes de la linea para ver si el mensaje ya estaba guardado en la bbdd y levantó EmailNotificationMicroservice en debugmode. Luego levantó ProductsMicroservice (previo hardcodeo en el IDE de messageID (le puso 123 en vez de UUID.RandomUUID())) y Mockservice normalmente.
+Mandó un producto con un post en postman y continuó desde el breakpoint hasta el final, observando q el programa pasa por la logica de negocio de guardar en la bbdd 
+Levantó la bbdd de h2 en un browser y vió q el producto estaba guardado sin problemas.
+Luego mandó a crear el mismo rpoducto con en mismo messageID =123,  continuó desde el breakpoint hasta el final, observando q el programa ahora no pasa por la logica de negocio de guardar en la bbdd ni esta duplicado en la bbdd en el browser.
+
+Transactiones
+
+Transactions-->Los conceptos explicado por Bharath en su curso de entrevista Java son válidos para cualquier tipo de transacción, pero Bharath lo enfocó desde punto de vista entre microservicio y base de datos,  no de kafka.
+Kafka Transactions -->entre microservicios de nuestra empresa
+JPA Transactions -->entre microservicio y base de datos (es lo mismo q DataBase Transaction)
+Compensating transaction-->entre un microservicio nuestro y otro de otra empresa (escapa al ambito de este curso).
+Distributed transactions-->entre diferentes bases de datos (al sacar de una bbdd y poner la plata en otra), esta es la q explica Bharath en el curso de entrevista java (la q ademas del transactionManager tiene varios resourceManagers, uno por bbdd).
+En esta sección del  curso tendremos:
+-TransferService: microservicio que actua como provider para los otros dos.
+-WithdrawalService: microservicio que consume de TransferService y retira dinero desde las cuentas de usuarios.
+-DepositService: microservicio que consume de TransferService y deposita dinero en las cuentas de usuarios.
+Estos 3 proyectos funcionan bajo el paradigma de commited transaction (q es lo mismo q TRANSACTIONS_READ_COMMITED, o sea esta previniendo Dirty Reads)
+
+En los videos siguientes configuró transacciones en TransferService. Para ello:
+-Anotó la configuracion de idempotent producer en el application.properties.
+-La rescató con @Value en la clase de configuracion y lo unió en los props con TransactionalIDConfig. Con ello (sigo en inglés acá) if my application crashes in the middle of transaction, Kafka can then use this transaction
+ID to identify which messages were part of incomplete transaction and make sure that these messages are not processed until transaction is complete.
+-Setió el proyecto como producer con los beans necesarios para ello (ProducerFactory, KafkaTemplate y TransactionManager).
+-Anotó  el método transfer() que es el metodo q efectua la logica de negocio para retiro y deposito de dinero entre microservicios como @Transactional. Esto significa que agarra el TransactionManager q seteamos como bean en la clase de configuracion.
+-Explicó q @Transactional sin parametros hace rollback solo para RuntimeExceptions.  Si se quiere hacer rollback para CheckedExceptions hay q definirlo explicitamente en los argumentos.
+-Setió el isolation level en los  consumidores (no en el producer!), q pa kafka entre microservicios por defecto es TRANSACTIONS_READ_UNCOMMITED.  Para ello, en el application.properties de los proyectos WithdrawalService y DepositService setió el isolation level de read commited (previene uncommited reads). Los rescató con @value y y los pasó en las respectivas clases de configuración de estos proyectos,
+-Probó todo el sistema levantando WithdrawalService y DepositService y Mockservice. TransferService lo levantó en modo debug y puso un breakpoint en callRemoteServce(). Al debuguear vió que le corria el codigo para retirar dinero.
+Luego bajó el Mockservice y reaunudó el debugging. Ya que MockService fue incapaz de reponder el http request enviado por DepositService, vimos que el WithdrawalService echó para atrás lo q habia hecho y el mensaje enviado desde TransferService nose consumió en ninguno de los dos topics.
+Nota: al probar hay que ir revisando el envio y recepcion de mensajes buscando en los logs "KafkaTransactionManager". Si hay rollback no aparecerá el "KafkaTransactionManager" en los logs.
+
+DataBase Transactions and Kafka Transactions.
+Ahora necesita que q TransferService ademas de actuar como producer para WithdrawalService y DepositService (Kafka Transactions orquestada por KafkaTransactionManager) pueda guardar en una bbdd (JPA Transactions orquestada por JPATransactionManager).
+Para ello en TransferService:
+-Agregó las dependencias de h2 y starter-data-jpa en TransferService.
+-Agregó las clases TransferEntity y TransferRepository en TransferService.
+-Creó el bean jpaTransactionManager llamado "transactionManager" q es el JPATransactionManager encargado de manejar las transacciones en la bbdd.
+-Usó el método transfer() para guardar en bbdd.
+-Sincronizó escribiendo @Transactional("transactionManager"), que es el bean de Spring JPA. El concepto acá es utilizar el bean de Spring JPA para que tome todo el bloque como una single unit
+para la transacción, pero internamente cuando el código llegue a la parte q ocupa kafkaTemplate sabe q tiene que usar kafkaTransactionManager para gestionar la parte de la transaccion con los otros dos microservicios.
+-Cambió la configuracion de los logger en application.properties pa q le saliera los logging de la transaccion a la bbdd.
+-Probó de la misma forma q en la seccion inmediatamente anterior (linea 119 de este documento a menos que haya cambiado algo), con el mismo breakpoint en TransferService, solo que esta vez ademas de los logs prestó atencion a la consola de
+h2 para ver si se le guardaba el producto q le estaba mandando por postman (caso commited o exitoso) o si no se lo guardaba (caso rollback o fallido).
+
+Nota: en las dos secciones de tests de integracion no escribí mucho,pero lo importante es saber:
+1. En kafka se privilegian test de integracion por separado: uno para producer y otro para consumer, en vez de pruebas unitarias.
+2. En ambos casos con @EmbededKafka podemos tener un servidor de kafka embebido al correr los tests, lo qnos permite hacer las pruebas sin necesidad de levantar absolutamente nada. 
+3. Si bien contaremos con servidor de kafka embebido, igual necesitamos configurar parametros como nombres de topics, particiones, etc. para la simulación. Esto se logra con los parametros de application.properties
+IntegrationTests - KafkaProducer
+El código esta complejo de ver (esta en el proyecto mio q dice TestIntegrationProducer). Pa los test de integracion necesita simular primero lo q manda por postman y segundo todo elambiente con los brokers y topic para poder recibir un mensaje simulado y comparar
+si es lo mismo q simuló mandar por kafka. Esto corre en el IDE,en ninguna otra parte. 
+
+IntegrationTests - KafkaConsumer
+Va a ocupar EmailNotificationMicroservice, particularmente desea comprobar q el metodo handle() recibe correctamente los mensajes que le estan llegando de kafka, pero no la parte de guardar en bbdd por jpa ni la llamada a mockservice q tambien
+estan en este metodo, por ello estas dos cosas serán mockeadas, por lo q el test de integracion solo sera para los mensajes kafka.
+El proyecto donde esta esta seccion esta en EmailNotificationMicroservice-IntegrationTests.
+-Hardcodeó  lo que mandaria por postman.
+-Creó el mock pal jpa y pal rest
+-Creó un spy para el  evento (ProductCreatedEvent), ya q igual necesita el evento real, por ello solo hace stub al metodo handle().
+-Corrió el test sin levantar nada.
+
+
+
+

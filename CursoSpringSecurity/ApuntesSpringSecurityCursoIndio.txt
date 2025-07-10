@@ -3,27 +3,47 @@ Authorization-->Role
 Confidentiality-->Process where the app ensures a hacker is not allowed, even if he stoles one's username and password, because he will not have the private key to decrypt the info that the server is sending to him.
 Token Integrity-->The AuthorizationServer generates a token and the ResourseServer uses this token to send to the client whatever resourse he needs by having the right signature. Again private key is needed to decrypt token's signature so if the hacker tries to modify the token he will not be able to because its encrypted.
 CSRF Cross Site Request Forging and CORS cross origin resource sharing.
-CSRF  will prevent any other website or application to submit data on our behalf on the browser by default. In order to do so you will need to configure CORS on your server side if you are developing your frontend using angular or react
+CSRF will prevent any other website or application to submit data on our behalf on the browser by default. In order to do so you will need to configure CORS on your server side if you are developing your frontend using angular or react
 
 Key Security Concepts (Authentication Filter is the only class, all of the rest are interfaces) -->ver primera slide del curso (las slides ya estan descargadas!) para ver la arquitectura basica de Spring Security (sin ningun tipo de token como JWT ni OAUTH, solo con cookies como jsessionid), aqui mas abajo se explican c/U de sus componentes.
 Todos los siguientes componentes se pueden usar asi como estan o bien customizarlos segun nuestras necesidades.
 Authentication Filter: This is a servlet filter. It receives all http requests, deciding if the user is authenticated or not. If user is not authenticated, it sends http request to the Autentication Manager.
-Authentication Manager: If the username and password are valid, the authentication manager in turn send credentials to Authentication Provided. Posee el metodo Authenticate (Authentication authentication). Esto lo menciona despues cuando escribe código -->It goes through all of the possible providers (que segun https://www.youtube.com/watch?v=qiPh0yrDNas pueden ser LDAP, OAUTH, etc) that support "basic authentication" (porq en el codigo usa "basic authentication" pero creo que deberia ser para otros tipos de autenticacion tambien )selects the first that is available and passes on
-Autentication Provider: this is where the login logic or the authentication logic is defined, so is this component that compares between incoming credentials and credentials form the database. Tambien posee el metodo Authenticate (Authentication authentication).
-User Details Service: The authentication provider will not fetch the user details from the database or from L dap or in memory. It will use user details service for that purpose. Es el componente que mas frecuentemente se customiza, y q tenia el metodo loadByUserName() en versiones anteriores. Actualmente (a partir de la version 3.0) si se quiere customizar UserDetailService, solo se inyecta UserDetailService  como dependencia en la clase donde se escribe el código (clase que normalmente es llamada WebSecurityService)
+Authentication Manager: If the username and password are valid, the authentication manager in turn send credentials to Authentication Provider. 
+Según chatgtp coordina los  envios entre los demas componentes (Authentication Filter, Autentication Provider, etc).
+Autentication Provider: this is where the login logic or the authentication logic is defined, so is this component that compares between incoming credentials and credentials from the database.
+chatgtp-->Each AuthenticationProvider supports a specific authentication method. Por ejemplo DAO con DaoAuthenticationProvider,  LDAP con LdapAuthenticationProvider para Stateful (sesiones) o JWT y OAuth2 para Stateless (token), etc.).
+chatgtp-->El AuthenticationManager delega al AutenticationProvider para la creacion del objeto Authentication  (es decir entre los  dos lo crean).
+Authentication auth = authenticationManager.authenticate( //notar q authenticate() pertenece a AuthenticationManager
+    new UsernamePasswordAuthenticationToken(username, password)); //UsernamePasswordAuthenticationToken pertenece al AutenticationProvider, ojo que no es para crear un token como tal para usarlo en Stateless, es solo  un nombre y puede ser usado  en stateful (cookie)
+User Details Service: The authentication provider will not fetch the user details from the database or from Ldap or in memory. It will use user details service for that purpose. Es el componente que mas frecuentemente se customiza, y q tenia el metodo loadByUserName() en versiones 
+anteriores. Actualmente (a partir de la version 3.0) si se quiere customizar UserDetailService, solo se inyecta UserDetailService como dependencia en la clase donde se escribe el código (clase que normalmente es llamada WebSecurityService). Este es 
+el componente que ve si el  username y el  password ingresados inicialmente en el formulario estan o no en la bbdd (o sea si el usuario se registró previamente).  
 Password Encoder: Autentication Provider also uses a password Encoder because we don't store passwords in plain text so the passwords will be encoded on the database.
 Once the authentication provider checks if the authentication details, the username, password, etc, are correct, then it will send the appropriate response (o sea el autenticacion object segun https://www.youtube.com/watch?v=qiPh0yrDNas )back to the authentication manager.
 Authentication manager hands it back to the authentication filter if the user details are OK.
-Security Context: If the authentication succeeded. The authentication filter will use a authentication success handler and stores that authentication information the user entity itself in a security context (en realidad guarda datos de la sesion), in an instance of security context holder. If the authentication failed, it will use the authentication failure hanler to send the appropiate response to the client.
-
+Security Context: If the authentication succeeded. The authentication filter will use a AuthenticationSuccessHandler and stores that authentication information the user entity itself in a security context (en realidad guarda datos de la sesion), in an instance of security context holder. If the authentication failed, it will use the authentication failure hanler to send the appropiate response to the client.
 handler to send the appropriate response back to the client.
+ is not authenticated -->El usuario pasa su username y password en un formulario de logueo
+ is authenticated-->El usuario manda http requests despues de haberse logueado exitosamente solamente con la cookie tras bambalinas
+Authentication Object: se crea vacío primero en la ida hacia UserDetailsService y si en la vuelta desde UserDetailService el username y el password estan correctos se llena con ellos y 
+Spring Security filters and the Servlet container (Tomcat) lo guardan en el SecurityContext. 
+JSESSIONID cookie: la crea y la almacena el Servlet container (Tomcat) cuando hay una vuelta exitosa desde en la vuelta desde UserDetailService y la envía de vuelta al frontend. No contiene ni username ni password!
+HTTP session: contiene info sobre la sesion, entre otras cosas contiene un identificador  de la JSESSIONID cookie, lo q permite verificar en cada llamada sucesiva si el usuario ya estaba autenticado, ya q este id lo tiene tambien el Authentication Object almacenado en SecurityContext. Los http session se guardan 
+en memoria en el backend (en la memoria de la JVM, pero puede modificarse esto para guardarlas en cache, por ejemplo con Redis)
+En stateful authentication, si el usuario cierra la ventana del frontend, la sesion muere, por lo q al reabrir la ventana tiene q loguearse de nuevo.
+En el backend la sesion tambien puede morir, si hay un periodo largo de inactividad,  si desde el frontend le llega la señal q el usuario se ha deslogueado o si se cae el servidor.
+En stateful authentication en cada llamada despues del logueo 
 
+
+		
+		
+		
 Authentication Filter                          is not authenticated        Autentication Manager             Authentication Provider (customizable or we can use it as a template) <---------->UserDetailsService(Contains data to be checked, its customizable or we can use it as a template)
 (checks if the user is already authenticated) --------------------->                              <--------- (Authenticates the user)<------------------------------------------------------->PasswordEncoder(Encodes)
         |
 		| is authenticated
         v
-AuthenticationSuccessHandler------->SecurityContext (stores user session data for the future).
+AuthenticationSuccessHandler------->SecurityContext (stores user session data (Authentication Object, pero no JSESSIONID) for futures requests)
 
 Proyecto "first_app" -->solo spring security, sin oauth2 ni token ni JWT, para una aplicacion tipica MVC con thymeleaf no se necesitan!!
 1. Creó el proyecto que esta en mi carpeta de desarrollo (fui escribiendo el codigo y guardando en github en musiciancoder).
@@ -69,8 +89,8 @@ En seccion Secure Rest API
 6.Probó en postman con un usuario "ADMIN" y otro usuario "USER". Importante notar que ya sea si usamos WebSecurityConfig o WebSecurityConfig2 es aqui donde va la lógica para configurar la autorizacion (roles), pero esta clase ademas contiene lógica para autenticar que junto con la lógica de UserDetails logra la autenticacion, aunque si usamos 
 custom login para autenticarnos debemos crear un servicio aparte (SecurityServiceImpl en nuestro caso).
 
-En seccion Secure Web App-->en esta seccion se implementa un custom login, para añadir una capa extra de seguridad con respecto a la seccion anterior (de default login mediante basic auth), ya que junto con archivos .html dentro del proyecto (usa Thymeleaf) tiene un token
-de registro (login token, que no es JWT) mediante una clase java (UsernamePasswordAuthenticationToken) que se pasa mediante código al Authentication Manager y al SecurityContext. El token es entonces pasado tras bambalinas automaticamente (el usuario no hace nada!) en el formulario de registro
+En seccion Secure Web App-->en esta seccion se implementa un custom login, para añadir una capa extra de seguridad con respecto a la seccion anterior (de default login mediante basic auth), ya que junto con archivos .html dentro del proyecto (usa Thymeleaf) 
+tiene un objeto de Autenticacion mediante una clase java (UsernamePasswordAuthenticationToken) que se pasa mediante código al Authentication Manager y al SecurityContext. El token es entonces pasado tras bambalinas automaticamente (el usuario no hace nada!) en el formulario de registro
 1.Agregó dependencia de Thymeleaf (vamos a probar con un frontend personalizado en esta seccion).
 2.Agregó 5 archivos html al proyecto y el controlador CouponController.java q contiene las rutas para estos html.
 3.Dio permisos selectivamente segun roles para cada url en metodo configure() de la clase WebSecurityConfig2 (o sea volvió al codigo de la version2) y probó crear un cupon desde el navegador con las rutas a los los html q ya tenia en el proyecto. Le resultó ok.
@@ -123,7 +143,44 @@ Además introfujo los argumentos HttpServletRequest request, HttpServletResponse
  1. Agregó @EnableGlobalMethodSecurity(prePostEnabled=true) en WebSecurityConfig y en el metodo showGetCoupon() de clase CouponController agregó la anotacion @PreAuthorize("hasRole('ADMIN')") 
  2.Probó en el navegador crear un cupon con usuario 'ADMIN' y con usuario 'USER', con este ultimo no pudo porque no estaba autorizado.
  3.En CouponRestController, metodo getCoupon agregó la linea     @PostAuthorize("returnObject.discount<60"). Es para arrojar un error 403 (forbidden, access denied) si es que tenemos un descuento a devolver q sea mayor o igual a 60.
- 4. Agregó la linea @EnableGlobalMethodSecurity(prePostEnabled=true, jsr250Enabled = true, securedEnabled = true) Esto es para usar en el controlador @ROLESALLOWED y @SECURITY respectivamente, q se usaba en versiones anteriores. Al final comentó esta misma linea.
+ 4. Agregó la linea @EnableGlobalMethodSecurity(prePostEnabled=true, jsr250Enabled = true, securedEnabled = true). Esto es para usar en el controlador @ROLESALLOWED y @SECURITY respectivamente, q se usaba en versiones anteriores. Al final comentó esta misma linea.
+ 
+ JWT solo sin OAUTH (esto es mio de chatgtp, no del curso).
+ La idea es autenticarnos desde  un formulario de frontend directamente en el backend con Spring Security, por lo q el objetivo es el mismo q en session based (stateful), pero por medios muy distintos, ya que JWT es stateless.
+ 1.Se llena el formulario con username y password.
+ 2.El backend recibe el username y password, pero no se genera ningun Authentication object en este punto (a diferencia de Session Based), solo chequea que el usuario exista en la bbdd mediante UserDetailService.
+ 3.Si el  paso anterior es exitoso, una clase adicional llamada JwtTokenService, JwtUtil crea el token.
+ Conceptos fundamentales:
+ Headers: el algoritmo para hashear el signature.
+ Payload: username y rol, pero nunca el password.
+ Secret: un string elegido por nosotros mismos. No va dentro del token, pero se usa para generar y verificar el Signature.
+ Signature: que es el resultado de hashear (hashear es encriptar sin q exista la posibilidad de desencriptar) el Header y el Payload mediante el secret.
+ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9-->encoded header
+ eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0-->encoded payload
+ KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30-->hashed (not encoded!) header + payload.
+ 3.El token no se guarda en el backend (esto es lo bueno de stateless autenticacion), solo se manda al frontend que lo almacena en el localStorage o en las cookies.
+ 4.El cliente manda el token en cada peticion al  backend a partir de ahora en la seccion Authorization Headers (recordar postman).
+ 5.En el backend, un JWTFilter (como BearerTokenAuthenticationFilter or your custom JwtAuthenticationFilter) chequea la presencia en el request de un bearer token en el Authorization Header.
+ 6.Lo pasa a JwtDecoder (Jwt jwt = jwtDecoder.decode(token) ); , quien:
+ -  Verifica el signature usando el secret. Para ello no desencripta el signature (no puede, pq esta hackeado). En vez de eso vuelve a hashear el signature y lo compara con el q viene en el token.
+ -  Chequea expiracion e issued time.
+ -  Arroja error si el token es invalido o esta expirado.
+ 7. El token validado se transforma en un objeto de tipo JwtAuthenticationToken, q es una subclase de Authentication Object (o sea aca recien se crea el Autenticacion object). JwtAuthenticationToken auth = new JwtAuthenticationToken(jwt, authorities);
+ Este objeto contiene: Principal (e.g. user ID or email)
+                       Authorities (ROLE_USER, ROLE_ADMIN, etc.)
+                       Token claims.
+ 8.El JwtAuthenticationToken se guarda en SecurityContext manualmente o bien automaticamente como en Session Based Authentication, pero notar q a diferencia de Session Based Authentication donde se crea y guarda Autenticacion Object
+ solo una vez en la sesion, aca se crea y guarda JwtAuthenticationToken en cada request.
+ 
+ Ojo, q tanto la cookie de JSESSIONID como el JWT pueden ser robados desde el frontend. En el caso de JWT como no se guarda ningun token en el backend, no es mucho lo q podemos hacer, pero sí en el frontend.
+ En el caso de q alguien robe el token, la idea es tener las url fundamentales de la aplicacion protegidas con @PreAuthorize("hasRole('ADMIN'),  entonces si el hacker quiere cambiar de rol user a admin en el payload para tener acceso
+ a privilegios mayores no podrá pq entonces tendría q modificar el  token. 
+ 
+ 
+ 
+ 
+ 
  
  OAUTH
  Ojo que cuando el indio habla de oauth en realidad se refiere a oauth2, ya que agrega la libreria de oauth2 (para el servidor de recursos y para el servidor de autorizacion) al proyecto de esta seccion. 
@@ -153,7 +210,7 @@ This is where our private and public keys are stored. This file is password prot
 And also for each private key we give alias, which is like a username and also a password. These public keys can be exported using the key tool into a certificate, and then we can distribute that certificate across our client applications so that they can use the public key and do the encryption in case of signatures. They will use the public key to verify if the signature is really from the expected user.
 Cuadro de arquitectura de mas arriba (Key Security Concepts) --> spring security en general, pero se ve mejor cuando un usuario quiere ingresar directamente a la aplicacion de spring protegida con springsecurity por medio de thymeleaf por ejemplo. Proyecto couponservice es un ejemplo de esto.
                                                        OAUTH --> usar el cuadro de arquitectura user, client app, resourceserver, authorizationserver. Es para logueo y comunicacion entre aplicaciones por medio de credenciales de usuario.
-													     JWT -->complementario a OAUTH. Elimina el paso de verificacion de token desde resourceserver a authorizationserver en cada peticion. Antiguamente se podía usar jwt sin oauth con la librería spring-security-jwt, pero ahora se obliga a usar con oauth2.
+
 													 
 1.Generó una publicKey (que no es otra cosa q un string super largo) con linea de comando de keytool (ver video). a todas las variables de credenciales les puso jwtiscool en este comando, por si acaso.
 2.Pasó los proyectos de authserverlatest y resourceserverlatest para importarlos (estan bajo la carpeta "todo", a mi no me los agarró como proyecto maven pero segui adelante sin calentarme la cabeza). 
